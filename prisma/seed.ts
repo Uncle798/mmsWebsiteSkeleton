@@ -141,7 +141,7 @@ async function createEmployees() {
 
 async function randomEmployee() {
    const employees = await prisma.user.findMany({
-      select: { id: true }
+      select: { userId: true }
    });
    const employee = employees[Math.floor(Math.random() * employees.length)];
    return employee;
@@ -155,7 +155,7 @@ async function createLease(unit: UnitPricing, leaseStart, leaseEnd: Date | null,
             {customerLeases: {
                none: {}
             }},
-            { id:{notIn:employeeList} }
+            { userId:{notIn:employeeList} }
          ]
       },
    });
@@ -167,12 +167,13 @@ async function createLease(unit: UnitPricing, leaseStart, leaseEnd: Date | null,
    const leaseEnded:Date | null = leaseEnd;
    const lease = await prisma.lease.create({
      data: {
-       customerId: customer!.id,
-       employeeId: randEmployee.id,
-       contactInfoId: contactInfos?.id,
+       customerId: customer!.userId,
+       employeeId: randEmployee.userId,
+       contactInfoId: contactInfos?.contactId,
        unitNum: unit.unitNum,
        price: unit.price,
        leaseEffectiveDate: new Date(leaseStart),
+       leaseReturnedAt: new Date(leaseStart),
        leaseEnded,
      },
    });
@@ -203,6 +204,7 @@ async function  main (){
       console.error(error);
    });
    for await (const user of users) {
+      
       await prisma.contactInfo.create({
          data:{
             email: user.email,
@@ -226,7 +228,7 @@ async function  main (){
          employee: true
       }
    })
-   const employeeList = employees.map((employee) => employee.id);
+   const employeeList = employees.map((employee) => employee.userId);
    const randEmployee = employees[Math.floor(Math.random()*employees.length)];
    let lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
    for await (const unit of pricedUnits) {
@@ -255,7 +257,7 @@ async function  main (){
       if(today.diff(leaseEnd, 'months') <3){
          await prisma.lease.update({
             where:{
-               id: lease.id
+               leaseId: lease.leaseId
             },
             data:{
                leaseEnded: null
@@ -272,7 +274,7 @@ async function  main (){
          const invoice = await prisma.invoice.create({
            data: {
              customerId: lease.customerId,
-             leaseId: lease.id,
+             leaseId: lease.leaseId,
              amount: lease.price,
              invoiceCreated: month,
              unitNum: lease.unitNum,
@@ -295,11 +297,11 @@ async function  main (){
             unitNum: invoice.unitNum,
             unitPrice: invoice.amount, 
             amount: invoice.amount, 
-            receiverId: employee.id,
+            receiverId: employee.userId,
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
             recordNum: faker.string.uuid(),
-            invoiceNum: invoice.id
+            invoiceNum: invoice.invoiceId
          }
       });
    }                                                     

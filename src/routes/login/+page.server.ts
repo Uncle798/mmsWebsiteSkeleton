@@ -30,8 +30,10 @@ export const actions:Actions = {
       const user = await prisma.user.findFirst({
          where: {
             email: validEmail
-         }
-      })
+         },
+         omit:{
+            passwordHash:false,
+      }})
       if(!user){
          return message(form, 'Invalid username or password');
       }

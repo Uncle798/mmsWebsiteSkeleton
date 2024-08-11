@@ -64,7 +64,7 @@ export const actions:Actions = {
 				passwordHash: hashedPass
 			}
 		});
-		const session = await lucia.createSession(user.id, {});
+		const session = await lucia.createSession(user.userId, {});
 		const sessionCookie = await lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.', 

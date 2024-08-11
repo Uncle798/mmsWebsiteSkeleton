@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -11,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
+  id               String          @id @default(cuid()) @map("id")
   createdAt        DateTime        @default(now()) @map("created_at")
   updatedAt        DateTime?       @updatedAt @map("updated_at")
   email            String?         @unique
@@ -39,7 +40,7 @@ model User {
 }
 
 model ContactInfo {
-  id                 String   @id @default(cuid())
+  contactId          String   @id @default(cuid())
   user               User?    @relation(fields: [email, givenName, familyName], references: [email, givenName, familyName], onUpdate: NoAction)
   email              String
   givenName          String?
@@ -69,7 +70,7 @@ model Unit {
 }
 
 model Pricing {
-  id          String        @id @default(cuid())
+  pricingId   String        @id @default(cuid())
   size        String
   price       Int
   startDate   DateTime      @default(now())
@@ -83,7 +84,7 @@ model Pricing {
 }
 
 model UnitPricing {
-  id              String    @id @default(cuid())
+  unitPricingId   String    @id @default(cuid())
   unit            Unit      @relation(fields: [unitNum], references: [num])
   unitNum         String
   pricing         Pricing?  @relation(fields: [price, startDate, endDate], references: [price, startDate, endDate])
@@ -98,12 +99,12 @@ model UnitPricing {
 }
 
 model Lease {
-  id                 String      @id @default(cuid())
+  leaseId            String      @id @default(cuid())
   customer           User        @relation(name: "customer", fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   customerId         String
   employee           User        @relation(name: "employee", fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employeeId         String
-  contactInfo        ContactInfo @relation(fields: [contactInfoId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  contactInfo        ContactInfo @relation(fields: [contactInfoId], references: [contactId], onUpdate: NoAction, onDelete: NoAction)
   contactInfoId      String
   unitPrice          UnitPricing @relation(fields: [price, unitNum], references: [price, unitNum], onUpdate: NoAction)
   unitNum            String
@@ -114,12 +115,12 @@ model Lease {
   leaseEnded         DateTime?
   invoices           Invoice[]
 
-  @@unique([id, unitNum, price])
-  @@index([id, leaseCreatedAt(sort: Desc)])
+  @@unique([leaseId, unitNum, price])
+  @@index([leaseId, leaseCreatedAt(sort: Desc)])
 }
 
 model PaymentRecord {
-  id               String      @id @default(cuid())
+  paymentId        String      @id @default(cuid())
   customer         User        @relation(name: "customer", fields: [customerId], references: [id])
   customerId       String
   unitNum          String?
@@ -135,26 +136,26 @@ model PaymentRecord {
   invoiceNum       String?
   invoice          Invoice?
 
-  @@unique([paymentCompleted, id])
-  @@index([id, paymentCompleted(sort: Desc)])
+  @@unique([paymentCompleted, paymentId])
+  @@index([paymentId, paymentCompleted(sort: Desc)])
 }
 
 model Invoice {
-  id              String         @id @default(cuid())
+  invoiceId       String         @id @default(cuid())
   customer        User?          @relation(fields: [customerId], references: [id])
   customerId      String?
-  lease           Lease?         @relation(fields: [leaseId, unitNum, price], references: [id, unitNum, price])
+  lease           Lease?         @relation(fields: [leaseId, unitNum, price], references: [leaseId, unitNum, price])
   leaseId         String?
   unitNum         String
   price           Int
   amount          Int
   invoiceCreated  DateTime       @default(now())
-  paymentRecord   PaymentRecord? @relation(fields: [paymentRecordId, invoicePaid], references: [id, paymentCompleted], onUpdate: Cascade)
+  paymentRecord   PaymentRecord? @relation(fields: [paymentRecordId, invoicePaid], references: [paymentId, paymentCompleted], onUpdate: Cascade)
   paymentRecordId String?        @unique
   invoicePaid     DateTime?      @unique
 
   @@unique([paymentRecordId, invoicePaid])
-  @@index([id, invoiceCreated(sort: Desc)])
+  @@index([invoiceId, invoiceCreated(sort: Desc)])
 }
 
 enum PaymentType {

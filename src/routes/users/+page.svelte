@@ -8,7 +8,7 @@
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
    export let data;
-   const handler = new DataHandler(data.users, { rowsPerPage: 50})
+   const handler = new DataHandler(data.data, { rowsPerPage: 50})
    const rows = handler.getRows();
 </script>
 
@@ -25,8 +25,13 @@
          <th>Email address</th>
          <th>Organization name</th>
          <th>Address 1</th>
-         <th>Address 2</th>
-         <th>Address 3</th>
+         <!-- <th>Address 2</th>
+         <th>Address 3</th> -->
+         <th>City</th>
+         <th>State</th>
+         <th>Zip</th>
+         <th>Lease Start Date</th>
+         <th>Lease End Date</th>
       </tr>
       <tr>
          <ThFilter {handler} filterBy='familyName' />
@@ -34,11 +39,13 @@
          <ThFilter {handler} filterBy='emailAddress' />
          <ThFilter {handler} filterBy='organizationName' />
          <ThFilter {handler} filterBy='address1' />
-         <ThFilter {handler} filterBy='address2' />
-         <ThFilter {handler} filterBy='address3' />
-         <ThFilter {handler} filterBy='City' />
-         <ThFilter {handler} filterBy='State' />
-         <ThFilter {handler} filterBy='Zip' />
+         <!-- <ThFilter {handler} filterBy='address2' />
+         <ThFilter {handler} filterBy='address3' /> -->
+         <ThFilter {handler} filterBy='city' />
+         <ThFilter {handler} filterBy='state' />
+         <ThFilter {handler} filterBy='zip' />
+         <ThFilter {handler} filterBy='leaseStart' />
+         <ThFilter {handler} filterBy='leaseEndDate' />
       </tr>
    </thead>
    <tbody>
@@ -47,21 +54,14 @@
             <td>{row.familyName}</td>
             <td>{row.givenName}</td>
             <td>{row.email}</td>
-            <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.organizationName}</td>
-            <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.address1}</td>
-            {#if data.contactInfos.find((contact)=> contact.email === row.email)?.address2}
-               <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.address2}</td>
-               {:else}
-               <td></td>
-               {/if}
-               {#if data.contactInfos.find((contact)=> contact.email === row.email)?.address3}
-               <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.address3}</td>
-               {:else}
-               <td></td>
+            <td>{row.contactInfo.find((contact)=> contact.email === row.email)?.organizationName}</td>
+            
+            {#if row.customerLeases.find((lease)=> lease.customerId === row.id)?.leaseEnded}
+               <td>{row.customerLeases.find((lease)=> lease.customerId === row.id)?.leaseEnded}</td>
+            {:else}
+               <td>Current Customer</td>
             {/if}
-            <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.city}</td>
-            <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.state}</td>
-            <td>{data.contactInfos.find((contact)=> contact.email === row.email)?.zip}</td>
+
          </tr>
       {/each}
    </tbody>
