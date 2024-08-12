@@ -36,7 +36,7 @@
       <tr>
          <ThFilter {handler} filterBy='familyName' />
          <ThFilter {handler} filterBy='givenName' />
-         <ThFilter {handler} filterBy='emailAddress' />
+         <ThFilter {handler} filterBy='email' />
          <ThFilter {handler} filterBy='organizationName' />
          <ThFilter {handler} filterBy='address1' />
          <!-- <ThFilter {handler} filterBy='address2' />
@@ -54,14 +54,25 @@
             <td>{row.familyName}</td>
             <td>{row.givenName}</td>
             <td>{row.email}</td>
-            <td>{row.contactInfo.find((contact)=> contact.email === row.email)?.organizationName}</td>
-            
-            {#if row.customerLeases.find((lease)=> lease.customerId === row.id)?.leaseEnded}
-               <td>{row.customerLeases.find((lease)=> lease.customerId === row.id)?.leaseEnded}</td>
+            {#if !row.organizationName}
+            <td>None</td>
             {:else}
-               <td>Current Customer</td>
+            <td>{row.organizationName}</td>
             {/if}
-
+            <td>{row.address1}</td>
+            <td>{row.city}</td>
+            <td>{row.state}</td>
+            <td>{row.zip}</td>
+            {#if row.leaseEffectiveDate}
+               <td>{row.leaseEffectiveDate}</td>
+            {:else if !row.leaseEnded}
+               <td>No leases</td>
+            {/if}
+            {#if row.leaseEnded}
+               <td>{row.leaseEnded}</td>
+            {:else if !row.leaseEffectiveDate}
+               <td>No leases</td>
+            {/if}
          </tr>
       {/each}
    </tbody>
@@ -95,6 +106,7 @@
    tbody tr:hover {
        background: #f5f5f5;
        transition: background, 0.2s;
+       color: #0f0f0f;
    }
    td {
        padding: 4px 20px;

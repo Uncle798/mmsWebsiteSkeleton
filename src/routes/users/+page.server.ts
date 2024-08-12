@@ -13,24 +13,26 @@ export const load:PageServerLoad = async ({locals }) =>{
       orderBy: {
          familyName: 'asc'
       }, 
-      include:{
-         customerLeases: true,
-         employeeLeases: true,
-         contactInfo: true,
+      where:{
+         employee: false
+      },
+   });
+   const leases = await prisma.lease.findMany()
+   const contactInfo = await prisma.contactInfo.findMany({
+      omit: {
+         familyName: true,
+         givenName: true,
       }
    });
-   const flattenObject = (obj: any, prefix = '.') =>{
-      const flattened: any = {}
-      Object.keys((obj)).forEach((key) => {
-         if(typeof obj[key] === 'object' && obj[key] !== null){
-            Object.assign(flattened, flattenObject(obj[key], prefix));
-         } else {
-            flattened[prefix+key] = obj[key]
-         }
-      });
-      return flattened
-   }
-   const data = flattenObject(users.slice(0,2), '.');
-   console.log(data);
+   const data:TableData[] = [];
+   users.forEach((user) =>{
+      const lease = leases.find((lease) => lease.customerId === user.id);
+      const contact = contactInfo.find((info) => info.email === user.email);
+      const datum:TableData = {} as TableData;
+      Object.assign(datum, user);
+      Object.assign(datum, contact)
+      Object.assign(datum, lease);
+      data.push(datum);
+   })
    return { data }
 }
