@@ -36,7 +36,7 @@ export async function load({ params, locals }) {
    if(unit && currentLease){
       const currentCustomer = await prisma.contactInfo.findUnique({
          where:{
-            id: currentLease?.contactInfoId
+            contactId: currentLease?.contactInfoId
          }
       })
       const leaseEmployee = await prisma.user.findUnique({
