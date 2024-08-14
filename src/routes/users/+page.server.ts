@@ -1,38 +1,42 @@
 import prisma from "$lib/server/prisma";
-import { redirect } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
+import { redirect, fail } from "@sveltejs/kit";
+import { superValidate, message } from 'sveltekit-superforms'
+import { zod } from 'sveltekit-superforms/adapters'
+import { z } from 'zod'
+import type { PageServerLoad, Actions } from "../$types";
 import type { ContactInfo, Lease, User } from "@prisma/client";
 
 export type TableData = User & ContactInfo & Lease
+
+const userFormSchema = z.object({
+   familyName: z.string().min(1).max(255).trim(),
+   givenName: z.string().min(1).max(255).trim(),
+   email: z.string().email().min(3).max(255).trim(),
+   organizationName: z.string().min(1).max(512).trim(),
+   userId: z.string(),
+})
 
 export const load:PageServerLoad = async ({locals }) =>{
    if(!locals.user){
       redirect(302, '/login');
    }
+   const form = await(superValidate(zod(userFormSchema)))
    const users = await prisma.user.findMany({
       orderBy: {
          familyName: 'asc'
       }, 
       where:{
-         employee: false
-      },
+         employee: false,
+      }, 
    });
-   const leases = await prisma.lease.findMany()
-   const contactInfo = await prisma.contactInfo.findMany({
-      omit: {
-         familyName: true,
-         givenName: true,
+   return { users, form }
+}
+
+export const actions:Actions = {
+   default: async (event) =>{
+      const form = await superValidate(event.request, zod(userFormSchema));
+      if(!form.valid){
+         return fail(400, {form});
       }
-   });
-   const data:TableData[] = [];
-   users.forEach((user) =>{
-      const lease = leases.find((lease) => lease.customerId === user.id);
-      const contact = contactInfo.find((info) => info.email === user.email);
-      const datum:TableData = {} as TableData;
-      Object.assign(datum, user);
-      Object.assign(datum, contact)
-      Object.assign(datum, lease);
-      data.push(datum);
-   })
-   return { data }
+   }
 }

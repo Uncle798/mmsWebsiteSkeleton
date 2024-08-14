@@ -81,6 +81,7 @@
    tbody tr:hover {
        background: #f5f5f5;
        transition: background, 0.2s;
+       color: #0f0f0f;
    }
    td {
        padding: 4px 20px;

@@ -28,17 +28,12 @@ export const load:PageServerLoad = async ({locals}) =>{
       select:{
          unitNum: true,
          price: true,
-         id: true,
+         unitPricingId: true,
          leases:{
             select:{
                leaseEffectiveDate: true,
                leaseEnded: true,
                price: true, 
-               contactInfo:{
-                  select:{
-                     organizationName: true,
-                  }
-               },
                customer:{
                   select:{
                      familyName: true,
@@ -76,21 +71,21 @@ export const load:PageServerLoad = async ({locals}) =>{
       let leasedFor: number = 0;
       let emptyFor: number = 0;
       const today = dayjs();
-      leases.forEach((lease) => {
-         const leaseStartDate = dayjs(lease.leaseEffectiveDate);
-         const contact = lease.customer;
-         if(!lease.leaseEnded){
-            leasedFor = today.diff(leaseStartDate, 'months');
-            familyName = contact.familyName;
-            givenName = contact.givenName;
-            if(lease.contactInfo.organizationName){
-               organizationName = lease.contactInfo.organizationName;
-            }
-         }
-         if(lease.leaseEnded < lastLeaseDate){
-            lastLeaseDate = lease.leaseEnded;
-         }
-      });
+      // leases.forEach((lease) => {
+      //    const leaseStartDate = dayjs(lease.leaseEffectiveDate);
+      //    const contact = lease.customer;
+      //    if(!lease.leaseEnded){
+      //       leasedFor = today.diff(leaseStartDate, 'months');
+      //       familyName = contact.familyName;
+      //       givenName = contact.givenName;
+      //       if(lease.contactInfo.organizationName){
+      //          organizationName = lease.contactInfo.organizationName;
+      //       }
+      //    }
+      //    if(lease.leaseEnded < lastLeaseDate){
+      //       lastLeaseDate = lease.leaseEnded;
+      //    }
+      // });
       if(lastLeaseDate){
          emptyFor = today.diff(lastLeaseDate, 'months');
          familyName = null;

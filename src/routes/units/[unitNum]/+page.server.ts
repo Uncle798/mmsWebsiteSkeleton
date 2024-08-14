@@ -1,6 +1,8 @@
 import prisma from '$lib/server/prisma';
+import type { UnitPricing, Lease, User } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 
+type TableData = UnitPricing & Lease & User 
 
 export async function load({ params, locals }) {
    if(!locals.user){
