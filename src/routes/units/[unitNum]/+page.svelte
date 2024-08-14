@@ -1,6 +1,5 @@
 <script lang="ts">
    export let data
-   console.log(data)
 </script>
 
 <h1>Unit: {data.unit.num.replace(/^0+/gm, '')}</h1>
