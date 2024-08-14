@@ -66,7 +66,7 @@ async function deleteAll() {
 
 async function createEmployees() {
    const employees: User[] = [];
-   const employeePass = await hash(process.env.EMPLOYEE_PASSWORD, {
+   const employeePass = await hash(process.env.EMPLOYEE_PASSWORD!, {
       memoryCost: 19456,
       timeCost: 2,
       outputLen: 32,
@@ -141,7 +141,10 @@ async function createEmployees() {
 
 async function randomEmployee() {
    const employees = await prisma.user.findMany({
-      select: { userId: true }
+      where:{
+         employee: true
+      },
+      select: { id: true }
    });
    const employee = employees[Math.floor(Math.random() * employees.length)];
    return employee;
@@ -155,21 +158,21 @@ async function createLease(unit: UnitPricing, leaseStart, leaseEnd: Date | null,
             {customerLeases: {
                none: {}
             }},
-            { userId:{notIn:employeeList} }
+            { id:{notIn:employeeList} }
          ]
       },
    });
    const contactInfos = await prisma.contactInfo.findFirst({
       where: {
-         email: customer?.email
+         email: customer!.email!
       }
    })
    const leaseEnded:Date | null = leaseEnd;
    const lease = await prisma.lease.create({
      data: {
-       customerId: customer!.userId,
-       employeeId: randEmployee.userId,
-       contactInfoId: contactInfos?.contactId,
+       customerId: customer!.id,
+       employeeId: randEmployee.id,
+       contactInfoId: contactInfos!.contactId,
        unitNum: unit.unitNum,
        price: unit.price,
        leaseEffectiveDate: new Date(leaseStart),
@@ -193,27 +196,35 @@ async function  main (){
       await prisma.unitPricing.create({
          data:{
             unitNum: unit.num,
-            price: price.price,
+            price: price!.price,
             startDate: new Date
          }
       });
    }
-   const users = await prisma.user.createManyAndReturn({
+   const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
-   }).catch((error)=>{
-      console.error(error);
-   });
+   })
+   for(let i=0; i<users.length; i++){
+      if(i%5 === 0){
+         await prisma.user.update({
+            where:{
+               id: users[i].id
+            },
+            data: {
+               organizationName: faker.company.name()
+            }
+         })
+      }
+   }
    for await (const user of users) {
-      
       await prisma.contactInfo.create({
          data:{
-            email: user.email,
+            email: user.email!,
             address1: faker.location.streetAddress(), 
             city: faker.location.city(),
             state: faker.location.state({abbreviated: true}),
             zip: faker.location.zipCode(),
             phoneNum1: faker.phone.number(),
-            organizationName: faker.company.name()
          }
       }) 
    }
@@ -228,7 +239,7 @@ async function  main (){
          employee: true
       }
    })
-   const employeeList = employees.map((employee) => employee.userId);
+   const employeeList = employees.map((employee) => employee.id);
    const randEmployee = employees[Math.floor(Math.random()*employees.length)];
    let lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
    for await (const unit of pricedUnits) {
@@ -269,7 +280,7 @@ async function  main (){
    for await (const lease of leases){
       const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
       const numMonths = dayjs(leaseEndDate).diff(lease.leaseEffectiveDate, 'months');
-      const months = Array.from({length:numMonths})
+      const months:Date[] = Array.from({length:numMonths})
       for await (const month of months) {
          const invoice = await prisma.invoice.create({
            data: {
@@ -293,11 +304,11 @@ async function  main (){
       const record = await prisma.paymentRecord.create({
          data:{
             paymentType: paymentType,
-            customerId: invoice.customerId,
+            customerId: invoice!.customerId!,
             unitNum: invoice.unitNum,
             unitPrice: invoice.amount, 
             amount: invoice.amount, 
-            receiverId: employee.userId,
+            receiverId: employee.id,
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
             recordNum: faker.string.uuid(),
