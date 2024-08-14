@@ -18,6 +18,7 @@ model User {
   email            String?         @unique
   givenName        String?
   familyName       String?
+  organizationName String?
   emailVerified    DateTime?       @map("email_verified")
   passwordHash     String?         @map("password_hash")
   employee         Boolean         @default(false)
@@ -41,11 +42,8 @@ model User {
 
 model ContactInfo {
   contactId          String   @id @default(cuid())
-  user               User?    @relation(fields: [email, givenName, familyName], references: [email, givenName, familyName], onUpdate: NoAction)
+  user               User?    @relation(fields: [email], references: [email], onUpdate: NoAction)
   email              String
-  givenName          String?
-  familyName         String?
-  organizationName   String?
   address1           String
   address2           String?
   address3           String?
