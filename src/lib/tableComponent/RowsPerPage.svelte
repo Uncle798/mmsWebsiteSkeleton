@@ -17,17 +17,3 @@
    rows per page
 </aside>
 
-
-<style>
-   aside {
-       display: flex;
-       justify-content: flex-start;
-       align-items: center;
-       height: 32px;
-       color: #616161;
-   }
-   select {
-       margin: 0 2px;
-       border-radius: .25rem;
-   }
-</style>
