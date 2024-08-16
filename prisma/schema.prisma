@@ -42,8 +42,8 @@ model User {
 
 model ContactInfo {
   contactId          String   @id @default(cuid())
-  user               User?    @relation(fields: [email], references: [email], onUpdate: NoAction)
-  email              String
+  user               User?    @relation(fields: [userId], references: [id], onUpdate: NoAction)
+  userId             String
   address1           String
   address2           String?
   address3           String?
