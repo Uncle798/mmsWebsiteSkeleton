@@ -6,12 +6,12 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from "@sveltejs/kit";
 
 const newLeaseSchema = z.object({
-
+   unitNum: z.string().min(3).max(3)
 })
 
 
 export const load:PageServerLoad = (async ({locals}) =>{
-   if(!locals.user!.employee){
+   if(!locals.user?.employee){
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
@@ -19,8 +19,22 @@ export const load:PageServerLoad = (async ({locals}) =>{
       orderBy:{
          unitNum: 'asc'
       },
+      where:{
+         leases:{
+            some:{
+               leaseEnded:{
+                  not:null
+               },
+            }
+         }
+      }
    })
-   return { form, units }
+   const users = await prisma.user.findMany({
+      orderBy: {
+         familyName: "asc"
+      }
+   })
+   return { form, units, users }
 })
 
 export const actions:Actions = {
