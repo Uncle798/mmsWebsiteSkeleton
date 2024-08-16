@@ -1,20 +1,6 @@
 <script lang="ts">
-
-   export let address : {
-      contactId: string,
-      email: string;
-      address1: string;
-      address2: string | null;
-      address3: string | null;
-      city: string;
-      state: string;
-      zip: string;
-      phoneNum1: string;
-      phoneNum2: string | null;
-      phoneNum1Validated: boolean;
-      phoneNum2Validated: boolean | null;
-      softDelete: boolean;
-   }
+   import type {ContactInfo} from 'prisma/prisma-client'
+   export const address:ContactInfo = {} as ContactInfo
 </script>
 
 <div class="card p-4">
