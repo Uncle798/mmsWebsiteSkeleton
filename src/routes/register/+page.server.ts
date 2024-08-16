@@ -8,26 +8,26 @@ import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 
 const registerSchema = z.object({
-   email: z.string().email().min(3).max(255).trim(),
+   email: z.string().email().min(3).max(255).trim().toLowerCase(),
    password: z.string().min(6, 'Password must be at least 6 characters')
       .max(255,'Password can\'t be longer than 255 characters').trim(),
    passwordConfirm: z.string().min(6, 'Password must be at least 6 characters')
       .max(255,'Password can\'t be longer than 255 characters').trim(),
 })
-// .superRefine(({password, passwordConfirm}, contex)=>{
-//    if(passwordConfirm !== password){
-//       contex.addIssue({
-//          code: 'custom',
-//          message: 'Password must match confirm password', 
-//          path: ['password']
-//       })
-//       contex.addIssue({
-//          code: 'custom',
-//          message: 'Password must match confirm password', 
-//          path: ['confirmPassword']
-//       })
-//    }
-// })
+.superRefine(({password, passwordConfirm}, context)=>{
+   if(passwordConfirm !== password){
+      context.addIssue({
+         code: 'custom',
+         message: 'Password must match confirm password', 
+         path: ['password']
+      })
+      context.addIssue({
+         code: 'custom',
+         message: 'Password must match confirm password', 
+         path: ['confirmPassword']
+      })
+   }
+})
 
 
 export const load: PageServerLoad = (async () => {

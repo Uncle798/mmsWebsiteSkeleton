@@ -1,14 +1,14 @@
 import prisma from '$lib/server/prisma';
-import type { UnitPricing, Lease, User } from '@prisma/client';
+import { handleLoginRedirect } from "$lib/utils";
+
 import { error, redirect } from '@sveltejs/kit';
 
-type TableData = UnitPricing & Lease & User 
 
-export async function load({ params, locals }) {
-   if(!locals.user){
-      redirect(302, '/login')
+export async function load(event) {
+   if(!event.locals.user){
+      throw redirect(302, handleLoginRedirect(event));
    }
-   const unitNum = params.unitNum;
+   const unitNum = event.params.unitNum;
    const unitPrice = await prisma.unitPricing.findFirst({
       where: {
          AND:[

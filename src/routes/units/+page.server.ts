@@ -1,6 +1,7 @@
  import prisma from "$lib/server/prisma";
 import  dayjs  from 'dayjs'
 import { redirect } from "@sveltejs/kit";
+import { handleLoginRedirect } from "$lib/utils";
 
 import type { PageServerLoad } from "../$types";
 
@@ -14,9 +15,9 @@ type TableData = {
    emptyFor: number,
 }
 
-export const load:PageServerLoad = async ({locals}) =>{ 
-   if(!locals.user){
-      redirect(302, '/login');
+export const load:PageServerLoad = async (event) =>{ 
+   if(!event.locals.user){
+      throw redirect(302,handleLoginRedirect(event))
    }
    const units = await prisma.unitPricing.findMany({
       where:{

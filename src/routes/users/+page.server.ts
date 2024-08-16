@@ -1,10 +1,11 @@
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
-import { superValidate, message } from 'sveltekit-superforms'
+import { superValidate } from 'sveltekit-superforms'
 import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 import type { PageServerLoad, Actions } from "../$types";
 import type { ContactInfo, Lease, User } from "@prisma/client";
+import { handleLoginRedirect } from "$lib/utils";
 
 export type TableData = User & ContactInfo & Lease
 
@@ -16,9 +17,9 @@ const userFormSchema = z.object({
    userId: z.string(),
 })
 
-export const load:PageServerLoad = async ({locals }) =>{
-   if(!locals.user){
-      redirect(302, '/login');
+export const load:PageServerLoad = async (event) =>{
+   if(!event.locals.user){
+      throw redirect(302, handleLoginRedirect(event));
    }
    const form = await(superValidate(zod(userFormSchema)))
    const users = await prisma.user.findMany({

@@ -1,14 +1,15 @@
 import prisma from "$lib/server/prisma";
 import { redirect } from "@sveltejs/kit";
 import type { PaymentRecord, User } from "@prisma/client";
+import { handleLoginRedirect } from "$lib/utils.js";
 
 export type PaymentTableData = PaymentRecord & User
 
-export async function load({ params, locals}) {
-   if(!locals.user?.employee){
-      redirect(302, '/login')
+export async function load(event) {
+   if(!event.locals.user?.employee){
+      throw redirect(302, handleLoginRedirect(event));
    }
-   const userId = params.userId;
+   const userId = event.params.userId;
    const dbUser = await prisma.user.findUnique({
       where:{
          id:userId
@@ -16,7 +17,7 @@ export async function load({ params, locals}) {
    })
    const contactInfo = await prisma.contactInfo.findMany({
       where:{
-         email: dbUser!.email!,
+         userId:dbUser?.id,
          softDelete: false
       }
    })
