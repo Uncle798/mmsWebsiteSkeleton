@@ -29,7 +29,7 @@ const prisma = new PrismaClient({
 //         });
 
 const userData = Array.from({length:numUsers}).map(()=>({
-   email: faker.internet.email(),
+   email: '',
    passwordHash: hashedPass,
    givenName: faker.person.firstName(),
    familyName: faker.person.lastName()
@@ -204,6 +204,9 @@ async function  main (){
    }
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(deleteEndTime, 'ms')} ms`);
+   userData.forEach((user)=>{
+      user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
+   })
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
    })
