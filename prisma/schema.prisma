@@ -19,7 +19,7 @@ model User {
   givenName        String?
   familyName       String?
   organizationName String?
-  emailVerified    DateTime?       @map("email_verified")
+  emailVerified    Boolean?        @map("email_verified")
   passwordHash     String?         @map("password_hash")
   employee         Boolean         @default(false)
   admin            Boolean         @default(false)
@@ -32,7 +32,7 @@ model User {
   paymentReceived  PaymentRecord[] @relation(name: "employee")
   customerInvoices Invoice[]
   session          Session[]
-  account          Account[]
+  verification     Verification[]
 
   @@unique([id, email])
   @@unique([email, givenName, familyName])
@@ -170,48 +170,11 @@ model Session {
   user User @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
-model Account {
-  id                 String    @id @default(cuid())
-  compoundId         String    @unique @map(name: "compound_id")
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId             String    @map("user_id")
-  providerType       String    @map("provider_type")
-  providerId         String    @map("provider_id")
-  providerAccountId  String    @map("provider_account_id")
-  refreshToken       String?   @map("refresh_token")
-  accessToken        String?   @map("access_token")
-  accessTokenExpires DateTime? @map("access_token_expires")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
-  scope              String?
-  sessionState       String?   @map("session_state")
-
-  @@unique([providerAccountId, providerId])
-  @@index([providerAccountId], name: "providerAccountId")
-  @@index([providerId], name: "providerId")
-  @@index([userId], name: "userId")
-  @@map("accounts")
-}
-
-model VerificationToken {
-  id                  String                 @id @default(cuid())
-  identifier          String
-  token               String                 @unique
-  expires             DateTime
-  createdAt           DateTime               @default(now())
-  updatedAt           DateTime               @updatedAt
-  identifierToken     verificationRequests[] @relation(name: "identifierToken")
-  verificationRequest verificationRequests?  @relation(fields: [requestId], references: [id])
-  requestId           String?                @map("identifier_token")
-
-  @@unique([identifier, token])
-  @@map("verificationtokens")
-}
-
-model verificationRequests {
-  id                String              @id @default(cuid())
-  identifier        String
-  verificationToken VerificationToken   @relation(fields: [token, identifier], references: [token, identifier], name: "identifierToken")
-  token             String
-  VerificationToken VerificationToken[]
+model Verification {
+  id        String   @id @default(cuid())
+  code      String
+  userId    String   @map("user_id")
+  user      User     @relation(references: [id, email], fields: [userId, email])
+  email     String
+  expiresAt DateTime @map("expires_at")
 }
