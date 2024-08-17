@@ -178,3 +178,9 @@ model Verification {
   email     String
   expiresAt DateTime @map("expires_at")
 }
+
+model PasswordReset {
+  tokenHash String   @unique() @map("token_hash")
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+}
