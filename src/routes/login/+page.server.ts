@@ -5,6 +5,7 @@ import { verify } from '@node-rs/argon2';
 import { superValidate, message } from 'sveltekit-superforms'
 import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod';
+import { ratelimit } from "$lib/server/redis";
 import type { Actions, PageServerLoad } from "./$types";
 
 const loginSchema = z.object({
@@ -27,6 +28,11 @@ export const actions:Actions = {
       }
       const validEmail = form.data.email;
       const validPass = form.data.password;
+      const { success, reset } = await ratelimit.login.limit(event.getClientAddress())
+		if(!success) {
+			const timeRemaining = Math.floor((reset - Date.now()) /1000);
+			return message(form, `Please wait ${timeRemaining}s before trying again.`)
+		}
       const user = await prisma.user.findFirst({
          where: {
             email: validEmail

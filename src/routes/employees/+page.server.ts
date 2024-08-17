@@ -3,7 +3,7 @@ import { redirect } from "@sveltejs/kit";
 import z from 'zod'
 import { superValidate } from "sveltekit-superforms";
 import { zod } from 'sveltekit-superforms/adapters'
-import type { PageServerLoad } from "../$types";
+import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
 
 
@@ -31,7 +31,7 @@ export const actions:Actions = {
       const form = await superValidate(event.request, zod(employeeRemoveSchema))
       console.log(form)
       if(form.valid){
-         user = await prisma.user.update({
+         const user = await prisma.user.update({
             where:{
                id: form.data.employeeId,
             },
