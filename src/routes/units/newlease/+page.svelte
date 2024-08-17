@@ -50,9 +50,9 @@
       userEmailSelection = event.detail.label;
       userNameDenyList.push(event.detail.value)
    }
-   function clearSearch()=>{
-      userEmailDenyList.
-   }
+   // function clearSearch()=>{
+   //    userEmailDenyList.
+   // }
 	const { form, errors, constraints, message, enhance } = superForm(data.form)
 </script>
 
