@@ -73,7 +73,7 @@ async function createEmployees() {
    employees.push(await prisma.user.create({
       data:{
          email: String(process.env.MY_EMAIL),
-         emailVerified: new Date,
+         emailVerified: true,
          passwordHash: employeePass,
          givenName: 'Eric',
          familyName: 'Branson',
@@ -95,7 +95,7 @@ async function createEmployees() {
          data:{
             email: String(process.env.GEORGE_EMAIL),
             passwordHash: employeePass,
-            emailVerified: new Date,
+            emailVerified: true,
             givenName: 'George',
             familyName: 'Branson',
             contactInfo:{
@@ -117,7 +117,7 @@ async function createEmployees() {
          data:{
             email: String(process.env.EMPLOYEE_EMAIL),
             passwordHash: employeePass,
-            emailVerified: new Date,
+            emailVerified: true,
             givenName: 'Walter',
             familyName: 'Branson',
             contactInfo:{
@@ -204,8 +204,14 @@ async function  main (){
    }
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(deleteEndTime, 'ms')} ms`);
-   userData.forEach((user)=>{
-      user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
+   userData.forEach((user, i)=>{
+      if(i%3 === 0 ){
+         user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
+      } else if (i%5 === 0 ){
+         user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
+      } else {
+         user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
+      }
    })
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
