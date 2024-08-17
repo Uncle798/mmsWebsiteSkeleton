@@ -1,11 +1,13 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { lucia } from '$lib/server/lucia';
 import  prisma from "$lib/server/prisma";
+import { sendEmail } from '$lib/server/nodemailer'
 import { hash } from "@node-rs/argon2";
 import { z } from 'zod'
 import type { Actions, PageServerLoad } from "./$types";
 import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
+import { generateEmailVerificationRequest } from "$lib/server/authUtils";
 
 const registerSchema = z.object({
    email: z.string().email().min(3).max(255).trim().toLowerCase(),
@@ -64,6 +66,8 @@ export const actions:Actions = {
 				passwordHash: hashedPass
 			}
 		});
+		const verificationCode = await generateEmailVerificationRequest(user.id, user.email!);
+		sendEmail('computer@bransonschlegel.com', 'eric.branson@gmail.com', 'Testing', `testing: verification code: ${verificationCode}`);
 		const session = await lucia.createSession(user.id, {});
 		const sessionCookie = await lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {

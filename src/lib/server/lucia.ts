@@ -21,6 +21,7 @@ export const lucia = new Lucia(adapter, {
          githubUsername: attributes.githubUsername,
          givenName: attributes.givenName,
          familyName: attributes.familyName,
+         emailVerified: attributes.emailVerified
       }
    }
 });
@@ -40,6 +41,7 @@ interface DatabaseUserAttributes {
    githubUsername: string;
    givenName: string;
    familyName: string;
+   emailVerified: boolean;
 }
 
 export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET);

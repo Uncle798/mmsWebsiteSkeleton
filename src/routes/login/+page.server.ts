@@ -53,6 +53,10 @@ export const actions:Actions = {
          path: '.',
          ...sessionCookie.attributes
       });
+      const redirectTo = event.url.searchParams.get('redirectTo');
+      if(redirectTo){
+         redirect(302,`${redirectTo.slice(1)}`)
+      }
       redirect(302, '/');
    }
 }

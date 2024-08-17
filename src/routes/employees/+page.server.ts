@@ -4,7 +4,7 @@ import z from 'zod'
 import { superValidate } from "sveltekit-superforms";
 import { zod } from 'sveltekit-superforms/adapters'
 import type { PageServerLoad } from "../$types";
-import type { User } from "@prisma/client";
+import { handleLoginRedirect } from "$lib/utils";
 
 
 const employeeRemoveSchema = z.object({
@@ -12,9 +12,9 @@ const employeeRemoveSchema = z.object({
    employeeId: z.string()
 })
 
-export const load: PageServerLoad = (async ({locals}) =>{
-   if(!locals.user?.admin){
-      redirect(302, '/login');
+export const load: PageServerLoad = (async (event) =>{
+   if(!event.locals.user?.admin){
+      throw redirect(302, handleLoginRedirect(event));
    }
    const form = await(superValidate(zod(employeeRemoveSchema)))
 
