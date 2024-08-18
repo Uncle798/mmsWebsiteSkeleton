@@ -34,3 +34,4 @@
 </form>
 
 <a href="/login/github">Sign in with GitHub</a>
+<a href="/login/resetPassword">Forgot your password?</a>
