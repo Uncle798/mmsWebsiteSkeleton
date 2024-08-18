@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { lucia } from '$lib/server/lucia';
 import  prisma from "$lib/server/prisma";
-import { sendEmail } from '$lib/server/nodemailer'
+import { mailtrap } from "$lib/server/mailtrap";
 import { hash } from "@node-rs/argon2";
 import { z } from 'zod'
 import type { Actions, PageServerLoad } from "./$types";
@@ -73,13 +73,22 @@ export const actions:Actions = {
 			}
 		});
 		const verificationCode = await generateEmailVerificationRequest(user.id, user.email!);
-		sendEmail('computer@bransonschlegel.com', 'eric.branson@gmail.com', 'Testing', `testing: verification code: ${verificationCode}`);
+		const sender = {
+			name: 'computer@bransonschlegel.com',
+			email: 'computer@bransonschlegel.com',
+		}
+		mailtrap.send({
+			from:sender,
+			to: [{email: user.email!}],
+			subject: "Please verify your email",
+			html: `testing: verification code: ${verificationCode}`
+		})
 		const session = await lucia.createSession(user.id, {});
 		const sessionCookie = await lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.', 
 			...sessionCookie.attributes
 		});
-		redirect(302, '/');
+		redirect(302, '/register/emailVerifications');
 	}
 }
