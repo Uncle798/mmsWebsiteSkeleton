@@ -32,7 +32,8 @@ const userData = Array.from({length:numUsers}).map(()=>({
    email: '',
    passwordHash: hashedPass,
    givenName: faker.person.firstName(),
-   familyName: faker.person.lastName()
+   familyName: faker.person.lastName(),
+   organizationName: '',
 }));
 
 async function deleteAll() {
@@ -207,6 +208,7 @@ async function  main (){
    userData.forEach((user, i)=>{
       if(i%3 === 0 ){
          user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
+         user.organizationName = faker.company.name()
       } else if (i%5 === 0 ){
          user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
       } else {
@@ -216,18 +218,6 @@ async function  main (){
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
    })
-   for(let i=0; i<users.length; i++){
-      if(i%5 === 0){
-         await prisma.user.update({
-            where:{
-               id: users[i].id
-            },
-            data: {
-               organizationName: faker.company.name()
-            }
-         })
-      }
-   }
    for await (const user of users) {
       await prisma.contactInfo.create({
          data:{
