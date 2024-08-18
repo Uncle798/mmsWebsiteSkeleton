@@ -42,5 +42,12 @@ export async function verifyEmailVerificationRequest(userId: string, userEmail: 
 export async function passwordResetToken(userId: string): Promise<string> {
    const tokenId = generateIdFromEntropySize(25);
    const tokenHash = encodeHex(await sha256(new TextEncoder().encode(tokenId)));
-   await prisma.
+   await prisma.passwordReset.create({
+      data:{
+         tokenHash,
+         userId,
+         expiresAt: createDate(new TimeSpan(2, 'h')),
+      }
+   })
+   return tokenId;
 }
