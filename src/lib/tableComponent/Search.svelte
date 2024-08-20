@@ -4,5 +4,5 @@
    let value = ''
 </script>
 
-<input placeholder="Search" bind:value on:input={() => handler.search(value)} />
+<input class="input" placeholder="Search" bind:value on:input={() => handler.search(value)} />
 

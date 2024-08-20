@@ -7,9 +7,9 @@
 
 <aside>
    Show
-   <select name="rowsPerPageOptions" bind:value={$rowsPerPage}>
+   <select class="select" name="rowsPerPageOptions" bind:value={$rowsPerPage}>
       {#each options as option}
-         <option value={option}>
+         <option class="option" value={option}>
             {option}
          </option>
       {/each}

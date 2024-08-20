@@ -5,6 +5,6 @@
    let value = ''
 </script>
 
-<th>
-   <input type="text" placeholder="Filter" bind:value on:input={()=> handler.filter(value, filterBy)} />
+<th class="table-cell-fit">
+   <input class="input" type="text" placeholder="Filter" bind:value on:input={()=> handler.filter(value, filterBy)} />
 </th>
