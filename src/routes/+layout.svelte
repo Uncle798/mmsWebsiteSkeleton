@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import Toasts from '$lib/Toasts/Toasts.svelte';
 	import "../app.css";
 </script>
@@ -11,5 +12,6 @@
 	<a href="/employees">employees</a>
 	<a href="/users">users</a>
 </nav>
+<LightSwitch />
 <Toasts />
 <slot></slot>
