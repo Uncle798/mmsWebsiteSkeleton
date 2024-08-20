@@ -7,7 +7,8 @@ export type PaymentTableData = PaymentRecord & User
 
 export async function load(event) {
    if(!event.locals.user?.employee){
-      throw redirect(302, handleLoginRedirect(event));
+      console.log(event.request.url)
+      return redirect(302, handleLoginRedirect(event));
    }
    const userId = event.params.userId;
    const dbUser = await prisma.user.findUnique({

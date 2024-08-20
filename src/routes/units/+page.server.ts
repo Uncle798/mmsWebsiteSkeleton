@@ -8,105 +8,62 @@ import type { PageServerLoad } from "../$types";
 type TableData = {
    unitNum: string,
    price: number,
-   givenName: string | null,
-   familyName: string | null,
-   organizationName: string | null,
+   givenName?: string | null,
+   familyName?: string | null,
+   organizationName?: string | null,
    leasedFor: number,
    emptyFor: number,
+   userId: string | null,
 }
 
 export const load:PageServerLoad = async (event) =>{ 
    if(!event.locals.user){
+      console.log(event.url)
       throw redirect(302,handleLoginRedirect(event))
    }
-   const units = await prisma.unitPricing.findMany({
-      where:{
-         endDate: null
-      },
-      orderBy:{
+   const leases = await prisma.lease.findMany({
+      orderBy: {
          unitNum: 'asc'
-      },
-      select:{
-         unitNum: true,
-         price: true,
-         unitPricingId: true,
-         leases:{
-            select:{
-               leaseEffectiveDate: true,
-               leaseEnded: true,
-               price: true, 
-               customer:{
-                  select:{
-                     familyName: true,
-                     givenName: true,
-                  }
-               }
-            }
-         }
       }
    });
-
-   // const contactInfo = await prisma.contactInfo.findMany({
-   //    where:{
-   //       softDelete: false
-   //    },
-   //    select:{
-   //       familyName: true,
-   //       givenName: true,
-   //       organizationName: true,
-   //       leases:{
-   //          select:{
-   //             id: true
-   //          }
-   //       }
-   //    }
-   // });
-
+   const units = await prisma.unitPricing.findMany({
+      where: {
+         endDate: null,
+      }
+   });
+   const users = await prisma.user.findMany({})
    const tableData:TableData[] = [];
-   for (const unit of units) {
-      const leases = unit.leases;
-      let familyName: string | null = null;
-      let givenName: string | null = null;
-      let organizationName: string | null = null;
-      let lastLeaseDate: Date | null = new Date();
-      let leasedFor: number = 0;
-      let emptyFor: number = 0;
-      const today = dayjs();
-      // leases.forEach((lease) => {
-      //    const leaseStartDate = dayjs(lease.leaseEffectiveDate);
-      //    const contact = lease.customer;
-      //    if(!lease.leaseEnded){
-      //       leasedFor = today.diff(leaseStartDate, 'months');
-      //       familyName = contact.familyName;
-      //       givenName = contact.givenName;
-      //       if(lease.contactInfo.organizationName){
-      //          organizationName = lease.contactInfo.organizationName;
-      //       }
-      //    }
-      //    if(lease.leaseEnded < lastLeaseDate){
-      //       lastLeaseDate = lease.leaseEnded;
-      //    }
-      // });
-      if(lastLeaseDate){
-         emptyFor = today.diff(lastLeaseDate, 'months');
-         familyName = null;
-         givenName = null;
-         organizationName = null;
-      } else {
-         emptyFor = 0;
+   const today = Date.now();
+   units.forEach((unit) =>{
+      const datum:TableData = {} as TableData;
+      datum.unitNum = unit.unitNum;
+      datum.price = unit.price;
+      const unitLeases = leases.filter((lease) => lease.unitNum === unit.unitNum);
+      let shortestMonthsSinceLeaseEnded = 0;
+      let monthsSinceLeaseEnded = 0;
+      if(unitLeases){
+         for(let i=0; i<unitLeases.length; i++){
+            const leaseEndDate = unitLeases[i].leaseEnded;
+            if(!leaseEndDate) {
+               datum.familyName = users.find((user) => user.id === unitLeases[i].customerId)?.familyName;
+               datum.givenName = users.find((user) => user.id === unitLeases[i].customerId)?.givenName;
+               datum.organizationName = users.find((user) => user.id === unitLeases[i].customerId)?.organizationName;
+               datum.leasedFor = dayjs(today).diff(unitLeases[0].leaseEffectiveDate, 'months');
+               datum.emptyFor = 0;
+               break;
+            } else {
+               monthsSinceLeaseEnded = dayjs(today).diff(leaseEndDate,'months');
+            }
+            if(shortestMonthsSinceLeaseEnded === 0){
+               shortestMonthsSinceLeaseEnded = monthsSinceLeaseEnded;
+            } else if(monthsSinceLeaseEnded < shortestMonthsSinceLeaseEnded) {
+               shortestMonthsSinceLeaseEnded = monthsSinceLeaseEnded;
+            }
+            datum.emptyFor = shortestMonthsSinceLeaseEnded;
+         }
+         tableData.push(datum);
       }
-      const unitNum = unit.unitNum;
-      const row: TableData ={
-         familyName,
-         givenName,
-         emptyFor, 
-         organizationName,
-         leasedFor,
-         price: unit.price,
-         unitNum
-      }
-      tableData.push(row);
-   }
+   })
    return {
       tableData
    }

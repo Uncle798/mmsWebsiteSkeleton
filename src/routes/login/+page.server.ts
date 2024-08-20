@@ -60,6 +60,7 @@ export const actions:Actions = {
          ...sessionCookie.attributes
       });
       const redirectTo = event.url.searchParams.get('redirectTo');
+      console.log(redirectTo)
       if(redirectTo){
          redirect(302,`${redirectTo.slice(1)}`)
       }
