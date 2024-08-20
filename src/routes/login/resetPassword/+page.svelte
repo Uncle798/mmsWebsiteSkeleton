@@ -10,10 +10,12 @@
 {/if}
 <form method="post" use:enhance>
    <label for="email">Please enter your registered email address</label>
-   <input type="email" name="email" id="email" 
+   <input type="email" name="email" 
+      id="email" 
+      class="input"
       bind:value={$form.email} 
       aria-invalid={$errors.email ? true : undefined} 
       {...$constraints.email} />
    {#if $errors.email}<span class="invalid">{$errors.email}</span>{/if}
-   <button type="submit">Reset password</button>
+   <button type="submit" class="btn">Reset password</button>
 </form>

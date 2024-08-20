@@ -11,17 +11,19 @@
 <form method="post" use:enhance>
    <label for="password">Please enter a new password</label>
    <input type="password" name="password" id="password" 
+   class="input"
    bind:value={$form.password} 
    aria-invalid={$errors.password ? true : undefined} 
    {...$constraints.password} />
    {#if $errors.password}<span class="invalid">{$errors.password}</span>{/if}
    <label for="password">Please confirm your new password</label>
-   <input type="password" name="passwordConfirm" id="passwordConfirm" 
+   <input type="password" name="passwordConfirm" id="passwordConfirm"
+      class="input"
       bind:value={$form.passwordConfirm} 
       aria-invalid={$errors.passwordConfirm ? true : undefined} 
       {...$constraints.passwordConfirm} />
    {#if $errors.passwordConfirm}<span class="invalid">{$errors.passwordConfirm}</span>{/if}
    <p>
-        <button type="submit">Reset password</button>
+        <button type="submit" class="btn">Reset password</button>
    </p>
 </form>
