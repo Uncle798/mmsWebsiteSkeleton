@@ -62,6 +62,9 @@ importers:
       svelte-stripe:
         specifier: ^1.2.0
         version: 1.2.0(@stripe/stripe-js@4.2.0)(svelte@4.2.18)
+      svelte-tel-input:
+        specifier: ^3.5.1
+        version: 3.5.1(svelte@4.2.18)
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -1589,6 +1592,9 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  libphonenumber-js@1.10.43:
+    resolution: {integrity: sha512-M/iPACJGsTvEy8QmUY4K0SoIFB71X2j7y2JvUMYzUXUxCNmiU+NTfHdz7gt+dC48BVfBzZi2oO6s9TDGllCfxA==}
+
   lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
     engines: {node: '>=10'}
@@ -2137,6 +2143,12 @@ packages:
     peerDependencies:
       '@stripe/stripe-js': ^3
       svelte: ^3 || ^4
+
+  svelte-tel-input@3.5.1:
+    resolution: {integrity: sha512-kMdCjvWPTOJyRFG2hgYCa8JbuUur96zPBaTfGGoXN1XyktSFVY7OqqQxWRK836pK3JyyXaTjJSviDur8jX5H+A==}
+    engines: {node: '>= 18', npm: '>= 8', pnpm: '>= 8', yarn: '>= 1'}
+    peerDependencies:
+      svelte: ^3.58.0 || ^4.0.0
 
   svelte@4.2.18:
     resolution: {integrity: sha512-d0FdzYIiAePqRJEb90WlJDkjUEx42xhivxN8muUBmfZnP+tzUgz12DJ2hRJi8sIHCME7jeK1PTMgKPSfTd8JrA==}
@@ -3707,6 +3719,8 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  libphonenumber-js@1.10.43: {}
+
   lilconfig@2.1.0: {}
 
   lilconfig@3.1.2: {}
@@ -4213,6 +4227,11 @@ snapshots:
   svelte-stripe@1.2.0(@stripe/stripe-js@4.2.0)(svelte@4.2.18):
     dependencies:
       '@stripe/stripe-js': 4.2.0
+      svelte: 4.2.18
+
+  svelte-tel-input@3.5.1(svelte@4.2.18):
+    dependencies:
+      libphonenumber-js: 1.10.43
       svelte: 4.2.18
 
   svelte@4.2.18:
