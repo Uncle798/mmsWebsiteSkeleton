@@ -33,5 +33,5 @@
    <button class="btn">Submit</button>
 </form>
 
-<a href="/login/github" class="">Sign in with GitHub</a>
+<a href="/login/github" class="btn">Sign in with Apple</a>
 <a href="/login/resetPassword">Forgot your password?</a>
