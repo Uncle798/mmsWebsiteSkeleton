@@ -23,8 +23,6 @@ model User {
   passwordHash     String?         @map("password_hash")
   employee         Boolean         @default(false)
   admin            Boolean         @default(false)
-  githubId         BigInt?         @unique @map("github_id")
-  githubUsername   String?         @map("github_username")
   customerLeases   Lease[]         @relation(name: "customer")
   employeeLeases   Lease[]         @relation(name: "employee")
   contactInfo      ContactInfo[]
