@@ -15,7 +15,8 @@ const addressFormSchema = z.object({
    city: z.string(),
    state: z.string().min(2).max(255),
    zip: z.string(),
-   phoneNum: z.string(),
+   phoneNum1: z.string(),
+   phoneNum2: z.string(),
 })
 
 export const load:PageServerLoad = (async (event) => {
@@ -48,7 +49,8 @@ export const actions:Actions = {
             city:address.city,
             state:address.state,
             zip:address.zip,
-            phoneNum1: address.phoneNum,
+            phoneNum1: address.phoneNum1,
+            phoneNum2: address.phoneNum2,
             userId: user?.id,
          },
       });

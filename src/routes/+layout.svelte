@@ -9,6 +9,7 @@
 	<a href="/login">Login</a>
 	<a href="/register">Register</a>
 	<a href="/units">units</a>
+	<a href="/units/available">Available units</a>
 	<a href="/employees">employees</a>
 	<a href="/users">users</a>
 </nav>

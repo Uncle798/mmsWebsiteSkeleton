@@ -70,7 +70,7 @@ export const actions:Actions = {
 				email: validEmail
 			}
 		})
-		if(!userAlreadyExists){
+		if(userAlreadyExists){
 			return message(form, 'Email already in use')
 		}
 		const user = await prisma.user.create({
@@ -96,6 +96,6 @@ export const actions:Actions = {
 			path: '.', 
 			...sessionCookie.attributes
 		});
-		redirect(302, '/register/emailVerifications');
+		redirect(302, '/register/emailVerification');
 	}
 }
