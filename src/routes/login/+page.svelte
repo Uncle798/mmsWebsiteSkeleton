@@ -2,10 +2,14 @@
    import { error } from '@sveltejs/kit';
    import { superForm } from 'sveltekit-superforms'
    export let data;
+   const mess = data.mess
    const {form, errors, constraints, message, enhance} = superForm(data.form);
 </script>
 {#if $message}
    {$message}
+{/if}
+{#if mess}
+   {mess}
 {/if}
 <form method="POST" use:enhance>
    <label for="email">email</label>
@@ -33,5 +37,4 @@
    <button class="btn">Submit</button>
 </form>
 
-<a href="/login/github" class="btn">Sign in with Apple</a>
 <a href="/login/resetPassword">Forgot your password?</a>

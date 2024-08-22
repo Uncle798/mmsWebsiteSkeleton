@@ -14,15 +14,20 @@ const loginSchema = z.object({
       .max(255,'Password can\'t be longer than 255 characters').trim(),
 })
 
-export const load: PageServerLoad = (async () => {
+export const load: PageServerLoad = (async (event) => {
+   const mess = event.url.searchParams.get('message');
    const form = await superValidate(zod(loginSchema))
-   return {form};
+   return {form, mess};
 })
 
 
 export const actions:Actions = {
    default: async (event) => {
       const form = await superValidate(event.request, zod(loginSchema))
+      const mess = event.url.searchParams.get('message');
+      if(mess){
+         return message(form, mess)
+      }
       if(!form.valid){
          return fail(400, { form })
       }
