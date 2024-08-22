@@ -73,7 +73,7 @@ async function createEmployees() {
    })
    employees.push(await prisma.user.create({
       data:{
-         email: String(process.env.MY_EMAIL),
+         email: 'email@email.email',
          emailVerified: true,
          passwordHash: employeePass,
          givenName: 'Eric',
