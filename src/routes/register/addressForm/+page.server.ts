@@ -15,8 +15,10 @@ const addressFormSchema = z.object({
    city: z.string(),
    state: z.string().min(2).max(255),
    zip: z.string(),
-   phoneNum1: z.string(),
-   phoneNum2: z.string(),
+   phoneNum1: z.string().min(10).max(12).trim(),
+   phoneNum1Country: z.string().min(2).max(2).trim(),
+   phoneNum2: z.string().min(10).max(12).trim().optional(),
+   phoneNum2Country: z.string().min(2).max(2).trim().optional(),
 })
 
 export const load:PageServerLoad = (async (event) => {
@@ -41,6 +43,12 @@ export const actions:Actions = {
       };
       const { user } = event.locals;
       const address = form.data;
+      console.log(address.phoneNum1)
+      const phone1Response = await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum1}&country_code=${address.phoneNum1Country}&format=1`);
+      const phone1ResponseData = await phone1Response.json();
+      if(!phone1ResponseData.valid){
+         return message(form, "That is not a valid phone number")
+      }
       const dbAddress = await prisma.contactInfo.create({
          data:{
             address1:address.address1,
@@ -49,7 +57,7 @@ export const actions:Actions = {
             city:address.city,
             state:address.state,
             zip:address.zip,
-            phoneNum1: address.phoneNum1,
+            phoneNum1: phone1ResponseData.number,
             phoneNum2: address.phoneNum2,
             userId: user?.id,
          },

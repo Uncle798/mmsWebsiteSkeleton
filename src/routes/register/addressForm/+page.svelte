@@ -8,7 +8,8 @@
    const { form, errors, constraints, message, enhance } = superForm(data.form)
 
    const phoneOptions = { invalidateOnCountryChange: true}
-   let selectedCountry:CountryCode = 'US'
+   let selectedCountryPhone1:CountryCode = 'US'
+   let selectedCountryPhone2:CountryCode = 'US'
    let detailedValue:DetailedValue = {} as DetailedValue;
    let isValid = false;
 </script>
@@ -43,11 +44,11 @@
       bind:value={$form.address3}
       {...$constraints.address3}
    />
-   <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+   <div class="card">
       <label for="city" class="label">City
 
          <input type="text"
-         class="input"
+         class="input col-span-1"
          name="city"
          id="city"
          placeholder="Moscow"
@@ -59,7 +60,7 @@
       <label for="state" class="label">State
 
          <input type="text"
-         class="input"
+         class="input col-span-2"
          name="state"
          id="state"
          placeholder="ID"
@@ -84,25 +85,53 @@
    <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <select
          class="country-select {!isValid && 'invalid'} "
-         aria-label="Default select example"
-         name="Country"
-         bind:value={selectedCountry}
+         aria-label="Select Country for your primary phone"
+         name="phoneNum1Country"
+         bind:value={selectedCountryPhone1}
 	   >
-		<option value={null} hidden={selectedCountry !== null}>Please select</option>
+		<option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
 		{#each normalizedCountries as country (country.id)}
 			<option
 				value={country.iso2}
-				selected={country.iso2 === selectedCountry}
-				aria-selected={country.iso2 === selectedCountry}
+				selected={country.iso2 === selectedCountryPhone1}
+				aria-selected={country.iso2 === selectedCountryPhone1}
+			>
+				{country.iso2} (+{country.dialCode})
+			</option>
+		{/each}
+	</select>
+   <TelInput {phoneOptions}
+      name='phoneNum1' 
+      bind:valid={isValid} 
+      bind:country={selectedCountryPhone1} 
+      bind:value={$form.phoneNum1} 
+      bind:detailedValue  
+      class=" {!isValid && 'invalid'} input" 
+   />
+   </div>
+   <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+      <select
+         class="country-select {!isValid && 'invalid'} "
+         aria-label="Select Country for your secondary phone"
+         name="phoneNum2Country"
+         bind:value={selectedCountryPhone2}
+	   >
+		<option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
+		{#each normalizedCountries as country (country.id)}
+			<option
+				value={country.iso2}
+				selected={country.iso2 === selectedCountryPhone2}
+				aria-selected={country.iso2 === selectedCountryPhone2}
 			>
 				{country.iso2} (+{country.dialCode})
 			</option>
 		{/each}
 	</select>
    <TelInput {phoneOptions} 
+      name="phoneNum2"
       bind:valid={isValid} 
-      bind:country={selectedCountry} 
-      bind:value={$form.phoneNum} 
+      bind:country={selectedCountryPhone2} 
+      bind:value={$form.phoneNum2} 
       bind:detailedValue  
       class=" {!isValid && 'invalid'} input" 
    />
