@@ -6,39 +6,37 @@ import { zod } from 'sveltekit-superforms/adapters'
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
 
-
-const employeeRemoveSchema = z.object({
-   remove: z.boolean(),
+const employeeAddSchema = z.object({
+   userId: z.string().min(23).max(25).trim(),
    admin: z.boolean(),
-   employeeId: z.string()
-});
-
+})
 
 export const load: PageServerLoad = (async (event) =>{
    if(!event.locals.user?.admin){
       throw redirect(302, handleLoginRedirect(event, "You must be an administrator to access that page"));
    }
-   const form = await(superValidate(zod(employeeRemoveSchema)))
+   const form = await(superValidate(zod(employeeAddSchema)))
 
-   const employees = await prisma.user.findMany({
-      where:{
-         employee: true
+   const users = prisma.user.findMany({
+      orderBy:{
+         familyName: 'asc'
       }
    })
-   return { employees, form } 
+   return { users, form } 
 })
 
+
 export const actions:Actions = {
-   remove: async (event) => {
-      const form = await superValidate(event.request, zod(employeeRemoveSchema))
+   default: async (event) => {
+      const form = await superValidate(event.request, zod(employeeAddSchema))
       console.log(form)
       if(form.valid){
          const user = await prisma.user.update({
             where:{
-               id: form.data.employeeId,
+               id: form.data.userId,
             },
             data:{
-               employee: form.data.remove,
+               employee: true,
                admin: form.data.admin,
             }
          })
