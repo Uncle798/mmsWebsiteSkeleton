@@ -45,6 +45,9 @@ async function deleteAll() {
    await prisma.pricing.deleteMany();
    await prisma.unit.deleteMany();
    await prisma.contactInfo.deleteMany();
+   await prisma.passwordReset.deleteMany();
+   await prisma.verification.deleteMany();
+   await prisma.session.deleteMany();
    await prisma.user.deleteMany();
    return true;
  }
