@@ -7,8 +7,7 @@
 </script>
 {#if $message}
    {$message}
-{/if}
-{#if mess}
+{:else if mess}
    {mess}
 {/if}
 <form method="POST" use:enhance>
