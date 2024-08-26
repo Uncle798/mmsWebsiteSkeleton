@@ -6,7 +6,7 @@
    
    export let data: PageData;
    const { form, errors, constraints, message, enhance } = superForm(data.form)
-
+   
    const phoneOptions = { invalidateOnCountryChange: true}
    let selectedCountryPhone1:CountryCode = 'US'
    let selectedCountryPhone2:CountryCode = 'US'
@@ -19,7 +19,8 @@
       class="input"
       name="address1"
       id="address1"
-      placeholder="1500 Mill Road" 
+      autocomplete="address-line1"
+      placeholder="1500 Mill Road"
       aria-invalid={$errors.address1 ? true : undefined}
       bind:value={$form.address1}
       {...$constraints.address1}
@@ -29,6 +30,7 @@
       class="input"
       name="address2"
       id="address2"
+      autocomplete="address-line2"
       placeholder="Unit 1" 
       aria-invalid={$errors.address2 ? true : undefined}
       bind:value={$form.address2}
@@ -39,18 +41,20 @@
       class="input"
       name="address3"
       id="address3"
+      autocomplete="address-line3"
       placeholder="C/O Smokey the Bear" 
       aria-invalid={$errors.address3 ? true : undefined}
       bind:value={$form.address3}
       {...$constraints.address3}
    />
-   <div class="card">
+   <div class="card flex">
       <label for="city" class="label">City
 
          <input type="text"
          class="input col-span-1"
          name="city"
          id="city"
+         autocomplete="address-level2"
          placeholder="Moscow"
          aria-invalid={$errors.city ? true : undefined}
          bind:value={$form.city}
@@ -63,6 +67,7 @@
          class="input col-span-2"
          name="state"
          id="state"
+         autocomplete="address-level1"
          placeholder="ID"
          aria-invalid={$errors.state ? true : undefined}
          bind:value={$form.state}
@@ -75,6 +80,7 @@
          class="input"
          name="zip"
          id="zip"
+         autocomplete="postal-code"
          placeholder="83843"
          aria-invalid={$errors.zip ? true : undefined}
          bind:value={$form.zip}

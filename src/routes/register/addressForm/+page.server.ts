@@ -1,11 +1,10 @@
 import prisma from '$lib/server/prisma';
 import { z } from 'zod'
 import { superValidate, message } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters'
+import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
 import { handleLoginRedirect } from '$lib/utils';
 import { ratelimit } from '$lib/server/redis';
-
 import type { PageServerLoad, Actions } from './$types';
 
 const addressFormSchema = z.object({
@@ -26,7 +25,6 @@ export const load:PageServerLoad = (async (event) => {
       throw redirect(302, handleLoginRedirect(event));
    }
    const form = await superValidate(zod(addressFormSchema));
-   
    return { form, };
 })
 
@@ -43,12 +41,36 @@ export const actions:Actions = {
       };
       const { user } = event.locals;
       const address = form.data;
-      console.log(address.phoneNum1)
       const phone1Response = await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum1}&country_code=${address.phoneNum1Country}&format=1`);
       const phone1ResponseData = await phone1Response.json();
       if(!phone1ResponseData.valid){
          return message(form, "That is not a valid phone number")
       }
+      if(address.phoneNum2){
+         const phone2Response = await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum2}&country_code=${address.phoneNum2Country}&format=1`);
+         const phone2ResponseData = await phone2Response.json();
+         if(!phone2ResponseData.valid){
+            return message(form, "That is not a valid phone number")
+         }
+      }
+      const addressRes = await fetch(`https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API}`,{ 
+         method:"POST",
+         body: JSON.stringify({
+            address:{
+               revision:0,
+               addressLines: [
+                  address.address1,
+                  address.address2,
+                  address.address3,
+               ],
+               postalCode: address.zip,
+               locality: address.city,
+               administrativeArea: address.state,
+            }
+         })
+      }).then((res) => res.json());
+      const addressComponents = addressRes.address;
+      console.log(addressComponents);
       const dbAddress = await prisma.contactInfo.create({
          data:{
             address1:address.address1,
