@@ -33,11 +33,9 @@ export const load:PageServerLoad = (async () => {
    const availableUnits:UnitPricing[] & Unit[] =[];
    unitPricing.forEach((unitPrice)=> {
       const unitLease = leases.find((lease) => lease.unitNum === unitPrice.unitNum);
-      console.log(`unitNum: ${unitPrice.unitNum} unitLease: ${unitLease}`);
       
       const unitInfo = units.find((u)=> u.num === unitPrice.unitNum);
       if(!unitLease){
-         console.log(`unitNum: ${unitPrice.unitNum} unitInfo: ${unitInfo}`);
          const availableUnit = { ... unitInfo, ...unitPrice};
             availableUnits.push(availableUnit);
       }
