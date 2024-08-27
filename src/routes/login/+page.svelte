@@ -5,6 +5,11 @@
    const mess = data.mess
    const {form, errors, constraints, message, enhance} = superForm(data.form);
 </script>
+
+<svelte:head>
+	<title>Moscow Mini Storage | Login</title>
+</svelte:head>
+
 {#if $message}
    {$message}
 {:else if mess}

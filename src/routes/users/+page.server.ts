@@ -26,9 +26,6 @@ export const load:PageServerLoad = async (event) =>{
       orderBy: {
          familyName: 'asc'
       }, 
-      where:{
-         employee: false,
-      }, 
    });
    return { users, form }
 }

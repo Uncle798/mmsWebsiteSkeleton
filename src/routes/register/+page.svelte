@@ -34,6 +34,12 @@
 	}
 	import { superForm } from "sveltekit-superforms";
 </script>
+
+<svelte:head>
+	<title>Moscow Mini Storage | Register</title>
+</svelte:head>
+
+
 {#if $message}
 	<h3>{$message}</h3>
 {/if}

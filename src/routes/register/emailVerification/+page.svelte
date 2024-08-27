@@ -6,6 +6,10 @@
    const { form, errors, constraints, message, enhance } = superForm(data.form);
 </script>
 
+<svelte:head>
+	<title>Moscow Mini Storage | Verify your email address</title>
+</svelte:head>
+
 <form method="post" use:enhance>
    <label class="label" for="code">Code:</label>
    <input type="text" 

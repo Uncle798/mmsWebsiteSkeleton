@@ -17,12 +17,16 @@
    const paymentSum = handler.createCalculation('amount').sum()
 </script>
 
+<svelte:head>
+	<title>Moscow Mini Storage | User: {dbUser?.givenName} {dbUser?.familyName}</title>
+</svelte:head>
+
 <NameBlock nameBlock={dbUser} />
 
 {#each contactInfo as info}   
    <Address address={info}/>
-   {/each}
-   {#each leases as lease}   
+{/each}
+{#each leases as lease}   
    <BasicLease lease={lease} />
 {/each}
 {#if $rowCount.total > 0 }

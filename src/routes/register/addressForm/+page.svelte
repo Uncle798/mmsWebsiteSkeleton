@@ -13,6 +13,11 @@
    let detailedValue:DetailedValue = {} as DetailedValue;
    let isValid = false;
 </script>
+
+<svelte:head>
+	<title>Moscow Mini Storage | Enter your Address</title>
+</svelte:head>
+
 <form method="post" use:enhance>
    <label for="address1" class="Label">Address line 1</label>
    <input type="text" 

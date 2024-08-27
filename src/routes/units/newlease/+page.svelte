@@ -56,6 +56,9 @@
 	const { form, errors, constraints, message, enhance } = superForm(data.form)
 </script>
 
+<svelte:head>
+	<title>Moscow Mini Storage | Admin New Lease</title>
+</svelte:head>
 
 {#if $message}
 	<h3>{$message}</h3>
