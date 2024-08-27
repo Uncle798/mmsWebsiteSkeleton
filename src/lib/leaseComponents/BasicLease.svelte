@@ -1,17 +1,8 @@
 <script lang="ts">
+	import type { Lease } from "@prisma/client";
 
-   export let lease: {
-      leaseId: string;
-      customerId: string;
-      employeeId: string;
-      contactInfoId: string;
-      unitNum: string;
-      price: number;
-      leaseCreatedAt: Date;
-      leaseReturnedAt: Date | null;
-      leaseEffectiveDate: Date;
-      leaseEnded: Date | null;
-   }
+
+   export let lease: Lease
 </script>
 <div class="card p-4">
    <span>

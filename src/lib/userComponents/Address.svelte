@@ -1,6 +1,6 @@
 <script lang="ts">
    import type {ContactInfo} from 'prisma/prisma-client'
-   export const address:ContactInfo = {} as ContactInfo
+   export let address:ContactInfo;
 </script>
 
 <div class="card p-4">
