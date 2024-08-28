@@ -20,16 +20,18 @@
    }
    function employeeToast():void {
       const t:ToastSettings = {
-         message: 'Are you sure you would like to remove this employee?',
-
+         message: 'Are you sure you would like to change this users employment status?',
          autohide: false,
+         background: 'variant-filled-warning',
          action: {
             label: 'Yes I\'m sure',
             response:() => {
                console.log('hello')
             },
+
          }
       }
+      toastStore.trigger(t)
    }
 </script>
 
