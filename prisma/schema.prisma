@@ -60,6 +60,7 @@ model Unit {
   num         String        @id
   building    String
   size        String
+  description String
   unitPricing UnitPricing[]
 
   @@index([num(sort: Desc)])

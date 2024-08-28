@@ -1,9 +1,10 @@
-import { Lease, PrismaClient, User, Invoice, UnitPricing, PaymentType, PaymentRecord, } from '@prisma/client';
+import { Lease, PrismaClient, User, Invoice, UnitPricing, PaymentType, PaymentRecord, Unit, } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import dayjs  from 'dayjs';
 import { hash } from '@node-rs/argon2';
 import  unitData from './unitData'
 import pricingData  from './pricingData'
+import sizeDescription  from './sizeDescription'
 const numUsers=unitData.length + 1500;
 const earliestStarting = new Date('2018-01-01');
 const hashedPass = await hash(String(process.env.USER_PASSWORD), {
@@ -193,8 +194,18 @@ async function  main (){
    const pricing = await prisma.pricing.createManyAndReturn({
       data: pricingData
    })
+   const uD:Unit[]=[];
+   unitData.forEach((unit)=>{
+      const sD = sizeDescription.find((description) => description.size === unit.size);
+      const newUnit:Unit= {} as Unit;
+      newUnit.building=unit.building;
+      newUnit.num = unit.num;
+      newUnit.size = unit.size
+      newUnit.description = sD?.description ? sD.description : '';
+      uD.push(newUnit);
+   })
    const units = await prisma.unit.createManyAndReturn({
-      data: unitData
+      data: uD
    })
    for await (const unit of units) {
       const price = pricing.find((p) => p.size === unit.size);
@@ -214,8 +225,10 @@ async function  main (){
          user.organizationName = faker.company.name()
       } else if (i%5 === 0 ){
          user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
-      } else {
+      } else if (i%4 ===0){
          user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
+      } else {
+         user.email = user.givenName+ '.' + user.familyName + '@horribleEmailAddress.com'
       }
    })
    const users:User[] = await prisma.user.createManyAndReturn({
