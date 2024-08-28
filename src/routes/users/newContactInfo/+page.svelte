@@ -7,6 +7,11 @@
     export const dbUser:User = data.dbUser!
     export const contactInfos:ContactInfo = data.contactInfos!
 </script>
+
+<svelte:head>
+	<title>Moscow Mini Storage | Home</title>
+</svelte:head>
+
 <NameBlock nameBlock={dbUser} />
 
 {#each contactInfos as info }   
