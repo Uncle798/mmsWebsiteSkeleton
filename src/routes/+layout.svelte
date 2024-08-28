@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { LightSwitch, initializeStores, Drawer, Toast } from '@skeletonlabs/skeleton';
+	import { LightSwitch, initializeStores, Drawer, Toast, Modal } from '@skeletonlabs/skeleton';
 	import "../app.css";
 	import { Hamburger } from 'svelte-hamburgers'
 	let open:boolean | undefined;
@@ -29,5 +29,6 @@
 {/if}
 <LightSwitch />
 <Drawer />
+<Modal />
 <Toast />
 <slot></slot>
