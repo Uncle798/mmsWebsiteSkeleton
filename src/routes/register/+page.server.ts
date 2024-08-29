@@ -71,7 +71,7 @@ export const actions:Actions = {
 			}
 		})
 		if(userAlreadyExists){
-			return message(form, 'Email already in use')
+			return message(form, 'Email already in use, please login')
 		}
 		const user = await prisma.user.create({
 			data:{ 
@@ -89,6 +89,8 @@ export const actions:Actions = {
 			to: [{email: user.email!}],
 			subject: "Please verify your email",
 			html: `testing: verification code: ${verificationCode}`
+		}).catch((err) =>{
+			console.log(err);
 		})
 		const session = await lucia.createSession(user.id, {});
 		const sessionCookie = await lucia.createSessionCookie(session.id);
