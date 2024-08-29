@@ -12,19 +12,20 @@
 {#if open}
 
 <nav>
-	{#if !data.user}
+	<ul class='list'>
+		{#if !data.user}
 		<li><a href="/login">Login</a></li>
-	{:else}
+		{:else}
 		<li><a href="/logout">Logout</a></li>
-	{/if}
-	<li><a href="/register" class="a">Register</a></li>
-	<li><a href="/register/addressForm" class="a">Address Form</a></li>
-	<li><a href="/units">units</a></li>
-	<li><a href="/units/available">Available units</a></li>
-	<li><a href="/units/newLease">New Lease</a></li>
-	<li><a href="/employees">employees</a></li>
-	<li><a href="/users">users</a></li>
-
+		{/if}
+		<li><a href="/register" class="a">Register</a></li>
+		<li><a href="/register/addressForm" class="a">Address Form</a></li>
+		<li><a href="/units">units</a></li>
+		<li><a href="/units/available">Available units</a></li>
+		<li><a href="/units/newLease">New Lease</a></li>
+		<li><a href="/employees">employees</a></li>
+		<li><a href="/users">users</a></li>
+	</ul>
 </nav>
 {/if}
 <LightSwitch />
