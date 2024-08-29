@@ -220,15 +220,17 @@ async function  main (){
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(deleteEndTime, 'ms')} ms`);
    userData.forEach((user, i)=>{
-      if(i%3 === 0 ){
+      if(i%5 === 0){
          user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
          user.organizationName = faker.company.name()
-      } else if (i%5 === 0 ){
+      } else if (i%5 === 1){
          user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
-      } else if (i%4 ===0){
+      } else if (i%5 === 2){
          user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
-      } else {
+      } else if (i%5 === 3){
          user.email = user.givenName+ '.' + user.familyName + '@horribleEmailAddress.com'
+      } else if (i%5 === 4){
+         user.email = user.givenName+ '.' + user.familyName + '@emailemailemail.com'
       }
    })
    const users:User[] = await prisma.user.createManyAndReturn({
