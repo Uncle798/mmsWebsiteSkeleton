@@ -18,7 +18,6 @@ type TableData = {
 
 export const load:PageServerLoad = async (event) =>{ 
    if(!event.locals.user){
-      console.log(event.url)
       throw redirect(302,handleLoginRedirect(event))
    }
    const leases = await prisma.lease.findMany({
