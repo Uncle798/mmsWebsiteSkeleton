@@ -9,11 +9,9 @@ import { handleLoginRedirect } from "$lib/utils";
 
 export type TableData = User & ContactInfo & Lease
 
-const userFormSchema = z.object({
-   familyName: z.string().min(1).max(255).trim(),
-   givenName: z.string().min(1).max(255).trim(),
-   email: z.string().email().min(3).max(255).trim(),
-   organizationName: z.string().min(1).max(512).trim(),
+const employeeConfirm = z.object({
+   employee: z.boolean(),
+   admin: z.boolean(),
    userId: z.string(),
 })
 
@@ -21,7 +19,7 @@ export const load:PageServerLoad = async (event) =>{
    if(!event.locals.user){
       throw redirect(302, handleLoginRedirect(event));
    }
-   const form = await(superValidate(zod(userFormSchema)))
+   const form = await(superValidate(zod(employeeConfirm)))
    const users = await prisma.user.findMany({
       orderBy: {
          familyName: 'asc'
@@ -32,9 +30,10 @@ export const load:PageServerLoad = async (event) =>{
 
 export const actions:Actions = {
    default: async (event) =>{
-      const form = await superValidate(event.request, zod(userFormSchema));
+      const form = await superValidate(event.request, zod(employeeConfirm));
       if(!form.valid){
          return fail(400, {form});
       }
+      console.log(form.data);
    }
 }
