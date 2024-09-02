@@ -45,6 +45,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@anvilco/anvil": "^3.3.0",
     "@floating-ui/dom": "1.6.8",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@mapbox/search-js-web": "1.0.0-beta.22",
