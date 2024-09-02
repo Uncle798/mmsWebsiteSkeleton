@@ -7,8 +7,12 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Verify your email address</title>
+	<title>{process.env.COMPANY_NAME} | Verify your email address</title>
 </svelte:head>
+
+{#if  $message}
+   <h3>{message}</h3>
+{/if}
 
 <form method="post" use:enhance>
    <label class="label" for="code">Code:</label>

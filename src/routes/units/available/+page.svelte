@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Available Units</title>
+	<title>{process.env.COMPANY_NAME} | Available Units</title>
 </svelte:head>
 
 
@@ -38,10 +38,11 @@
    <tbody>
       {#each $rows as row}
          <tr>
-            <td>{row.unitNum.replace(/^0+/gm,'')}</td>
-            <td>{row.size.replace(/^0+/gm,'')}</td>
-            <td>{row.description}</td>
-            <td>${row.price}</td>
+            <td><a href="/units/newLease">{row.unitNum.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/units/{row.unitNum}">{row.size.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/units/{row.unitNum}">{row.description}</a></td>
+            <td><a href="/units/{row.unitNum}">${row.price}</a></td>
+            
          </tr>
       {/each}
    </tbody>

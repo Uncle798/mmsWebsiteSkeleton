@@ -8,83 +8,73 @@
    import Search from "$lib/tableComponent/Search.svelte";
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
+   import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
+	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
    export let data;
    const handler = new DataHandler(data.users, { rowsPerPage: 50})
    const rows = handler.getRows();
-   const { form, errors, constraints, message, formId, enhance } = superForm(data.form);
-   import { getToastStore, type ToastSettings } from "@skeletonlabs/skeleton";
-   const toastStore = getToastStore();
-   let toastId = '';
-   function closeToast():void {
-      toastStore.close(toastId);
+   const modalStore = getModalStore();
+   const modalComponent: ModalComponent = {
+      ref: EmploymentConfirmModal,
+      props: {
+         formData:data.form, 
+      },
    }
-   function employeeToast():void {
-      const t:ToastSettings = {
-         message: 'Are you sure you would like to change this users employment status?',
-         autohide: false,
-         background: 'variant-filled-warning',
-         action: {
-            label: 'Yes I\'m sure',
-            response:() => {
-               console.log('hello')
-            },
+   const modal:ModalSettings = {
+      type: 'component',
+      component: modalComponent,
+      title:'Are you sure you\'d like to change employment status?',
 
-         }
-      }
-      toastStore.trigger(t)
+      body:''
+   }
+   function modalFire():void {
+      modalStore.trigger(modal);
    }
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | All Users</title>
+	<title>{process.env.COMPANY_NAME} | All Users</title>
 </svelte:head>
 
-<header class="w-1/4">
-   {#if $message}
-	<h3>{$message}</h3>
-   {/if}
-</header>
-<form method="post" use:enhance>
-   <table>
-      <thead>
-         <tr>
-            <th>
+<div class="table-container">
+   <table class="table table-hover">
+      <thead class="table-header-group table">
+         <tr class="table-row">
                <Search {handler}/>
-            </th>
-            <th></th>
-            <th>
                <RowsPerPage {handler} />
-            </th>
          </tr>
-         <tr>
+         <tr class="table-row">
             <Th {handler}>Family name</Th>
             <Th {handler}>Given name</Th>
             <Th {handler}>Email address</Th>
             <Th {handler}>Employee</Th>
             <Th {handler}>Admin</Th>
+            <td>Update employment status</td>
          </tr>
-         <tr>
+         <tr class="table-row">
             <ThFilter {handler} filterBy='familyName' />
             <ThFilter {handler} filterBy='givenName' />
             <ThFilter {handler} filterBy='email' />
             <ThFilter {handler} filterBy='employee' placeholder='true/false'/>
             <ThFilter {handler} filterBy='admin' placeholder='true/false'/>
+            <td>Update employment status</td>
          </tr>
       </thead>
       <tbody>
          {#each $rows as row}
          <tr>
-            <td><a href="/users/{row.id}"> {row.familyName}</a></td>
+            <td class="td"><a href="/users/{row.id}"> {row.familyName}</a></td>
             <td><a href="/users/{row.id}"> {row.givenName}</a></td>
             <td><a href="/users/{row.id}"> {row.email}</a></td>
             <td><input type="checkbox" class="checkbox" name="employee" checked={row.employee}></td>
             <td><input type="checkbox" class="checkbox" name="admin" checked={row.admin}></td>
-            <td><button class="btn" value={row.id} on:click={employeeToast}>Update Employee Status</button></td>
+            <td><button class="btn" value={row.id} on:click={modalFire}>Update Employee Status</button></td>
          </tr>
          {/each}
       </tbody>
    </table>
-</form>
+</div>
+   
    <footer>
       <Pagination {handler} />
    </footer>

@@ -4,10 +4,10 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Home</title>
+	<title>{process.env.COMPANY_NAME} | Home</title>
 </svelte:head>
 
-<h1>Moscow Mini Storage</h1>
+<h1>{process.env.COMPANY_NAME}</h1>
 {#if data.user}
    You're logged in
 {/if}

@@ -10,8 +10,10 @@
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
    const rows = handler.getRows();
 </script>
+<svelte:head>
+   <title>{process.env.COMPANY_NAME} | All Units</title>
+</svelte:head>
 <div class="table-container">
-   
    <header>
       <Search {handler} />
       <RowsPerPage {handler} />

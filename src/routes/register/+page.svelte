@@ -36,7 +36,7 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Register</title>
+	<title>{process.env.COMPANY_NAME} | Register</title>
 </svelte:head>
 
 

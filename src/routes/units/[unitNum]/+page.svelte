@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Unit: {data.unit.num.replace(/^0+/gm, '')}</title>
+	<title>{process.env.COMPANY_NAME} | Unit: {data.unit.num.replace(/^0+/gm, '')}</title>
 </svelte:head>
 
 <h1>Unit: {data.unit.num.replace(/^0+/gm, '')}</h1>

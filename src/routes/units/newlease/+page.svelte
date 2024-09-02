@@ -57,7 +57,7 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Admin New Lease</title>
+	<title>{process.env.COMPANY_NAME} | Admin New Lease</title>
 </svelte:head>
 
 {#if $message}

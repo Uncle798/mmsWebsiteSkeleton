@@ -15,10 +15,11 @@
    const rows = handler.getRows();
    const rowCount = handler.getRowCount();
    const paymentSum = handler.createCalculation('amount').sum()
+   
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | User: {dbUser?.givenName} {dbUser?.familyName}</title>
+	<title>{process.env.COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
 </svelte:head>
 
 <NameBlock nameBlock={dbUser} />

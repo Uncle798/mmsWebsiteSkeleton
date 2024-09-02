@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Home</title>
+	<title>{process.env.COMPANY_NAME} | Home</title>
 </svelte:head>
 
 <NameBlock nameBlock={dbUser} />
