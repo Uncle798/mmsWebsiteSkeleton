@@ -53,24 +53,6 @@ export const actions:Actions = {
             return message(form, "That is not a valid phone number")
          }
       }
-      const addressRes = await fetch(`https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API}`,{ 
-         method:"POST",
-         body: JSON.stringify({
-            address:{
-               revision:0,
-               addressLines: [
-                  address.address1,
-                  address.address2,
-                  address.address3,
-               ],
-               postalCode: address.zip,
-               locality: address.city,
-               administrativeArea: address.state,
-            }
-         })
-      }).then((res) => res.json());
-      const addressComponents = addressRes.address;
-      console.log(addressComponents);
       const dbAddress = await prisma.contactInfo.create({
          data:{
             address1:address.address1,
@@ -89,8 +71,7 @@ export const actions:Actions = {
          if(redirectTo){
             redirect(302,`${redirectTo.slice(1)}`)
          }
-         redirect(302, '/');
+         redirect(302, '/units/available');
       }
-      }
-
+   }
 } 
