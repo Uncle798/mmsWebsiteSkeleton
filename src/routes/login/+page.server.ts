@@ -17,17 +17,13 @@ const loginSchema = z.object({
 export const load: PageServerLoad = (async (event) => {
    const mess = event.url.searchParams.get('message');
    const form = await superValidate(zod(loginSchema))
-   return {form, mess};
+   return { form, mess };
 })
 
 
 export const actions:Actions = {
    default: async (event) => {
       const form = await superValidate(event.request, zod(loginSchema))
-      const mess = event.url.searchParams.get('message');
-      if(mess){
-         return message(form, mess)
-      }
       if(!form.valid){
          return fail(400, { form })
       }

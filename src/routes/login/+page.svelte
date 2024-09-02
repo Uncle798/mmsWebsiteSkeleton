@@ -1,19 +1,48 @@
 <script lang="ts">
    import { error } from '@sveltejs/kit';
    import { superForm } from 'sveltekit-superforms'
+   import { getToastStore, type ToastSettings } from "@skeletonlabs/skeleton";
+	import { onMount } from 'svelte';
+   const toastStore = getToastStore();
    export let data;
    const mess = data.mess
+   $: if (mess && data.user?.employee) {
+    onMount(() => {
+      // You cannot use async directly in onMount's function, so we need a workaround wrapping () around async 
+      (async () => {
+        const toast: ToastSettings = {
+          message: 'You must be an admin to access that page',
+          timeout: 5000,
+          background: 'variant-filled-error'
+        };
+        toastStore.trigger(toast);
+      })();
+    });
+  }
+   $: if (mess && !data.user) {
+    onMount(() => {
+      // You cannot use async directly in onMount's function, so we need a workaround wrapping () around async 
+      (async () => {
+        const toast: ToastSettings = {
+          message: 'You must be logged in to access that page',
+          timeout: 5000,
+          background: 'variant-filled-error'
+        };
+        toastStore.trigger(toast);
+      })();
+    });
+  }
+
+
    const {form, errors, constraints, message, enhance} = superForm(data.form);
 </script>
 
 <svelte:head>
-	<title>Moscow Mini Storage | Login</title>
+	<title>{process.env.COMPANY_NAME} | Login</title>
 </svelte:head>
 
 {#if $message}
    {$message}
-{:else if mess}
-   {mess}
 {/if}
 <form method="POST" use:enhance>
    <label for="email">email</label>
