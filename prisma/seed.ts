@@ -38,18 +38,42 @@ const userData = Array.from({length:numUsers}).map(()=>({
 }));
 
 async function deleteAll() {
-   await prisma.paymentRecord.deleteMany();
-   await prisma.invoice.deleteMany();
-   await prisma.lease.deleteMany();
-   await prisma.paymentRecord.deleteMany();
-   await prisma.unitPricing.deleteMany();
-   await prisma.pricing.deleteMany();
-   await prisma.unit.deleteMany();
-   await prisma.contactInfo.deleteMany();
-   await prisma.passwordReset.deleteMany();
-   await prisma.verification.deleteMany();
-   await prisma.session.deleteMany();
-   await prisma.user.deleteMany();
+   await prisma.paymentRecord.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.invoice.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.lease.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.paymentRecord.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.unitPricing.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.pricing.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.unit.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.contactInfo.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.passwordReset.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.verification.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.session.deleteMany().catch((err) =>{
+      console.error(err);
+   });
+   await prisma.user.deleteMany().catch((err) =>{
+      console.error(err);
+   });
    return true;
  }
  
@@ -191,46 +215,23 @@ async function  main (){
    await deleteAll();
    const deleteEndTime = dayjs(new Date);
    console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 'ms')} ms`);
-   const pricing = await prisma.pricing.createManyAndReturn({
-      data: pricingData
-   })
-   const uD:Unit[]=[];
-   unitData.forEach((unit)=>{
-      const sD = sizeDescription.find((description) => description.size === unit.size);
-      const newUnit:Unit= {} as Unit;
-      newUnit.building=unit.building;
-      newUnit.num = unit.num;
-      newUnit.size = unit.size
-      newUnit.description = sD?.description ? sD.description : '';
-      uD.push(newUnit);
-   })
-   const units = await prisma.unit.createManyAndReturn({
-      data: uD
-   })
-   for await (const unit of units) {
-      const price = pricing.find((p) => p.size === unit.size);
-      await prisma.unitPricing.create({
-         data:{
-            unitNum: unit.num,
-            price: price!.price,
-            startDate: new Date
-         }
-      });
-   }
-   const unitEndTime = dayjs(new Date);
-   console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(deleteEndTime, 'ms')} ms`);
    userData.forEach((user, i)=>{
-      if(i%5 === 0){
+      if(i%7 === 0){
          user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
          user.organizationName = faker.company.name()
-      } else if (i%5 === 1){
+      } else if (i%7 === 1){
          user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
-      } else if (i%5 === 2){
+      } else if (i%7 === 2){
          user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
-      } else if (i%5 === 3){
+      } else if (i%7 === 3){
          user.email = user.givenName+ '.' + user.familyName + '@horribleEmailAddress.com'
-      } else if (i%5 === 4){
+      } else if (i%7 === 4){
          user.email = user.givenName+ '.' + user.familyName + '@emailemailemail.com'
+      } else if (i%7 === 5){
+         user.email = user.givenName+ '.' + user.familyName + '@dumbfancyemail.com'
+         
+      } else if (i%7 === 6){
+         user.email = user.givenName+ '.' + user.familyName + '@sweetsweetemail.com'
       }
    })
    const users:User[] = await prisma.user.createManyAndReturn({
@@ -260,13 +261,41 @@ async function  main (){
                phoneNum1: faker.phone.number(),
             }
          }) 
-
+         
       }
    }
    await createEmployees();
    const totalUsers = await prisma.user.count();
    const userEndTime = dayjs(new Date);
-   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(unitEndTime, 'ms')} ms`);
+   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 'ms')} ms`);
+   const pricing = await prisma.pricing.createManyAndReturn({
+      data: pricingData
+   })
+   const uD:Unit[]=[];
+   unitData.forEach((unit)=>{
+      const sD = sizeDescription.find((description) => description.size === unit.size);
+      const newUnit:Unit= {} as Unit;
+      newUnit.building=unit.building;
+      newUnit.num = unit.num;
+      newUnit.size = unit.size
+      newUnit.description = sD?.description ? sD.description : '';
+      uD.push(newUnit);
+   })
+   const units = await prisma.unit.createManyAndReturn({
+      data: uD
+   })
+   for await (const unit of units) {
+      const price = pricing.find((p) => p.size === unit.size);
+      await prisma.unitPricing.create({
+         data:{
+            unitNum: unit.num,
+            price: price!.price,
+            startDate: new Date
+         }
+      });
+   }
+   const unitEndTime = dayjs(new Date);
+   console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
    const pricedUnits = (await prisma.unitPricing.findMany());
    const leases:Lease[]=[];
    let leaseStart = dayjs(earliestStarting);
@@ -314,7 +343,7 @@ async function  main (){
          }
       }
    const leaseEndTime = dayjs(new Date);
-   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(userEndTime, 'ms')} ms`);
+   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'ms')} ms`);
    const invoices: Invoice[] = [];
    for await (const lease of leases){
       const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
