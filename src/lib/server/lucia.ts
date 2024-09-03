@@ -1,6 +1,5 @@
 import { Lucia } from 'lucia';
 import { GitHub } from 'arctic';
-import { GITHUB_CLIENT_SECRET, GITHUB_CLIENT_ID } from '$env/static/private';
 import { PrismaAdapter }  from "@lucia-auth/adapter-prisma";
 import  prisma  from "$lib/server/prisma";
 
@@ -19,7 +18,8 @@ export const lucia = new Lucia(adapter, {
          admin: attributes.admin,
          givenName: attributes.givenName,
          familyName: attributes.familyName,
-         emailVerified: attributes.emailVerified
+         emailVerified: attributes.emailVerified,
+         organizationName: attributes.organizationName
       }
    }
 });
@@ -37,7 +37,6 @@ interface DatabaseUserAttributes {
    admin: boolean;
    givenName: string;
    familyName: string;
+   organizationName: string;
    emailVerified: boolean;
 }
-
-export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET);
