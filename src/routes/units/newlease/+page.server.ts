@@ -4,39 +4,41 @@ import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import type GraphQLResponse from "@anvilco/anvil";
 import type { Unit, UnitPricing, User } from "@prisma/client";
+
 const newLeaseSchema = z.object({
    unitNum: z.string().min(3).max(3)
 })
 
 
-export const load:PageServerLoad = (async ({locals}) =>{
-   if(!locals.user?.employee){
+export const load:PageServerLoad = (async (event) =>{
+   if(!event.locals.user){
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
-   const units = await prisma.unitPricing.findMany({
-      orderBy:{
-         unitNum: 'asc'
-      },
+   const unitNum = event.url.searchParams.get('unitNum');
+   const unit = await prisma.unit.findUnique({
       where:{
-         leases:{
-            some:{
-               leaseEnded:{
-                  not:null
-               },
-            }
-         }
+         num:unitNum!,
       }
-   })
-   const users = await prisma.user.findMany({
-      orderBy: {
-         familyName: "asc"
+   }).catch((err) =>{
+      console.error(err);
+      return error(404, 'Unit not found')
+   });
+   const address = await prisma.contactInfo.findFirst({
+      where:{
+         userId:event.locals.user.id
       }
-   })
-   return { form, units, users }
+   });
+   const unitPrice = await prisma.unitPricing.findFirst({
+      where:{
+         endDate: null,
+         unitNum: unit?.num
+      }
+   });
+   return { form, unit, address, unitPrice };
 })
 
 function getPacketVariable(customer:User, unitPrice:UnitPricing, unit:Unit, employee:User){

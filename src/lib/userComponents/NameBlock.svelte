@@ -1,6 +1,13 @@
 <script lang="ts">
-   import type { User } from 'prisma/prisma-client'
-   export let nameBlock:User;
+   import { Prisma, type User } from 'prisma/prisma-client'
+   const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
+      select:{ 
+         email: true, 
+         givenName: true, 
+         familyName: true, 
+         organizationName: true }
+   })
+   export let nameBlock: typeof partialUser;
 </script>
 
 <div class="card p-4">

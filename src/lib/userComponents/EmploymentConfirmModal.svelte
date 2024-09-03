@@ -20,7 +20,7 @@
    <div class="card p-4 w-modal shadow-xl space-y-4">
       <header class="text-2xl font-bold">{$modalStore[0].title ?? 'Title missing'}</header>
       <article>{$modalStore[0].body ?? 'Body missing'}</article>
-      <form class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
+      <form action="/employee" method="post" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
          <label for="employee"><span>Employee</span>
             <input type="checkbox" name="employee" id="employee" checked={$form.employee}/>
          </label>

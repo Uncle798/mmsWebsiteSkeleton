@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { LightSwitch, initializeStores, Drawer, Toast, Modal, type ModalComponent } from '@skeletonlabs/skeleton';
-	import EmploymentConfirmModal from '$lib/userComponents/EmploymentConfirmModal.svelte';
-	const modalRegistry:Record<string, ModalComponent> = {
-		employmentConfirm: { ref: EmploymentConfirmModal },
-	}
+	// import EmploymentConfirmModal from '$lib/userComponents/EmploymentConfirmModal.svelte';
+	// const modalRegistry:Record<string, ModalComponent> = {
+	// 	employmentConfirm: { ref: EmploymentConfirmModal },
+	// }
 	import "../app.css";
 	import { Hamburger } from 'svelte-hamburgers'
 	let open:boolean | undefined;
@@ -12,8 +12,8 @@
 	export let data:PageData;
 </script>
 
-<Hamburger bind:open />
-{#if open}
+<!-- <Hamburger bind:open />
+{#if open} -->
 
 <nav>
 	<ul class='list'>
@@ -30,9 +30,9 @@
 		<li><a href="/users">users</a></li>
 	</ul>
 </nav>
-{/if}
+<!-- {/if} -->
 <LightSwitch />
 <Drawer />
-<Modal components={modalRegistry}/>
+<Modal />
 <Toast />
 <slot></slot>
