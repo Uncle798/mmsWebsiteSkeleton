@@ -1,4 +1,5 @@
 <script>
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { enhance } from '$app/forms'
 </script>

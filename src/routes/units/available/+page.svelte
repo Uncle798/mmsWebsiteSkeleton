@@ -1,5 +1,7 @@
 <script lang="ts">
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
+
    import { DataHandler } from '@vincjo/datatables';
    import Th from '$lib/tableComponent/Th.svelte'
    import ThFilter from "$lib/tableComponent/ThFilter.svelte";

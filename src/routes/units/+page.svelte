@@ -1,4 +1,5 @@
 <script lang="ts">
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import type { PageData } from "../$types";
    import { DataHandler } from '@vincjo/datatables';

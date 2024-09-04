@@ -1,6 +1,7 @@
 
 <script lang="ts">
    import type { PageData } from "../$types";
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
    import { superForm } from "sveltekit-superforms";

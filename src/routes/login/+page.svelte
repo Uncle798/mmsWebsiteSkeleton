@@ -1,4 +1,5 @@
 <script lang="ts">
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { error } from '@sveltejs/kit';
    import { superForm } from 'sveltekit-superforms'

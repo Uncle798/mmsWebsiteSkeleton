@@ -1,4 +1,5 @@
 <script lang="ts">
+   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { onMount } from 'svelte';
    import { superForm } from 'sveltekit-superforms';
@@ -19,6 +20,7 @@
    onMount(() => {
    if (typeof window !== 'undefined') {
       import('@mapbox/search-js-web').then(({ config, autofill }) => {
+         /* cspell:disable-next-line */
          config.accessToken = 'pk.eyJ1IjoiZXJpY2JyYW5zb24iLCJhIjoiY20wYjh6b29yMDE4dDJqb2sxc3ZjZHgzMyJ9.3kAYNtGfsqEPi8a3Zlvlzg';
          autofill({
          options: {
