@@ -1,4 +1,5 @@
 <script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { onMount } from 'svelte';
    import { superForm } from 'sveltekit-superforms';
    import { TelInput, normalizedCountries } from 'svelte-tel-input';
@@ -33,7 +34,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Enter your Address</title>
+	<title>{PUBLIC_COMPANY_NAME} | Enter your Address</title>
 </svelte:head>
 
 <form method="post" use:enhance>

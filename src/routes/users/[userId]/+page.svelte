@@ -1,4 +1,5 @@
 <script>
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
    import Address from '$lib/userComponents/Address.svelte';
    import NameBlock from '$lib/userComponents/NameBlock.svelte';
@@ -19,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
+	<title>{PUBLIC_COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
 </svelte:head>
 
 <NameBlock nameBlock={dbUser} />

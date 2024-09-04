@@ -1,4 +1,5 @@
 <script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import type { UnitPricing } from '@prisma/client'
 	import { superForm } from "sveltekit-superforms";
    import { Autocomplete } from '@skeletonlabs/skeleton';
@@ -11,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Admin New Lease</title>
+	<title>{PUBLIC_COMPANY_NAME} | Admin New Lease</title>
 </svelte:head>
 
 {#if $message}

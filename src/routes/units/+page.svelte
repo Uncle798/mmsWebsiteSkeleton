@@ -1,4 +1,5 @@
-   <script lang="ts">
+<script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import type { PageData } from "../$types";
    import { DataHandler } from '@vincjo/datatables';
    import Th from '$lib/tableComponent/Th.svelte'
@@ -11,7 +12,7 @@
    const rows = handler.getRows();
 </script>
 <svelte:head>
-   <title>{process.env.COMPANY_NAME} | All Units</title>
+   <title>{PUBLIC_COMPANY_NAME} | All Units</title>
 </svelte:head>
 <div class="table-container">
    <header>

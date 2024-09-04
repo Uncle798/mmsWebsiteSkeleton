@@ -1,4 +1,5 @@
 <script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { error } from '@sveltejs/kit';
    import { superForm } from 'sveltekit-superforms'
    import { getToastStore, type ToastSettings } from "@skeletonlabs/skeleton";
@@ -38,7 +39,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Login</title>
+	<title>{PUBLIC_COMPANY_NAME} | Login</title>
 </svelte:head>
 
 {#if $message}

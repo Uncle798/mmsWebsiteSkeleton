@@ -1,4 +1,5 @@
 <script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { superForm } from 'sveltekit-superforms';
    import type { PageData } from './$types';
    
@@ -7,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Verify your email address</title>
+	<title>{PUBLIC_COMPANY_NAME} | Verify your email address</title>
 </svelte:head>
 
 {#if  $message}

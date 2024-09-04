@@ -1,9 +1,10 @@
 <script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    export let data
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Unit: {data.unit.num.replace(/^0+/gm, '')}</title>
+	<title>{PUBLIC_COMPANY_NAME} | Unit: {data.unit.num.replace(/^0+/gm, '')}</title>
 </svelte:head>
 
 <h1>Unit: {data.unit.num.replace(/^0+/gm, '')}</h1>

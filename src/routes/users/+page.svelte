@@ -1,6 +1,7 @@
 
 <script lang="ts">
    import type { PageData } from "../$types";
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
    import { superForm } from "sveltekit-superforms";
    import Th from '$lib/tableComponent/Th.svelte'
@@ -33,7 +34,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | All Users</title>
+	<title>{PUBLIC_COMPANY_NAME} | All Users</title>
 </svelte:head>
 
 <div class="table-container">

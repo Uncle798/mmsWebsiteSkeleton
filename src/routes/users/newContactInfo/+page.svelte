@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { PageData } from './$types';
+    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
     import type { ContactInfo, User } from '@prisma/client';
     import Address from '$lib/userComponents/Address.svelte';
     import NameBlock from '$lib/userComponents/NameBlock.svelte';
@@ -9,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Home</title>
+	<title>{PUBLIC_COMPANY_NAME} | Home</title>
 </svelte:head>
 
 <NameBlock nameBlock={dbUser} />

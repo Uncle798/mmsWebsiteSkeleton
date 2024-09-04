@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PUBLIC_COMPANY_NAME } from '$env/static/public'
 	import { zxcvbn, zxcvbnOptions, type Score } from "@zxcvbn-ts/core";
 	import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 	import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";

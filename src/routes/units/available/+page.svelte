@@ -1,4 +1,5 @@
-<script lang="ts"> 
+<script lang="ts">
+   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
    import Th from '$lib/tableComponent/Th.svelte'
    import ThFilter from "$lib/tableComponent/ThFilter.svelte";
@@ -12,7 +13,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Available Units</title>
+	<title>{PUBLIC_COMPANY_NAME} | Available Units</title>
 </svelte:head>
 
 
