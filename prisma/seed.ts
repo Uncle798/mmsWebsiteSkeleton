@@ -222,6 +222,7 @@ async function  main (){
       } else if (i%7 === 1){
          user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
       } else if (i%7 === 2){
+         // cSpell:disable 
          user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
       } else if (i%7 === 3){
          user.email = user.givenName+ '.' + user.familyName + '@horribleEmailAddress.com'
@@ -233,6 +234,7 @@ async function  main (){
       } else if (i%7 === 6){
          user.email = user.givenName+ '.' + user.familyName + '@sweetsweetemail.com'
       }
+      //cSpell:enable
    })
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData

@@ -118,9 +118,17 @@
 		"zIndex"
 	],
 	"cSpell.words": [
+		"anvilco",
+		"datatables",
 		"mapbox",
 		"skeletonlabs",
 		"superforms",
-		"UPSTASH"
+		"UPSTASH",
+		"vincjo",
+		"zxcvbn"
+	],
+	"cSpell.ignoreWords": [
+		"mmswebsiteskeleton",
+		"purgecss"
 	]
 }
