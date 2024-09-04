@@ -40,8 +40,53 @@
 </svelte:head>
 
 <form method="post" use:enhance>
-   <label for="address1" class="Label">Address line 1</label>
-   <input type="text" 
+   <div class="flex">
+
+      <label for="givenName" class="label">Given name
+         <input type="text" 
+         name="givenName" 
+         id="givenName"
+         class="input"
+         placeholder="Smokey"
+         aria-invalid={$errors.givenName ? true : undefined}
+         bind:value={$form.givenName}
+         {...$constraints.givenName}
+         />
+      </label>
+      {#if $errors.givenName}
+      <span class="input-error">{$errors.address1}</span>
+      {/if}
+      <label for="familyName" class="label">Family Name
+         <input type="text" 
+         name="familyName" 
+         id="familyName"
+         class="input"
+         placeholder="Bear"
+         aria-invalid={$errors.familyName ? true : undefined}
+         bind:value={$form.familyName}
+         {...$constraints.familyName}
+         />
+      </label>
+      {#if $errors.familyName}
+      <span class="input-error">{$errors.familyName}</span>
+      {/if}
+   </div>
+   <label for="organizationName" class="label">Organization Name
+      <input type="text" 
+      name="organizationName" 
+      id="organizationName"
+      class="input"
+      placeholder="The Forrest"
+      aria-invalid={$errors.organizationName ? true : undefined}
+      bind:value={$form.organizationName}
+      {...$constraints.organizationName}
+      />
+   </label>
+   {#if $errors.organizationName}
+   <span class="input-error">{$errors.organizationName}</span>
+   {/if}
+   <label for="address1" class="label">Address line 1
+      <input type="text" 
       class="input"
       name="address1"
       id="address1"
@@ -50,41 +95,28 @@
       aria-invalid={$errors.address1 ? true : undefined}
       bind:value={$form.address1}
       {...$constraints.address1}
-   />
+      />
+   </label>
    {#if $errors.address1}
       <span class="input-error">{$errors.address1}</span>
    {/if}
    <label for="address2" class="Label">Address line 2</label>
    <input type="text" 
-   class="input"
-   name="address2"
-   id="address2"
-   autocomplete="address-line2"
-   placeholder="Unit 1" 
-   aria-invalid={$errors.address2 ? true : undefined}
-   bind:value={$form.address2}
-   {...$constraints.address2}
+      class="input"
+      name="address2"
+      id="address2"
+      autocomplete="address-line2"
+      placeholder="Unit 1" 
+      aria-invalid={$errors.address2 ? true : undefined}
+      bind:value={$form.address2}
+      {...$constraints.address2}
    />
    {#if $errors.address2}
       <span class="input-error">{$errors.address2}</span>
    {/if}
-   <label for="address3" class="Label">Address line 3</label>
-   <input type="text" 
-   class="input"
-   name="address3"
-   id="address3"
-   autocomplete="address-line3"
-   placeholder="C/O Smokey the Bear" 
-   aria-invalid={$errors.address3 ? true : undefined}
-   bind:value={$form.address3}
-   {...$constraints.address3}
-   />
-   {#if $errors.address3}
-      <span class="input-error">{$errors.address3}</span>
-   {/if}
+
    <div class="card flex">
-      <label for="city" class="label">City
-         
+      <label for="city" class="label">City 
          <input type="text"
          class="input col-span-1"
          name="city"
@@ -100,32 +132,30 @@
          <span class="input-error">{$errors.city}</span>
       {/if}
       <label for="state" class="label">State
-         
          <input type="text"
-         class="input col-span-2"
-         name="state"
-         id="state"
-         autocomplete="address-level1"
-         placeholder="ID"
-         aria-invalid={$errors.state ? true : undefined}
-         bind:value={$form.state}
-         {...$constraints.state}
+            class="input col-span-2"
+            name="state"
+            id="state"
+            autocomplete="address-level1"
+            placeholder="ID"
+            aria-invalid={$errors.state ? true : undefined}
+            bind:value={$form.state}
+            {...$constraints.state}
          />
       </label>
       {#if $errors.state}
          <span class="input-error">{$errors.state}</span>
       {/if}
       <label for="zip" class="label">Zip code
-         
          <input type="text"
-         class="input"
-         name="zip"
-         id="zip"
-         autocomplete="postal-code"
-         placeholder="83843"
-         aria-invalid={$errors.zip ? true : undefined}
-         bind:value={$form.zip}
-         {...$constraints.zip}
+            class="input"
+            name="zip"
+            id="zip"
+            autocomplete="postal-code"
+            placeholder="83843"
+            aria-invalid={$errors.zip ? true : undefined}
+            bind:value={$form.zip}
+            {...$constraints.zip}
          />
       </label>
       {#if $errors.zip}
@@ -133,66 +163,66 @@
       {/if}
    </div>
    <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
+         <select
+            class="country-select {!isValid && 'invalid'} "
+            aria-label="Select Country for your primary phone"
+            name="phoneNum1Country"
+            bind:value={selectedCountryPhone1}
+         >
+         <option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
+         {#each normalizedCountries as country (country.id)}
+            <option
+               value={country.iso2}
+               selected={country.iso2 === selectedCountryPhone1}
+               aria-selected={country.iso2 === selectedCountryPhone1}
+            >
+            {country.iso2} (+{country.dialCode})
+            </option>
+         {/each}
+      </select>
+      <TelInput {phoneOptions}
+         name='phoneNum1' 
+         placeholder = "208 882 6564"
+         bind:valid={isValid} 
+         bind:country={selectedCountryPhone1} 
+         bind:value={$form.phoneNum1} 
+         bind:detailedValue  
+         class=" {!isValid && 'invalid'} input" 
+      />
+      {#if $errors.phoneNum1}
+         <span class="input-error">{$errors.phoneNum1}</span>
+      {/if}
+   </div>
+   <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
       <select
-      class="country-select {!isValid && 'invalid'} "
-      aria-label="Select Country for your primary phone"
-      name="phoneNum1Country"
-      bind:value={selectedCountryPhone1}
-	   >
-		<option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
-		{#each normalizedCountries as country (country.id)}
-      <option
-      value={country.iso2}
-      selected={country.iso2 === selectedCountryPhone1}
-      aria-selected={country.iso2 === selectedCountryPhone1}
+         class="country-select {!isValid && 'invalid'} "
+         aria-label="Select Country for your secondary phone"
+         name="phoneNum2Country"
+         bind:value={selectedCountryPhone2}
       >
-      {country.iso2} (+{country.dialCode})
-   </option>
-   {/each}
-</select>
-<TelInput {phoneOptions}
-name='phoneNum1' 
-placeholder = "208 882 6564"
-bind:valid={isValid} 
-bind:country={selectedCountryPhone1} 
-bind:value={$form.phoneNum1} 
-bind:detailedValue  
-class=" {!isValid && 'invalid'} input" 
-/>
-{#if $errors.phoneNum1}
-   <span class="input-error">{$errors.phoneNum1}</span>
-{/if}
-</div>
-<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-   <select
-   class="country-select {!isValid && 'invalid'} "
-   aria-label="Select Country for your secondary phone"
-   name="phoneNum2Country"
-   bind:value={selectedCountryPhone2}
-   >
    <option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
    {#each normalizedCountries as country (country.id)}
-   <option
-   value={country.iso2}
-   selected={country.iso2 === selectedCountryPhone2}
-   aria-selected={country.iso2 === selectedCountryPhone2}
-   >
-   {country.iso2} (+{country.dialCode})
-</option>
-{/each}
-</select>
-<TelInput {phoneOptions} 
-name="phoneNum2"
-placeholder= "208 882 6564"
-bind:valid={isValid} 
-bind:country={selectedCountryPhone2} 
-bind:value={$form.phoneNum2} 
-bind:detailedValue  
-class=" {!isValid && 'invalid'} input" 
-/>
-{#if $errors.phoneNum2}
-   <span class="input-error">{$errors.phoneNum2}</span>
-{/if}
-</div>
-<button class="btn">Submit</button>
+      <option
+         value={country.iso2}
+         selected={country.iso2 === selectedCountryPhone2}
+         aria-selected={country.iso2 === selectedCountryPhone2}
+      >
+      {country.iso2} (+{country.dialCode})
+      </option>
+   {/each}
+   </select>
+      <TelInput {phoneOptions} 
+         name="phoneNum2"
+         placeholder= "208 882 6564"
+         bind:valid={isValid} 
+         bind:country={selectedCountryPhone2} 
+         bind:value={$form.phoneNum2} 
+         bind:detailedValue  
+         class=" {!isValid && 'invalid'} input" 
+      />
+      {#if $errors.phoneNum2}
+         <span class="input-error">{$errors.phoneNum2}</span>
+      {/if}
+   </div>
+   <button class="btn">Submit</button>
 </form>
