@@ -50,12 +50,12 @@ export async function load(event) {
    }
    if(event.locals.user){
       const unitNum = event.params.unitNum;
-      const unit = prisma.unit.findFirst({
+      const unit = await prisma.unit.findFirst({
          where: {
             num:unitNum
          }
       })
-      const unitPrice = prisma.unitPricing.findFirst({
+      const unitPrice = await prisma.unitPricing.findFirst({
          where:{
             unitNum,
          }
