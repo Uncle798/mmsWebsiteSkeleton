@@ -47,28 +47,31 @@
    {$message}
 {/if}
 <form method="POST" use:enhance>
-   <label for="email">email</label>
-   <input type="email"
+   <label for="email">email
+      <input type="email"
       name="email"
       class="input" 
       aria-invalid={$errors.email ? 'true' : undefined } 
       bind:value={$form.email}
       {...$constraints.email}
-   >
-   {#if $errors.email}
+      />
+   </label>
+      {#if $errors.email}
       <span class="input-error">{$errors.email}</span>
-   {/if}
-   <label for="password">password</label>
-   <input type="password" name="password" 
+      {/if}
+   <label for="password">password
+
+      <input type="password" name="password" 
       id="password"
       class="input" 
       aria-invalid={$errors.password ? 'true' : undefined}
       bind:value={$form.password}
       {...$constraints.password}
-   >
-   {#if $errors.password}
+      />
+   </label>
+      {#if $errors.password}
       <span class="input-error">{$errors.password}</span>
-   {/if}
+      {/if}
    <button class="btn">Submit</button>
 </form>
 
