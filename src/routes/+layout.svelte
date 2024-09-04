@@ -12,8 +12,8 @@
 	export let data:PageData;
 </script>
 
-<!-- <Hamburger bind:open />
-{#if open} -->
+<Hamburger bind:open />
+{#if open}
 
 <nav>
 	<ul class='list'>
@@ -30,7 +30,7 @@
 		<li><a href="/users">users</a></li>
 	</ul>
 </nav>
-<!-- {/if} -->
+{/if}
 <LightSwitch />
 <Drawer />
 <Modal />
