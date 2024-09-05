@@ -10,7 +10,7 @@ import type { PageServerLoad, Actions } from './$types';
 const addressFormSchema = z.object({
    familyName: z.string().min(1).max(255).trim(),
    givenName: z.string().min(1).max(255).trim(),
-   organizationName: z.string().min(1).max(255).trim(),
+   organizationName: z.string().min(1).max(255).trim().optional(),
    address1: z.string().min(2).max(255).trim(),
    address2: z.string().min(2).max(255).trim().optional(),
    city: z.string(),
