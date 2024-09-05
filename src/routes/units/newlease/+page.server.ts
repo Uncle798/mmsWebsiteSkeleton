@@ -7,9 +7,12 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
 import type { Unit, UnitPricing } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
+import dayjs from "dayjs";
 
 const newLeaseSchema = z.object({
-   unitNum: z.string().min(3).max(3)
+   contactInfoId: z.string().min(23).max(30),
+   unitPriceId: z.string().min(23).max(30),
+   unitNum: z.string().min(23).max(30),
 })
 
 
@@ -29,7 +32,7 @@ export const load:PageServerLoad = (async (event) =>{
          }).catch((err) =>{
             console.error(err);
             return error(404, 'Unit not found')
-         });
+         }) || {} as Unit;
       }
       const address = await prisma.contactInfo.findFirst({
          where:{
@@ -121,22 +124,23 @@ export const actions:Actions = {
       if(!form.valid){
          message(form, 'no good')
       }
+
       const customer = await prisma.user.findUniqueOrThrow({
          where:{
             id:event.locals.user?.id
          }
       })
-      const unitNum = event.url.searchParams.get('unitNum');
       const unit = await prisma.unit.findFirst({
          where:{
-            num:unitNum!,
+            num:form.data.unitNum,
          }
       })
-      const unitPrice = await prisma.unitPricing.findFirst({
+      const unitPrice = await prisma.unitPricing.findUniqueOrThrow({
          where:{
-            unitNum: unitNum!,
+            unitPricingId:form.data.unitPriceId
          }
       })
+      const contactInfoId = form.data.contactInfoId;
       const employees = await prisma.user.findMany({
          where:{
             employee: true,
@@ -149,8 +153,19 @@ export const actions:Actions = {
       const { statusCode, data, errors } = await anvilClient.createEtchPacket({
          variables
       })
-      console.log('Finished! Status code:', statusCode) // => 200, 400, 404, etc
-
+      console.log('Finished' + data ) // => 200, 400, 404, etc
+      if(data){
+         await prisma.lease.create({
+            data:{
+               customerId: customer.id,
+               employeeId: employee.id,
+               unitNum: form.data.unitNum,
+               price: unitPrice?.price,
+               contactInfoId,
+               leaseEffectiveDate: dayjs().format('YYYY-MM-DD')
+            }
+         })
+      }
       if (errors) {
         // Note: because of the nature of GraphQL, statusCode may be a 200 even when
         // there are errors.

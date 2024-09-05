@@ -33,6 +33,9 @@
 
 {#if data.user && data.address && data.unitPrice}
 <form method="post">
+   <input type="hidden" name="contactInfoId" id="contactInfoId" value={data.address.contactId} />
+   <input type="hidden" name="unitPriceId" id="unitPriceId" value={data.unitPrice.unitPricingId} />
+   <input type="hidden" name="unitNum" id="unitNum" value={data.unit.num} />
    <button class="btn">All the above is correct, please email me a lease to sign</button>
 </form>
 {/if}
