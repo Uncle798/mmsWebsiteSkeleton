@@ -63,7 +63,6 @@ export const actions:Actions = {
          data:{
             address1:address.address1,
             address2:address.address2,
-            address3:address.address3,
             city:address.city,
             state:address.state,
             zip:address.zip,
@@ -72,10 +71,14 @@ export const actions:Actions = {
             userId: user?.id,
          },
       });
+      const unitNum = event.url.searchParams.get('unitNum');
       if(dbAddress){
          const redirectTo = event.url.searchParams.get('redirectTo');
          if(redirectTo){
             redirect(302,`${redirectTo.slice(1)}`)
+         }
+         if(unitNum){
+            redirect(302, '/newLease?unitNum' + unitNum)
          }
          redirect(302, '/units/available');
       }
