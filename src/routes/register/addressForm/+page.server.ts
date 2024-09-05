@@ -59,6 +59,16 @@ export const actions:Actions = {
             return message(form, "That is not a valid phone number")
          }
       }
+      await prisma.user.update({
+         where: {
+            id: user?.id
+         },
+         data:{
+            givenName: address.givenName,
+            familyName: address.familyName,
+            organizationName: address.organizationName,
+         }
+      })
       const dbAddress = await prisma.contactInfo.create({
          data:{
             address1:address.address1,
@@ -70,6 +80,8 @@ export const actions:Actions = {
             phoneNum2: phone2ResponseData.number ?? null,
             userId: user?.id,
          },
+      }).catch((err) =>{
+         return message(form, err);
       });
       const unitNum = event.url.searchParams.get('unitNum');
       if(dbAddress){
