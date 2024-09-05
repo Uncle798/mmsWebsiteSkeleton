@@ -57,9 +57,13 @@ export const actions:Actions = {
          }
       }
       const redirectTo = event.url.searchParams.get('redirectTo');
+      const unitNum = event.url.searchParams.get('unitNum');
       if(redirectTo){
          redirect(302,`${redirectTo.slice(1)}`)
       }
-      redirect(302, '/');
+      if(unitNum){
+         redirect(302, '/register/addressForm?unitNum=' + unitNum);
+      }
+      redirect(302, '/register/addressForm');
    }
 }

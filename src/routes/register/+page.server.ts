@@ -98,6 +98,10 @@ export const actions:Actions = {
 			path: '.', 
 			...sessionCookie.attributes
 		});
-		redirect(302, '/register/emailVerification');
+		const unitNum = event.url.searchParams.get('unitNum');
+		if(unitNum){
+			redirect(302, `/register/emailVerification?unitNum=${unitNum}`);
+		}
+		redirect(302, `/register/emailVerification`);
 	}
 }

@@ -39,14 +39,25 @@
       </tr>
    </thead>
    <tbody>
-      {#each $rows as row}
+      {#if data.user}    
+         {#each $rows as row}
          <tr>
             <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.unitNum.replace(/^0+/gm,'')}</a></td>
             <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.size.replace(/^0+/gm,'')}</a></td>
             <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.description}</a></td>
             <td><a href="/units/newLease/?unitNum={row.unitNum}">${row.price}</a></td>
          </tr>
-      {/each}
+         {/each}
+      {:else}
+         {#each $rows as row}
+         <tr>
+            <td><a href="/register?unitNum={row.unitNum}">{row.unitNum.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/register?unitNum={row.unitNum}">{row.size.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/register?unitNum={row.unitNum}">{row.description}</a></td>
+            <td><a href="/register?unitNum={row.unitNum}">${row.price}</a></td>
+         </tr>
+         {/each}
+      {/if}
    </tbody>
    
 </table>
