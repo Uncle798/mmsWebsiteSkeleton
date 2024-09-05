@@ -43,7 +43,7 @@ export const load:PageServerLoad = (async (event) =>{
       const unitPrice = await prisma.unitPricing.findFirst({
          where:{
             endDate: null,
-            unitNum: unit?.num
+            unitNum: unit.num
          }
       });
       return { form, unit, address, unitPrice };
