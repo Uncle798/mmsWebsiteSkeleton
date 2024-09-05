@@ -61,8 +61,12 @@ export const actions:Actions = {
          ...sessionCookie.attributes
       });
       const redirectTo = event.url.searchParams.get('redirectTo');
+      const unitNum = event.url.searchParams.get('unitNum');
       if(redirectTo){
          redirect(302,`${redirectTo.slice(1)}`)
+      }
+      if(unitNum){
+         redirect(302, `units/newLease?unitNum=${unitNum}`)
       }
       redirect(302, '/');
    }

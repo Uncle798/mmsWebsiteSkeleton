@@ -4,7 +4,11 @@
 	import { zxcvbn, zxcvbnOptions, type Score } from "@zxcvbn-ts/core";
 	import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 	import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
-	export let data
+	import { superForm } from "sveltekit-superforms";
+	
+	import type { PageData } from './$types';
+	
+	export let data:PageData
 	let passwordTouched = false;
 	const { translations } = zxcvbnEnPackage;
 	const { adjacencyGraphs: graphs, dictionary: commonDictionary } = zxcvbnCommonPackage;
@@ -34,7 +38,6 @@
 	default:
 		strengthDescription = "Low";
 	}
-	import { superForm } from "sveltekit-superforms";
 </script>
 
 <svelte:head>
@@ -107,4 +110,8 @@
 	<button type="submit" class="btn">Register</button>
 </p>
 </form>
+{#if data.unitNum}
+	<p>Already have an account <a class="a" href="/login?unitNum={data.unitNum}">Login</a></p>
+{:else}
 <p>Already have an account? <a class="a" href="/login">Login</a></p>
+{/if}

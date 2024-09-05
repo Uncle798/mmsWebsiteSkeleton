@@ -10,8 +10,7 @@ import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import { generateEmailVerificationRequest } from "$lib/server/authUtils";
 import { ratelimit } from "$lib/server/redis";
-import { sha1 } from "oslo/crypto";
-import { encodeHex } from "oslo/encoding";
+
 
 const registerSchema = z.object({
    email: z.string().email().min(3).max(255).trim().toLowerCase(),
@@ -36,10 +35,11 @@ const registerSchema = z.object({
 })
 
 
-export const load: PageServerLoad = (async () => {
+export const load: PageServerLoad = (async (event) => {
    const form = await superValidate(zod(registerSchema))
+	const unitNum = event.url.searchParams.get('unitNum');
 
-   return {form};
+   return {form, unitNum};
 })
 
 export const actions:Actions = {
@@ -100,6 +100,7 @@ export const actions:Actions = {
 		});
 		const unitNum = event.url.searchParams.get('unitNum');
 		if(unitNum){
+			
 			redirect(302, `/register/emailVerification?unitNum=${unitNum}`);
 		}
 		redirect(302, `/register/emailVerification`);
