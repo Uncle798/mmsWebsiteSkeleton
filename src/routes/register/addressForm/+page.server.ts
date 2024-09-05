@@ -94,5 +94,6 @@ export const actions:Actions = {
          }
          redirect(302, '/units/available');
       }
+      redirect(302, '/units/available')
    }
 } 
