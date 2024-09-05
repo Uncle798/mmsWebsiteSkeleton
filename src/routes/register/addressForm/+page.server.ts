@@ -53,7 +53,9 @@ export const actions:Actions = {
          return message(form, "That is not a valid phone number")
       }
       let phone2ResponseData: typeof phone1ResponseData;
+      let phoneNum2:string = '';
       if(address.phoneNum2){
+         phoneNum2 = phone2ResponseData.number;
          phone2ResponseData = await (await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum2}&country_code=${address.phoneNum2Country}&format=1`)).json();
          if(!phone2ResponseData.valid){
             return message(form, "That is not a valid phone number")
@@ -77,7 +79,7 @@ export const actions:Actions = {
             state:address.state,
             zip:address.zip,
             phoneNum1: phone1ResponseData.number,
-            phoneNum2: phone2ResponseData.number ?? null,
+            phoneNum2,
             userId: user?.id,
          },
       }).catch((err) =>{
