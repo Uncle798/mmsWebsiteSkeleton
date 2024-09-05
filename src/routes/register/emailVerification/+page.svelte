@@ -12,6 +12,8 @@
 	<title>{PUBLIC_COMPANY_NAME} | Verify your email address</title>
 </svelte:head>
 
+<h1>Please verify your email address</h1>
+
 {#if  $message}
    <h3>{message}</h3>
 {/if}
