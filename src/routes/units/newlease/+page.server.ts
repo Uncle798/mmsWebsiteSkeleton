@@ -5,8 +5,8 @@ import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
-import type GraphQLResponse from "@anvilco/anvil";
-import type { Unit, UnitPricing, User } from "@prisma/client";
+import type { Unit, UnitPricing } from "@prisma/client";
+import type { PartialUser } from "$lib/server/partialTypes";
 
 const newLeaseSchema = z.object({
    unitNum: z.string().min(3).max(3)
@@ -18,42 +18,48 @@ export const load:PageServerLoad = (async (event) =>{
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
-   const unitNum = event.url.searchParams.get('unitNum');
-   const unit = await prisma.unit.findUnique({
-      where:{
-         num:unitNum!,
+   if(!event.locals.user.employee){
+      const unitNum = event.url.searchParams.get('unitNum');
+      let unit:Unit= {} as Unit;
+      if(unitNum){
+         unit = await prisma.unit.findUnique({
+            where:{
+               num:unitNum,
+            }
+         }).catch((err) =>{
+            console.error(err);
+            return error(404, 'Unit not found')
+         });
       }
-   }).catch((err) =>{
-      console.error(err);
-      return error(404, 'Unit not found')
-   });
-   const address = await prisma.contactInfo.findFirst({
-      where:{
-         userId:event.locals.user.id
-      }
-   });
-   const unitPrice = await prisma.unitPricing.findFirst({
-      where:{
-         endDate: null,
-         unitNum: unit?.num
-      }
-   });
-   return { form, unit, address, unitPrice };
+      const address = await prisma.contactInfo.findFirst({
+         where:{
+            userId:event.locals.user.id
+         }
+      });
+      const unitPrice = await prisma.unitPricing.findFirst({
+         where:{
+            endDate: null,
+            unitNum: unit?.num
+         }
+      });
+      return { form, unit, address, unitPrice };
+   }
+   return { form }
 })
 
-function getPacketVariable(customer:User, unitPrice:UnitPricing, unit:Unit, employee:User){
+function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Unit, employee:PartialUser){
    return {
-      isDraft: true,
+      isDraft: false,
       isTest: true,
       name: `Fake Lease ${customer.familyName}, ${customer.givenName} unit ${unit.num.replace(/^0+/gm,'')}`,
-      signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at Moscow Mini`,
+      signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at ${process.env.PUBLIC_COMPANY_NAME}`,
       signatureEmailBody: `Hello ${customer.givenName}, please sign the attached lease for unit ${unit.num.replace(/^0+/gm,'')}`,
       files:[
          {
             id:'leaseTemplate',
             castEid: leaseTemplateId,
-            filename: `Unit ${unit.num} lease for ${customer.familyName}, ${customer.givenName}.pdf`,
-            title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${process.env.COMPANY_NAME}`,
+            // filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
+            title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${process.env.PUBLIC_COMPANY_NAME}`,
 
          }
       ],
@@ -61,11 +67,12 @@ function getPacketVariable(customer:User, unitPrice:UnitPricing, unit:Unit, empl
          payloads: {
             leaseTemplate:{
                data: {
-                  'Customer Name': customer.givenName + ' ' + customer.familyName,
-                  'Lease Effective Date': Date.now(),
-                  'Unit Number': unit.num.replace(/^0+/gm,''),
-                  'Size': unit.size,
-                  'Price': unitPrice.price
+                  'fielddba6ff096bb211ef892b8f8f688ede64':customer.givenName + ' ' + customer.familyName,
+                  'fielddba6ff086bb211ef892b8f8f688ede64': process.env.PUBLIC_COMPANY_NAME,
+                  'fielddba6ff076bb211ef892b8f8f688ede64': Date.now(),
+                  'fielddba6ff066bb211ef892b8f8f688ede64': unit.num.replace(/^0+/gm,''),
+                  'fielddba6ff056bb211ef892b8f8f688ede64': unit.size,
+                  'fielddba6ff046bb211ef892b8f8f688ede64': unitPrice.price
                }
             }
          }
@@ -79,11 +86,11 @@ function getPacketVariable(customer:User, unitPrice:UnitPricing, unit:Unit, empl
             fields: [
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'Customer Signature'
+                  fieldId: 'fielddba6ff036bb211ef892b8f8f688ede64'
                },
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'Customer Signature Date'
+                  fieldId: 'fielddba6ff026bb211ef892b8f8f688ede64', 
                }
 
             ]
@@ -96,11 +103,11 @@ function getPacketVariable(customer:User, unitPrice:UnitPricing, unit:Unit, empl
             fields: [
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'Manager Signature',
+                  fieldId: 'fielddba6ff016bb211ef892b8f8f688ede64',
                },
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'Manager Signature Date'
+                  fieldId: 'fielddba6ff006bb211ef892b8f8f688ede64'
                }
             ]
          }
@@ -118,24 +125,18 @@ export const actions:Actions = {
          where:{
             id:event.locals.user?.id
          }
-      }).catch((err) =>{
-         console.error(err);
-      });
+      })
       const unitNum = event.url.searchParams.get('unitNum');
       const unit = await prisma.unit.findFirst({
          where:{
             num:unitNum!,
          }
-      }).catch((err)=>{
-         console.error(err);
-      });
-      const unitPrice = await prisma.unit.findFirst({
+      })
+      const unitPrice = await prisma.unitPricing.findFirst({
          where:{
-            num: unitNum!,
+            unitNum: unitNum!,
          }
-      }).catch((err)=>{
-         console.error(err);
-      });
+      })
       const employees = await prisma.user.findMany({
          where:{
             employee: true,
@@ -143,8 +144,9 @@ export const actions:Actions = {
       })
       const employee = employees[Math.floor(Math.random()*employees.length)];
 
-      const variables = getPacketVariable(customer, unitPrice, unit, employee);
-      const { statusCode, data, errors } :GraphQLResponse = await anvilClient.createEtchPacket({
+      const variables = getPacketVariable( customer, unitPrice!, unit!, employee! );
+      console.log(variables)
+      const { statusCode, data, errors } = await anvilClient.createEtchPacket({
          variables
       })
       console.log('Finished! Status code:', statusCode) // => 200, 400, 404, etc
