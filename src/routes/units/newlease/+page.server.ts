@@ -34,6 +34,7 @@ export const load:PageServerLoad = (async (event) =>{
             return error(404, 'Unit not found')
          }) || {} as Unit;
       }
+      console.log(unit.num);
       const address = await prisma.contactInfo.findFirst({
          where:{
             userId:event.locals.user.id
