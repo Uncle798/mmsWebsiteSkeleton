@@ -39,6 +39,8 @@ export const load:PageServerLoad = (async (event) =>{
          where:{
             userId:event.locals.user.id
          }
+      }).catch((err) =>{
+         console.error(err);
       });
       const unitPrice = await prisma.unitPricing.findFirst({
          where:{
@@ -125,21 +127,26 @@ export const actions:Actions = {
       if(!form.valid){
          message(form, 'no good')
       }
-
       const customer = await prisma.user.findUniqueOrThrow({
          where:{
             id:event.locals.user?.id
          }
+      }).catch((err) =>{
+         console.error(err);
       })
       const unit = await prisma.unit.findFirst({
          where:{
             num:form.data.unitNum,
          }
+      }).catch((err) =>{
+         console.error(err);
       })
       const unitPrice = await prisma.unitPricing.findUniqueOrThrow({
          where:{
             unitPricingId:form.data.unitPriceId
          }
+      }).catch((err) =>{
+         console.error(err);
       })
       const contactInfoId = form.data.contactInfoId;
       const employees = await prisma.user.findMany({
@@ -149,19 +156,19 @@ export const actions:Actions = {
       })
       const employee = employees[Math.floor(Math.random()*employees.length)];
 
-      const variables = getPacketVariable( customer, unitPrice!, unit!, employee! );
+      const variables = getPacketVariable( customer!, unitPrice!, unit!, employee! );
       console.log(variables)
       const { statusCode, data, errors } = await anvilClient.createEtchPacket({
          variables
       })
-      console.log('Finished' + data ) // => 200, 400, 404, etc
+      console.log('Finished' + data )
       if(data){
          await prisma.lease.create({
             data:{
-               customerId: customer.id,
+               customerId: customer!.id,
                employeeId: employee.id,
                unitNum: form.data.unitNum,
-               price: unitPrice?.price,
+               price: unitPrice!.price,
                contactInfoId,
                leaseEffectiveDate: dayjs().format('YYYY-MM-DD')
             }
