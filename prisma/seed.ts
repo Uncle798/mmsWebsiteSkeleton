@@ -216,26 +216,35 @@ async function  main (){
    const deleteEndTime = dayjs(new Date);
    console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 'ms')} ms`);
    userData.forEach((user, i)=>{
+      const randString:string=String(Math.floor(Math.random()*101));
+      const emailFront = user.givenName + '.' + user.familyName + randString;
       if(i%7 === 0){
-         user.email= user.givenName + '.' + user.familyName + '@veryFakeEmail.com'
+         user.email= emailFront.toLowerCase() + '@veryFakeEmail.com'
          user.organizationName = faker.company.name()
       } else if (i%7 === 1){
-         user.email= user.givenName + '.' + user.familyName + '@sillyNotRealEmail.com'
+         user.email= emailFront.toLowerCase() + '@sillyNotRealEmail.com'
       } else if (i%7 === 2){
          // cSpell:disable 
-         user.email= user.givenName + '.' + user.familyName + '@blahblahblahEmail.com'
+         user.email= emailFront.toLowerCase() + '@blahblahblahEmail.com'
       } else if (i%7 === 3){
-         user.email = user.givenName+ '.' + user.familyName + '@horribleEmailAddress.com'
+         user.email = emailFront.toLowerCase() + '@horribleEmailAddress.com'
       } else if (i%7 === 4){
-         user.email = user.givenName+ '.' + user.familyName + '@emailemailemail.com'
+         user.email = emailFront.toLowerCase() + '@emailemailemail.com'
       } else if (i%7 === 5){
-         user.email = user.givenName+ '.' + user.familyName + '@dumbfancyemail.com'
-         
+         user.email = emailFront.toLowerCase() + '@dumbfancyemail.com'
       } else if (i%7 === 6){
-         user.email = user.givenName+ '.' + user.familyName + '@sweetsweetemail.com'
+         user.email = emailFront.toLowerCase() + '@sweetsweetemail.com'
       }
-      //cSpell:enable
    })
+   userData.forEach((user) =>{
+      const sameEmail = userData.filter((u) => u.email === user.email);
+      if(sameEmail.length > 1){
+         const randString:string=String(Math.floor(Math.random()*101));
+         const emailFront = user.givenName + '.' + user.familyName + randString;
+         user.email = emailFront.toLowerCase() + 'yetanotherfakeemail.com';
+      }
+   })
+   //cSpell:enable
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
    })
@@ -269,7 +278,7 @@ async function  main (){
    await createEmployees();
    const totalUsers = await prisma.user.count();
    const userEndTime = dayjs(new Date);
-   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 'ms')} ms`);
+   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 's')} s`);
    const pricing = await prisma.pricing.createManyAndReturn({
       data: pricingData
    })
@@ -297,7 +306,7 @@ async function  main (){
       });
    }
    const unitEndTime = dayjs(new Date);
-   console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
+   console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 's')} s`);
    const pricedUnits = (await prisma.unitPricing.findMany());
    const leases:Lease[]=[];
    let leaseStart = dayjs(earliestStarting);
@@ -345,7 +354,7 @@ async function  main (){
          }
       }
    const leaseEndTime = dayjs(new Date);
-   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'ms')} ms`);
+   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 's')} s`);
    const invoices: Invoice[] = [];
    for await (const lease of leases){
       const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
@@ -367,7 +376,7 @@ async function  main (){
       }
    }
    const invoiceEndTime = dayjs(new Date);
-   console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'ms')} ms`);
+   console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 's')} s`);
    const paymentRecords:PaymentRecord[]=[];
    for await (const invoice of invoices){
       const paymentDate = dayjs(invoice.invoiceCreated).add(1, 'months');
@@ -392,7 +401,7 @@ async function  main (){
    }                                                     
    const paymentEndTime = dayjs(new Date);
    const totalRecords = await countAll();
-   console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 'ms')} ms`);
+   console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 's')} s`);
    console.log(`🖥️  ${totalRecords} database entries created in ${paymentEndTime.diff(deleteStartTime, 'seconds')} seconds`);
 }
 
