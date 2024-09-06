@@ -39,7 +39,7 @@ export const actions:Actions = {
          return message(form, 'An email will be sent to the email provided');
       }
       const verificationToken = await passwordResetToken(user.id);
-      const verificationLink = 'http://localhost:5173/login/resetPassword/'+ verificationToken;
+      const verificationLink = 'https://' + process.env.VERCEL_URL + verificationToken;
       const sender = {name: 'Computer@bransonschlegel.com', email:'computer@bransonschlegel.com'}
       mailtrap.send({
          from: sender,
