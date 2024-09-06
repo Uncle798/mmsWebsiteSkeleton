@@ -127,6 +127,7 @@ export const actions:Actions = {
       if(!form.valid){
          message(form, 'no good')
       }
+      console.log(form.data);
       const customer = await prisma.user.findUniqueOrThrow({
          where:{
             id:event.locals.user?.id
