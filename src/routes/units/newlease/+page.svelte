@@ -8,7 +8,6 @@
 	
    import type { PageData } from './$types';
 	export let data:PageData
-
 	const { form, errors, constraints, message, enhance } = superForm(data.form)
 </script>
 
