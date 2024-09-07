@@ -92,7 +92,7 @@ export const actions:Actions = {
             redirect(302,`${redirectTo.slice(1)}`)
          }
          if(unitNum){
-            redirect(302, '/newLease?unitNum' + unitNum)
+            redirect(302, '/newLease?unitNum=' + unitNum)
          }
          redirect(302, '/units/available');
       }
