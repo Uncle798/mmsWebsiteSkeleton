@@ -7,7 +7,6 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
 import type { Unit, UnitPricing } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
-import dayjs from "dayjs";
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
@@ -34,7 +33,6 @@ export const load:PageServerLoad = (async (event) =>{
             return error(404, 'Unit not found')
          }) || {} as Unit;
       }
-      console.log(unit.num);
       const address = await prisma.contactInfo.findFirst({
          where:{
             userId:event.locals.user.id
@@ -57,6 +55,7 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
    return {
       isDraft: false,
       isTest: true,
+      webhookURL: 'https://' + process.env.VERCEL_URL + '/units/newLease',
       name: `Fake Lease ${customer.familyName}, ${customer.givenName} unit ${unit.num.replace(/^0+/gm,'')}`,
       signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at ${process.env.PUBLIC_COMPANY_NAME}`,
       signatureEmailBody: `Hello ${customer.givenName}, please sign the attached lease for unit ${unit.num.replace(/^0+/gm,'')}`,
@@ -64,7 +63,7 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
          {
             id:'leaseTemplate',
             castEid: leaseTemplateId,
-            // filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
+            filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
             title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${process.env.PUBLIC_COMPANY_NAME}`,
 
          }
@@ -73,12 +72,12 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
          payloads: {
             leaseTemplate:{
                data: {
-                  'fielddba6ff096bb211ef892b8f8f688ede64':customer.givenName + ' ' + customer.familyName,
-                  'fielddba6ff086bb211ef892b8f8f688ede64': process.env.PUBLIC_COMPANY_NAME,
-                  'fielddba6ff076bb211ef892b8f8f688ede64': Date.now(),
-                  'fielddba6ff066bb211ef892b8f8f688ede64': unit.num.replace(/^0+/gm,''),
-                  'fielddba6ff056bb211ef892b8f8f688ede64': unit.size,
-                  'fielddba6ff046bb211ef892b8f8f688ede64': unitPrice.price
+                  'customerName':customer.givenName + ' ' + customer.familyName,
+                  'companyName': process.env.PUBLIC_COMPANY_NAME,
+                  'leaseEffectiveDate': Date.now(),
+                  'unitNum': unit.num.replace(/^0+/gm,''),
+                  'size': unit.size,
+                  'price': unitPrice.price
                }
             }
          }
@@ -92,11 +91,11 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
             fields: [
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'fielddba6ff036bb211ef892b8f8f688ede64'
+                  fieldId: 'customerSignDate'
                },
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'fielddba6ff026bb211ef892b8f8f688ede64', 
+                  fieldId: 'customerSign', 
                }
 
             ]
@@ -109,11 +108,11 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
             fields: [
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'fielddba6ff016bb211ef892b8f8f688ede64',
+                  fieldId: 'companySignDate',
                },
                {
                   fileId: 'leaseTemplate',
-                  fieldId: 'fielddba6ff006bb211ef892b8f8f688ede64'
+                  fieldId: 'companySign'
                }
             ]
          }
@@ -162,8 +161,15 @@ export const actions:Actions = {
       const { statusCode, data, errors } = await anvilClient.createEtchPacket({
          variables
       })
-      console.log('Finished' + data )
-      if(data){
+      if (errors) {
+         // Note: because of the nature of GraphQL, statusCode may be a 200 even when
+         // there are errors.
+         console.log('There were errors!')
+         console.log(JSON.stringify(errors, null, 2))
+      } else {
+         const packetDetails = data?.data['createEtchPacket']
+         console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
+         console.log(JSON.stringify(packetDetails, null, 2))
          await prisma.lease.create({
             data:{
                customerId: customer!.id,
@@ -171,19 +177,10 @@ export const actions:Actions = {
                unitNum: form.data.unitNum,
                price: unitPrice!.price,
                contactInfoId,
-               leaseEffectiveDate: dayjs().format('YYYY-MM-DD')
+               leaseEffectiveDate: new Date(),
+               leaseId: packetDetails['eid'],
             }
          })
-      }
-      if (errors) {
-        // Note: because of the nature of GraphQL, statusCode may be a 200 even when
-        // there are errors.
-        console.log('There were errors!')
-        console.log(JSON.stringify(errors, null, 2))
-      } else {
-        const packetDetails = data?.data['createEtchPacket']
-        console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
-        console.log(JSON.stringify(packetDetails, null, 2))
       }
    }
 }
