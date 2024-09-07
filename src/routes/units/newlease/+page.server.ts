@@ -33,7 +33,7 @@ export const load:PageServerLoad = (async (event) =>{
             return error(404, 'Unit not found')
          }) || {} as Unit;
       }
-      const address = await prisma.contactInfo.findFirst({
+      const address = await prisma.contactInfo.findMany({
          where:{
             userId:event.locals.user.id
          }
@@ -63,7 +63,7 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
          {
             id:'leaseTemplate',
             castEid: leaseTemplateId,
-            filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
+            // filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
             title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${process.env.PUBLIC_COMPANY_NAME}`,
 
          }

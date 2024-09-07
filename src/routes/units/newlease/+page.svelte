@@ -16,13 +16,17 @@
 </svelte:head>
 
 {#if $message}
-	<h3>{$message}</h3>
+<h3>{$message}</h3>
 {/if}
 {#if data.user}
 <NameBlock nameBlock={data.user} />
 {/if}
+<form method="post">
 {#if data.address}
-   <Address address={data.address} />
+   {#each data.address as address}
+      <Address address={address} />
+      <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} />
+   {/each}
 {:else}
    <a class="a" href="/register/addressFrom">Please add your address</a>
 {/if}
@@ -31,10 +35,8 @@
 {/if}
 
 {#if data.user && data.address && data.unitPrice}
-<form method="post">
-   <input type="hidden" name="contactInfoId" id="contactInfoId" value={data.address.contactId} />
    <input type="hidden" name="unitPriceId" id="unitPriceId" value={data.unitPrice.unitPricingId} />
    <input type="hidden" name="unitNum" id="unitNum" value={data.unit.num} />
    <button class="btn">All the above is correct, please email me a lease to sign</button>
+   {/if}
 </form>
-{/if}
