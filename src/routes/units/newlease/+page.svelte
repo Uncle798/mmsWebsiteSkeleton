@@ -21,7 +21,7 @@
 {#if data.user}
 <NameBlock nameBlock={data.user} />
 {/if}
-<form method="post">
+<form method="post" use:enhance>
 {#if data.address}
    {#each data.address as address}
       <Address address={address} />
@@ -38,5 +38,5 @@
    <input type="hidden" name="unitPriceId" id="unitPriceId" value={data.unitPrice.unitPricingId} />
    <input type="hidden" name="unitNum" id="unitNum" value={data.unit.num} />
    <button class="btn">All the above is correct, please email me a lease to sign</button>
-   {/if}
+{/if}
 </form>

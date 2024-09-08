@@ -1,5 +1,7 @@
 import  prisma from "$lib/server/prisma";
 import { anvilClient, leaseTemplateId } from "$lib/server/anvil";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore: it works
 import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
@@ -158,7 +160,7 @@ export const actions:Actions = {
 
       const variables = getPacketVariable( customer!, unitPrice!, unit!, employee! );
       console.log(variables)
-      const { statusCode, data, errors } = await anvilClient.createEtchPacket({
+      const { data, errors } = await anvilClient.createEtchPacket({
          variables
       })
       if (errors) {
@@ -166,6 +168,7 @@ export const actions:Actions = {
          // there are errors.
          console.log('There were errors!')
          console.log(JSON.stringify(errors, null, 2))
+         message(form, 'Sorry there were server errors. Please try again later.')
       } else {
          const packetDetails = data?.data['createEtchPacket']
          console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
@@ -182,5 +185,6 @@ export const actions:Actions = {
             }
          })
       }
+      redirect(302, '/units/newLease/leaseSent')
    }
 }
