@@ -4,7 +4,7 @@
 	import { superForm } from "sveltekit-superforms";
 	import NameBlock from '$lib/userComponents/NameBlock.svelte';
 	import Address from '$lib/userComponents/Address.svelte';
-	import BasicUnitCustomer from '$lib/unitComponenets/BasicUnitCustomer.svelte';
+	import BasicUnitCustomer from '$lib/unitComponents/BasicUnitCustomer.svelte';
 	
    // @ts-ignore: it works
    import type { PageData } from './$types';
@@ -32,7 +32,15 @@
          {/if}
          <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} />
       </div>
+      {#if data.user?.organizationName}
+         <div>
+            <label for="orgainzation">This unit is being rented by an organization (Company, Non Profit, ect)
+               <input type="checkbox" name="organization" id="organization" checked />
+            </label>
+         </div>
+      {/if}
    {/each}
+   
 {:else}
    <a class="a" href="/register/addressFrom">Please add your address</a>
 {/if}

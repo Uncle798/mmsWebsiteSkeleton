@@ -1,5 +1,5 @@
 import  prisma from "$lib/server/prisma";
-import { anvilClient, leaseTemplateId } from "$lib/server/anvil";
+import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore: it works
 import type { Actions, PageServerLoad } from './$types';
@@ -7,15 +7,14 @@ import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
-import { PUBLIC_COMPANY_NAME } from '$env/static/public';
 import { ratelimit } from "$lib/server/redis";
-import type { Unit, UnitPricing } from "@prisma/client";
-import type { PartialUser } from "$lib/server/partialTypes";
+import type { Unit } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
    unitPriceId: z.string().min(23).max(30),
    unitNum: z.string().min(23).max(30),
+   organization: z.boolean(),
 })
 
 
@@ -57,74 +56,6 @@ export const load:PageServerLoad = (async (event) =>{
    return { form }
 })
 
-function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Unit, employee:PartialUser){
-   return {
-      isDraft: false,
-      isTest: true,
-      webhookURL: 'https://' + process.env.VERCEL_URL + '/units/newLease',
-      name: `Fake Lease ${customer.familyName}, ${customer.givenName} unit ${unit.num.replace(/^0+/gm,'')}`,
-      signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at ${PUBLIC_COMPANY_NAME}`,
-      signatureEmailBody: `Please sign the attached lease for unit ${unit.num.replace(/^0+/gm,'')} from ${PUBLIC_COMPANY_NAME}`,
-      files:[
-         {
-            id:'leaseTemplate',
-            castEid: leaseTemplateId,
-            // filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
-            title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${PUBLIC_COMPANY_NAME}`,
-
-         }
-      ],
-      data: {
-         payloads: {
-            leaseTemplate:{
-               data: {
-                  'customerName':customer.givenName + ' ' + customer.familyName,
-                  'companyName': PUBLIC_COMPANY_NAME,
-                  'leaseEffectiveDate': new Date(),
-                  'unitNum': unit.num.replace(/^0+/gm,''),
-                  'size': unit.size,
-                  'price': unitPrice.price
-               }
-            }
-         }
-      },
-      signers: [
-         {
-            id: 'customer', 
-            name: `${customer.givenName} ${customer.familyName}`,
-            email: customer.email,
-            signerType: 'email',
-            fields: [
-               {
-                  fileId: 'leaseTemplate',
-                  fieldId: 'customerSignDate'
-               },
-               {
-                  fileId: 'leaseTemplate',
-                  fieldId: 'customerSign', 
-               }
-
-            ]
-         },
-         {
-            id: 'manager',
-            name: `${employee.givenName, employee.familyName}`,
-            email: employee.email,
-            signerType: 'email',
-            fields: [
-               {
-                  fileId: 'leaseTemplate',
-                  fieldId: 'companySignDate',
-               },
-               {
-                  fileId: 'leaseTemplate',
-                  fieldId: 'companySign'
-               }
-            ]
-         }
-      ]
-   }
-}
 
 export const actions:Actions = {
    default: async (event) =>{
@@ -175,9 +106,12 @@ export const actions:Actions = {
          }
       })
       const employee = employees[Math.floor(Math.random()*employees.length)];
-
-      const variables = getPacketVariable( customer!, unitPrice!, unit!, employee! );
-      console.log(variables)
+      let variables ={};
+      if(form.data.organization){
+         variables = getOrganizationalPacketVariables( customer!, unitPrice!, unit!, employee! );
+      } else {
+         variables = getPersonalPacketVariables( customer!, unitPrice!, unit!, employee! );
+      }
       const { data, errors } = await anvilClient.createEtchPacket({
          variables
       })
