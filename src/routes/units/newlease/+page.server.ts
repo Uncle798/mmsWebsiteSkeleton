@@ -7,7 +7,8 @@ import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
-import { PUBLIC_COMPANY_NAME } from '$env/static/public'
+import { PUBLIC_COMPANY_NAME } from '$env/static/public';
+import { ratelimit } from "$lib/server/redis";
 import type { Unit, UnitPricing } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
 
@@ -131,6 +132,11 @@ export const actions:Actions = {
       if(!form.valid){
          message(form, 'no good')
       }
+      const { success, reset } = await ratelimit.register.limit(event.getClientAddress())
+		if(!success) {
+			const timeRemaining = Math.floor((reset - Date.now()) /1000);
+			return message(form, `Please wait ${timeRemaining}s before trying again.`)
+		}
       console.log(form.data);
       const customer = await prisma.user.findUniqueOrThrow({
          where:{
@@ -146,6 +152,15 @@ export const actions:Actions = {
       }).catch((err) =>{
          console.error(err);
       })
+      const lease = await prisma.lease.findFirst({
+         where:{
+            unitNum: unit?.num,
+            leaseEnded: null,
+         }
+      })
+      if(lease){
+         message(form, 'That unit is already leased');
+      }
       const unitPrice = await prisma.unitPricing.findUniqueOrThrow({
          where:{
             unitPricingId:form.data.unitPriceId
