@@ -6,6 +6,7 @@
 	import Address from '$lib/userComponents/Address.svelte';
 	import BasicUnitCustomer from '$lib/unitComponenets/BasicUnitCustomer.svelte';
 	
+   // @ts-ignore: it works
    import type { PageData } from './$types';
 	export let data:PageData
 	const { form, errors, constraints, message, enhance } = superForm(data.form)

@@ -7,6 +7,7 @@ import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
+import { PUBLIC_COMPANY_NAME } from '$env/static/public'
 import type { Unit, UnitPricing } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
 
@@ -59,14 +60,14 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
       isTest: true,
       webhookURL: 'https://' + process.env.VERCEL_URL + '/units/newLease',
       name: `Fake Lease ${customer.familyName}, ${customer.givenName} unit ${unit.num.replace(/^0+/gm,'')}`,
-      signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at ${process.env.PUBLIC_COMPANY_NAME}`,
-      signatureEmailBody: `Hello ${customer.givenName}, please sign the attached lease for unit ${unit.num.replace(/^0+/gm,'')}`,
+      signatureEmailSubject: `Lease for Unit ${unit.num.replace(/^0+/gm,'')} at ${PUBLIC_COMPANY_NAME}`,
+      signatureEmailBody: `Please sign the attached lease for unit ${unit.num.replace(/^0+/gm,'')} from ${PUBLIC_COMPANY_NAME}`,
       files:[
          {
             id:'leaseTemplate',
             castEid: leaseTemplateId,
             // filename: `Unit:${unit.num}_lease_${customer.familyName}_${customer.givenName}.pdf`,
-            title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${process.env.PUBLIC_COMPANY_NAME}`,
+            title: `Unit ${unit.num} lease between ${customer.familyName}, ${customer.givenName} and ${PUBLIC_COMPANY_NAME}`,
 
          }
       ],
@@ -75,8 +76,8 @@ function getPacketVariable(customer:PartialUser, unitPrice:UnitPricing, unit:Uni
             leaseTemplate:{
                data: {
                   'customerName':customer.givenName + ' ' + customer.familyName,
-                  'companyName': process.env.PUBLIC_COMPANY_NAME,
-                  'leaseEffectiveDate': Date.now(),
+                  'companyName': PUBLIC_COMPANY_NAME,
+                  'leaseEffectiveDate': new Date(),
                   'unitNum': unit.num.replace(/^0+/gm,''),
                   'size': unit.size,
                   'price': unitPrice.price
