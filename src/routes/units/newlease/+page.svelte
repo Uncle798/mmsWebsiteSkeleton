@@ -24,9 +24,14 @@
 {/if}
 <form method="post" use:enhance>
 {#if data.address}
-   {#each data.address as address}
-      <Address address={address} />
-      <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} />
+   {#each data.address as address, index}
+      <div class="flex">
+         <Address address={address} />
+         {#if index === 0}
+            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked />
+         {/if}
+         <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} />
+      </div>
    {/each}
 {:else}
    <a class="a" href="/register/addressFrom">Please add your address</a>

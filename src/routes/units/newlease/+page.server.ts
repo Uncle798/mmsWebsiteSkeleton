@@ -27,6 +27,7 @@ export const load:PageServerLoad = (async (event) =>{
       const unitNum = event.url.searchParams.get('unitNum');
       let unit:Unit= {} as Unit;
       if(unitNum){
+         console.log('newLease +page.server: unitNum:' + unitNum);
          unit = await prisma.unit.findUnique({
             where:{
                num:unitNum,
@@ -36,6 +37,7 @@ export const load:PageServerLoad = (async (event) =>{
             return error(404, 'Unit not found')
          }) || {} as Unit;
       }
+      console.log('newLease +page.server: unit:' + unit);
       const address = await prisma.contactInfo.findMany({
          where:{
             userId:event.locals.user.id
