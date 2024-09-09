@@ -1,5 +1,5 @@
 import  prisma from "$lib/server/prisma";
-import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore: it works
 import type { Actions, PageServerLoad } from './$types';
@@ -83,13 +83,13 @@ export const actions:Actions = {
       }).catch((err) =>{
          console.error(err);
       })
-      const lease = await prisma.lease.findFirst({
+      const currentLease = await prisma.lease.findFirst({
          where:{
             unitNum: unit?.num,
             leaseEnded: null,
          }
       })
-      if(lease){
+      if(currentLease){
          message(form, 'That unit is already leased');
       }
       const unitPrice = await prisma.unitPricing.findUniqueOrThrow({
@@ -106,26 +106,26 @@ export const actions:Actions = {
          }
       })
       const employee = employees[Math.floor(Math.random()*employees.length)];
-      let variables ={};
-      if(form.data.organization){
-         variables = getOrganizationalPacketVariables( customer!, unitPrice!, unit!, employee! );
-      } else {
-         variables = getPersonalPacketVariables( customer!, unitPrice!, unit!, employee! );
-      }
-      const { data, errors } = await anvilClient.createEtchPacket({
-         variables
-      })
-      if (errors) {
-         // Note: because of the nature of GraphQL, statusCode may be a 200 even when
-         // there are errors.
-         console.log('There were errors!')
-         console.log(JSON.stringify(errors, null, 2))
-         message(form, 'Sorry there were server errors. Please try again later.')
-      } else {
-         const packetDetails = data?.data['createEtchPacket']
-         console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
-         console.log(JSON.stringify(packetDetails, null, 2))
-         await prisma.lease.create({
+      // let variables ={};
+      // if(form.data.organization){
+      //    variables = getOrganizationalPacketVariables( customer!, unitPrice!, unit!, employee! );
+      // } else {
+      //    variables = getPersonalPacketVariables( customer!, unitPrice!, unit!, employee! );
+      // }
+      // const { data, errors } = await anvilClient.createEtchPacket({
+      //    variables
+      // })
+      // if (errors) {
+      //    // Note: because of the nature of GraphQL, statusCode may be a 200 even when
+      //    // there are errors.
+      //    console.log('There were errors!')
+      //    console.log(JSON.stringify(errors, null, 2))
+      //    message(form, 'Sorry there were server errors. Please try again later.')
+      // } else {
+      //    const packetDetails = data?.data['createEtchPacket']
+      //    console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
+      //    console.log(JSON.stringify(packetDetails, null, 2))
+         const lease = await prisma.lease.create({
             data:{
                customerId: customer!.id,
                employeeId: employee.id,
@@ -133,10 +133,9 @@ export const actions:Actions = {
                price: unitPrice!.price,
                contactInfoId,
                leaseEffectiveDate: new Date(),
-               leaseId: packetDetails['eid'],
             }
-         })
-      }
-      redirect(302, '/units/newLease/leaseSent')
+         });
+
+      redirect(302, '/units/newLease/payDeposit?leaseId=' + lease?.leaseId)
    }
 }

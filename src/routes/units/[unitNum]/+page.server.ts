@@ -62,5 +62,5 @@ export async function load(event) {
       })
       return{unit, unitPrice}
    }
-      error(404, 'Unit not found')
+      error(404, 'Unit not found');
 }

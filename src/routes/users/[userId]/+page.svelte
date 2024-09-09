@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
    // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
@@ -10,8 +10,9 @@
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte"; 
 	import { DataHandler } from '@vincjo/datatables';
+	import type { PageData } from './$types';
 
-   export let data;
+   export let data:PageData;
    export const { contactInfo, dbUser, leases, paymentTableData } = data;
    const handler = new DataHandler(paymentTableData, {rowsPerPage:  10});
    const rows = handler.getRows();
@@ -24,8 +25,9 @@
 	<title>{PUBLIC_COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
 </svelte:head>
 
+{#if dbUser}
 <NameBlock nameBlock={dbUser} />
-
+{/if}
 {#each contactInfo as info}   
    <Address address={info}/>
 {/each}

@@ -2,13 +2,13 @@ import Anvil from "@anvilco/anvil";
 import { PUBLIC_COMPANY_NAME } from '$env/static/public';
 
 import type { PartialUser } from "./partialTypes";
-import type { Unit, UnitPricing } from "@prisma/client";
+import type { Lease, Unit, } from "@prisma/client";
 
 export const anvilClient = new Anvil({apiKey:process.env.ANVIL_API_KEY});
 
 export const leaseTemplateId = '3ABabYkvU2ySORZ7RKrw'
 
-export function getPersonalPacketVariables(customer:PartialUser, unitPrice:UnitPricing, unit:Unit, employee:PartialUser){
+export function getPersonalPacketVariables(customer:PartialUser, lease:Lease, unit:Unit, employee:PartialUser){
    return {
       isDraft: false,
       isTest: true,
@@ -31,10 +31,10 @@ export function getPersonalPacketVariables(customer:PartialUser, unitPrice:UnitP
                data: {
                   'customerName':customer.givenName + ' ' + customer.familyName,
                   'companyName': PUBLIC_COMPANY_NAME,
-                  'leaseEffectiveDate': new Date(),
+                  'leaseEffectiveDate': lease.leaseEffectiveDate,
                   'unitNum': unit.num.replace(/^0+/gm,''),
                   'size': unit.size,
-                  'price': unitPrice.price
+                  'price': lease.price
                }
             }
          }
@@ -76,7 +76,7 @@ export function getPersonalPacketVariables(customer:PartialUser, unitPrice:UnitP
       ]
    }
 }
-export function getOrganizationalPacketVariables(customer:PartialUser, unitPrice:UnitPricing, unit:Unit, employee:PartialUser){
+export function getOrganizationalPacketVariables(customer:PartialUser, lease:Lease, unit:Unit, employee:PartialUser){
    return {
       isDraft: false,
       isTest: true,
@@ -99,10 +99,10 @@ export function getOrganizationalPacketVariables(customer:PartialUser, unitPrice
                   'customerName':customer.organizationName,
                   'representativeName':customer.givenName + ' ' + customer.familyName,
                   'companyName': PUBLIC_COMPANY_NAME,
-                  'leaseEffectiveDate': new Date(),
+                  'leaseEffectiveDate': lease.leaseEffectiveDate,
                   'unitNum': unit.num.replace(/^0+/gm,''),
                   'size': unit.size,
-                  'price': unitPrice.price
+                  'price': lease.price
                }
             }
          }

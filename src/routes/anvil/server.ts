@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async (event) => {
    const data = event.request.body;
-   const eid = data.;
+   const eid = data.eid;
    const downloadURL = data.documentGroup.files[0].downloadURL;
    const dropboxResult = await dropbox.filesSaveUrl({
       url:downloadURL,
@@ -17,7 +17,8 @@ export const POST: RequestHandler = async (event) => {
          leaseId: eid,
       },
       data: {
-         leaseReturnedAt:data.updatedAt, 
+         leaseReturnedAt:data.updatedAt,
+         dropboxURL: dropboxResult.result
       }
    })
    return new Response();
