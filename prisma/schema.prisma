@@ -111,6 +111,7 @@ model Lease {
   leaseEffectiveDate DateTime
   leaseEnded         DateTime?
   dropboxURL         String?
+  anvilEID           String?
   invoices           Invoice[]
 
   @@unique([leaseId, unitNum, price])
