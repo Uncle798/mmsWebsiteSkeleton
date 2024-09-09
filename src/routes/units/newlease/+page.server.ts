@@ -50,6 +50,8 @@ export const load:PageServerLoad = (async (event) =>{
             endDate: null,
             unitNum: unit.num
          }
+      }).catch((err) =>{
+         console.error(err);
       });
       return { form, unit, address, unitPrice };
    }

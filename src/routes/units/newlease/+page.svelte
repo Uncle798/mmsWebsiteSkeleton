@@ -28,9 +28,11 @@
       <div class="flex">
          <Address address={address} />
          {#if index === 0}
-            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked />
+            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked class="radio"/>
+         {:else}
+            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} class="radio"/>
          {/if}
-         <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} />
+
       </div>
       {#if data.user?.organizationName}
          <div>
