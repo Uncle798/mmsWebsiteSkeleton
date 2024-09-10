@@ -27,7 +27,7 @@
       component: modalComponent,
       title:'Are you sure you\'d like to change employment status?',
 
-      body:''
+      body:'Body'
    }
    function modalFire():void {
       modalStore.trigger(modal);

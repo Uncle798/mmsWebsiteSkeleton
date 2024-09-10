@@ -1,11 +1,14 @@
 import prisma from "$lib/server/prisma";
-import { redirect } from "@sveltejs/kit";
+import { redirect} from "@sveltejs/kit";
+import type { PageServerLoad, Actions } from "./$types";
 import type { PaymentRecord, User } from "@prisma/client";
 import { handleLoginRedirect } from "$lib/utils.js";
-
+import { superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import z from 'zod'
 export type PaymentTableData = PaymentRecord & User
 
-export async function load(event) {
+export const load:PageServerLoad = async (event) => {
    if(!event.locals.user){
       console.log(event.request.url)
       return redirect(302, handleLoginRedirect(event, 'You must be an employee to access that page'));
@@ -51,3 +54,13 @@ export async function load(event) {
       return{ dbUser, contactInfo, leases}
    }
 }  
+
+const employeeFormSchema = z.object({
+   admin
+})
+
+export const actions:Actions = {
+   default: async (event) => {
+      const form = await superValidate(event.request, zod(employeeFormSchema))
+   }
+}
