@@ -55,12 +55,9 @@ export const load:PageServerLoad = async (event) => {
    }
 }  
 
-const employeeFormSchema = z.object({
-   admin
-})
 
 export const actions:Actions = {
    default: async (event) => {
-      const form = await superValidate(event.request, zod(employeeFormSchema))
+      // const form = await superValidate(event.request, zod(employeeFormSchema))
    }
 }
