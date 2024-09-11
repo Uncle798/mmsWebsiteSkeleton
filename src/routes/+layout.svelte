@@ -28,6 +28,7 @@
 		<li><a href="/units/available">Available units</a></li>
 		<li><a href="/units/newLease">New Lease</a></li>
 		<li><a href="/users">users</a></li>
+		<li><a href="/customers">Customers</a></li>
 	</ul>
 </nav>
 {/if}
