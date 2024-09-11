@@ -1,10 +1,9 @@
 
 <script lang="ts">
-   import type { PageData } from "../$types";
+   import type { PageData } from "./$types";
    // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
-   import { superForm } from "sveltekit-superforms";
    import Th from '$lib/tableComponent/Th.svelte'
    import ThFilter from "$lib/tableComponent/ThFilter.svelte";
    import Search from "$lib/tableComponent/Search.svelte";
@@ -12,24 +11,26 @@
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
    import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
-   export let data;
+	import type { PartialUser } from "$lib/server/partialTypes";
+   export let data:PageData;
    const handler = new DataHandler(data.users, { rowsPerPage: 50})
    const rows = handler.getRows();
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: EmploymentConfirmModal,
-      props: {
-         formData:data.form, 
-      },
    }
-   const modal:ModalSettings = {
-      type: 'component',
-      component: modalComponent,
-      title:'Are you sure you\'d like to change employment status?',
-
-      body:'Body'
-   }
-   function modalFire():void {
+   function modalFire(employee:boolean, admin: boolean, userId:string, givenName:string|null, familyName: string|null):void {
+      const modal:ModalSettings = {
+         type: 'component',
+         component: modalComponent,
+         title:'Are you sure you\'d like to change employment status?',
+         body:`of ${givenName} ${familyName}`,
+         meta: {
+            employee,
+            admin,
+            userId,
+         }
+      }
       modalStore.trigger(modal);
    }
 </script>
@@ -70,7 +71,7 @@
             <td><a href="/users/{row.id}"> {row.email}</a></td>
             <td><input type="checkbox" class="checkbox" name="employee" checked={row.employee}></td>
             <td><input type="checkbox" class="checkbox" name="admin" checked={row.admin}></td>
-            <td><button class="btn" value={row.id} on:click={modalFire}>Update Employee Status</button></td>
+            <td><button class="btn" on:click={()=>modalFire(row.employee, row.admin, row.id, row.givenName, row.familyName)}>Update Employee Status</button></td>
          </tr>
          {/each}
       </tbody>

@@ -4,14 +4,12 @@ import { superValidate } from 'sveltekit-superforms'
 import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 import type { PageServerLoad, Actions } from "../$types";
-import type { ContactInfo, Lease, User } from "@prisma/client";
 import { handleLoginRedirect } from "$lib/utils";
 
-export type TableData = User & ContactInfo & Lease
 
 const employeeConfirmSchema = z.object({
-   employee: z.boolean(),
-   admin: z.boolean(),
+   employee: z.string(),
+   admin: z.string().optional(),
    userId: z.string().min(23).max(30),
 })
 
@@ -34,6 +32,6 @@ export const actions:Actions = {
       if(!form.valid){
          return fail(400, {form});
       }
-      console.log(form.data);
+      console.log(form);
    }
 }
