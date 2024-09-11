@@ -13,8 +13,4 @@
    {#if lease.leaseEnded}
       <p>Lease ended: {lease.leaseEnded.getMonth()}/{lease.leaseEnded.getDate()}/{lease.leaseEnded.getFullYear()}</p>
    {/if}   
-   <form action="/units/newlease">
-      <input type="hidden" value={lease.customerId}>
-      <button>Add new lease</button>
-   </form>
 </div>
