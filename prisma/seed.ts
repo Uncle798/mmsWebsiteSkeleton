@@ -365,7 +365,7 @@ async function  main (){
             data: {
                customerId: lease.customerId,
                leaseId: lease.leaseId,
-               amount: lease.price,
+               invoiceAmount: lease.price,
                invoiceCreated: month,
                unitNum: lease.unitNum,
                price: lease.price,
@@ -388,13 +388,13 @@ async function  main (){
             paymentType: paymentType,
             customerId: invoice!.customerId!,
             unitNum: invoice.unitNum,
-            unitPrice: invoice.amount, 
-            amount: invoice.amount, 
+            unitPrice: invoice.invoiceAmount, 
+            paymentAmount: invoice.invoiceAmount, 
             receiverId: employee.id,
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
             recordNum: faker.string.uuid(),
-            invoiceNum: invoice.invoiceId
+            invoiceId: invoice.invoiceId
          }      
       });
       paymentRecords.push(record);
