@@ -5,6 +5,7 @@ import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
+import type { Lease } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
 
 const customerSchema = z.object({
@@ -19,18 +20,30 @@ export const load:PageServerLoad = async (event) =>{
    const leases = await prisma.lease.findMany({
       where: {
          leaseEnded: null,
+      },
+      orderBy: {
+         unitNum:'asc'
       }
    })
-   const users:PartialUser[] = [];
-   leases.forEach(async (lease) =>{
-      const user = await prisma.user.findUnique({
-         where: {
-            id: lease.customerId,
+   const users = await prisma.user.findMany({
+      where:{
+         customerLeases:{
+            some:{
+               leaseEnded: null,
+            }
          }
-      });
-      users.push(user!);
+      }
    })
-   return { users, leases, form }
+   type TableData = PartialUser & Lease;
+   const tableData:TableData[]=[];
+   leases.forEach((lease) =>{
+      const user = users.find((u) => u.id === lease.customerId);
+      if(user){
+         const datum:TableData = {...lease, ...user}; 
+         tableData.push(datum);
+      }
+   })
+   return { tableData, form }
 }
 
 export const actions:Actions = {
