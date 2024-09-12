@@ -7,7 +7,7 @@
 
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
-   const { form, errors, constraints, message, formId, enhance } = superForm($page.data.form,{
+   const { form:employeeForm, errors:employeeErrors, constraints, message, formId, enhance } = superForm($page.data.employeeForm,{
       onUpdate(event) {
          modalStore.close();
       },
@@ -15,36 +15,54 @@
          console.error(event.result);
       },
       onSubmit({formData}){
+         console.log({formData});
          formData.set('userId', $modalStore[0].meta.userId)
          modalStore.close();
-      }
+      },
+      resetForm: true,
    });
+   const {form: adminForm, errors: adminErrors} = superForm($page.data.adminForm, {
+      onUpdate(event) {
+         modalStore.close();
+      },
+      onError(event) {
+         console.error(event.result);
+      },
+      onSubmit({formData}){
+         console.log({formData});
+         formData.set('userId', $modalStore[0].meta.userId)
+         modalStore.close();
+      },
+      resetForm: true,
+   })
 </script>
 
-<SuperDebug data={$form} />
 
 {#if $modalStore[0]}
    <div class="card p-4 w-modal shadow-xl space-y-4">
       <header class="text-2xl font-bold">{$modalStore[0].title ?? 'Title missing'}</header>
       <article>{$modalStore[0].body ?? 'Body missing'}</article>
-      <form method="post" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
-         <label for="employee"><span>Employee</span>
-            <input type="checkbox" name="employee" id="employee" bind:checked={$form.employee} {...$constraints.employee}/>
-         </label>
-         {#if $errors.employee}
-            {$errors.employee}
-         {/if}
-         <label for="admin"><span>Admin</span>
-            <input type="checkbox" name="admin" id="admin" bind:checked={$form.admin} {...$constraints.admin}/>
-         </label>
-         {#if $errors.employee}
-            {$errors.admin}
-         {/if}
+      <form method="post" action=?/changeEmployeeStatus class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
+            <button class="btn">
+               {#if $modalStore[0].meta.employee}
+                  Remove Employee Status
+                  {:else}
+                  Add Employee Status
+               {/if}
+            </button>
+            <input type="hidden" name="userId" id="userId" value={$modalStore[0].meta.userId} {...$constraints.userId}/>
+      </form>
+
+      <form method="post" action=?/changeAdminStatus class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
+         <button class="btn">
+            {#if $modalStore[0].meta.admin}
+               Remove Admin status
+               {:else}
+               Add Admin status
+            {/if}
+         </button>
          <input type="hidden" name="userId" id="userId" value={$modalStore[0].meta.userId} {...$constraints.userId}/>
       </form>
-      <footer class="modal-footer {parent.regionFooter}">
-         <button class="btn {parent.buttonNeutral}" on:click={parent.$onClose}>{parent.buttonTextCancel}</button>
-         <button class="btn {parent.buttonPositive}">{parent.buttonTextSubmit}</button>
-      </footer>
+      <button class="btn {parent.buttonNeutral}" on:click={parent.$onClose}>{parent.buttonTextCancel}</button>
    </div>
 {/if}
