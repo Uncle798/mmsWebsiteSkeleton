@@ -9,13 +9,15 @@
    const modalStore = getModalStore();
    const { form, errors, constraints, message, formId, enhance } = superForm($page.data.form,{
       onUpdate(event) {
-         console.log(event.result);
          modalStore.close();
       },
-      onChange(event){
-         console.log(event);
+      onError(event) {
+         console.error(event.result);
       },
-
+      onSubmit({formData}){
+         formData.set('userId', $modalStore[0].meta.userId)
+         modalStore.close();
+      }
    });
 </script>
 
@@ -27,13 +29,13 @@
       <article>{$modalStore[0].body ?? 'Body missing'}</article>
       <form method="post" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
          <label for="employee"><span>Employee</span>
-            <input type="checkbox" name="employee" id="employee" checked={$modalStore[0].meta.employee} bind:value={$form.employee} {...$constraints.employee}/>
+            <input type="checkbox" name="employee" id="employee" bind:checked={$form.employee} {...$constraints.employee}/>
          </label>
          {#if $errors.employee}
             {$errors.employee}
          {/if}
          <label for="admin"><span>Admin</span>
-            <input type="checkbox" name="admin" id="admin" checked={$modalStore[0].meta.admin} bind:value={$form.admin} {...$constraints.admin}/>
+            <input type="checkbox" name="admin" id="admin" bind:checked={$form.admin} {...$constraints.admin}/>
          </label>
          {#if $errors.employee}
             {$errors.admin}

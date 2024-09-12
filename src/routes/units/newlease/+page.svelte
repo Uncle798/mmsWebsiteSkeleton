@@ -10,11 +10,14 @@
    import type { PageData } from './$types';
 	export let data:PageData
 	const { form, errors, constraints, message, enhance } = superForm(data.form)
+   import SuperDebug from 'sveltekit-superforms';
 </script>
 
 <svelte:head>
 	<title>{PUBLIC_COMPANY_NAME} | Admin New Lease</title>
 </svelte:head>
+
+<SuperDebug data={$form} />
 
 {#if $message}
 <h3>{$message}</h3>

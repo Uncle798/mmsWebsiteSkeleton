@@ -28,10 +28,11 @@ export const load:PageServerLoad = async (event) =>{
 
 export const actions:Actions = {
    default: async (event) =>{
-      const form = await superValidate(event.request, zod(employeeConfirmSchema));
+      const formData = await event.request.formData();
+      console.log(formData)
+      const form = await superValidate(formData, zod(employeeConfirmSchema));
       if(!form.valid){
          return fail(400, {form});
       }
-      console.log(form);
    }
 }

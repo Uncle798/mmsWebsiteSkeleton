@@ -8,7 +8,6 @@
 	import { loadStripe } from '@stripe/stripe-js';
 	import { enhance } from '$app/forms';
 	import { redirect } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
 	export let data:PageData;
    let stripe = null;
    let clientSecret:string | undefined  = undefined;
@@ -20,13 +19,14 @@
       clientSecret = await createPaymentIntent();
    })
    async function createPaymentIntent() {
-      const response = await fetch('/units/newLease/paymentIntent', {
+      const response = await fetch('/stripe/paymentIntent?invoiceId='+data.invoice?.invoiceId, {
          method: 'POST',
          headers: {
             'content-type': 'applications/json'
          },
-         body:JSON.stringify({price:data.lease?.price}),
+         body:JSON.stringify({price:data.invoice?.price}),
       });
+      console.log('payDeposit '+response);
       const { clientSecret } = await response.json();
       return clientSecret;
    }
@@ -42,7 +42,7 @@
          error = result.error;
          processing = false;
       } else {
-         redirect(302,'/units/newLease/leaseSent?leaseId=' + data.lease?.leaseId);
+         redirect(302,'/units/newLease/leaseSent?leaseId=' + data.invoice?.leaseId);
       }
    }
 </script>
