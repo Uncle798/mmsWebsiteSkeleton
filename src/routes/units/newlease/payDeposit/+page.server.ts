@@ -2,7 +2,7 @@
 import { redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 import { stripe } from '$lib/server/stripe';
-import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
+// import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
 //@ts-ignore:
 import type { PageServerLoad, Actions } from './$types';
 
@@ -10,29 +10,29 @@ export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user){
       redirect(302, '/login')
    }
-   const leaseId = event.url.searchParams.get('leaseId');
-   if(leaseId){
-      const lease = await prisma.lease.findUnique({
+   const invoiceId = event.url.searchParams.get('invoiceId');
+   if(invoiceId){
+      const invoice = await prisma.invoice.findUnique({
          where: {
-            leaseId
+            invoiceId
          }
       })
-      return { lease };
+      return { invoice };
    }
 });
 
 export const actions:Actions = {
    default: async (event) => {
-      const leaseId = event.url.searchParams.get('leaseId');
-      if(leaseId){
-         const lease = await prisma.lease.findUnique({
+      const invoiceId = event.url.searchParams.get('invoiceId');
+      if(invoiceId){
+         const invoice = await prisma.invoice.findUnique({
             where:{
-               leaseId,
+               invoiceId,
             }
          })
-         if(lease){
+         if(invoice){
             const paymentIntent = await stripe.paymentIntents.create({
-               amount: lease.price,
+               amount: invoice.price,
                currency: 'usd',
                payment_method_types: ['card'],
             })
@@ -44,17 +44,17 @@ export const actions:Actions = {
          }
          // const customer = await prisma.user.findUnique({
          //    where:{
-         //       id: lease?.customerId 
+         //       id: invoice?.customerId 
          //    }
          // })
          // const unit = await prisma.unit.findUnique({
          //    where:{
-         //       num: lease?.unitNum,
+         //       num: invoice?.unitNum,
          //    }
          // });
-         // const employee = await prisma.user.findUnique({
+         // const employee = await prisma.user.findFirst({
          //    where: {
-         //       id: lease?.employeeId
+         //       admin:true
          //    }
          // })
          // let variables ={};

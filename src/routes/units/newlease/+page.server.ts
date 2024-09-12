@@ -137,7 +137,15 @@ export const actions:Actions = {
                leaseEffectiveDate: new Date(),
             }
          });
-
-      redirect(302, '/units/newLease/payDeposit?leaseId=' + lease?.leaseId)
+         const invoice = await prisma.invoice.create({
+            data:{
+               price: lease.price,
+               unitNum: lease.unitNum,
+               amount: lease.price,
+               customerId: lease.customerId,
+               leaseId: lease.leaseId,
+            }
+         })
+      redirect(302, '/units/newLease/payDeposit?invoiceId=' + invoice.invoiceId)
    }
 }
