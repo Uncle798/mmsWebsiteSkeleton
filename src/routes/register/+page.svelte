@@ -41,7 +41,7 @@
 </script>
 
 <svelte:head>
-	<title>{process.env.COMPANY_NAME} | Register</title>
+	<title>{PUBLIC_COMPANY_NAME} | Register</title>
 </svelte:head>
 
 
