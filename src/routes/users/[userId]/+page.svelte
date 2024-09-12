@@ -13,8 +13,8 @@
 	import type { PageData } from './$types';
 
    export let data:PageData;
-   export const { contactInfo, dbUser, leases, paymentTableData } = data;
-   const handler = new DataHandler(paymentTableData, {rowsPerPage:  10});
+   export const { contactInfo, dbUser, leases, tableData } = data;
+   const handler = new DataHandler(tableData, {rowsPerPage:  10});
    const rows = handler.getRows();
    const rowCount = handler.getRowCount();
    const paymentSum = handler.createCalculation('amount').sum()
@@ -41,16 +41,17 @@
    <table class="table-container table-hover">
       <thead>
          <tr>
-            <Th {handler}>Amount</Th>
+            <Th {handler}>Invoice Amount</Th>
             <Th {handler}>Invoice num</Th>
-            <Th {handler}>Payment Type</Th>
-            <Th {handler}>Employee</Th>
+            <Th {handler}>Payment Completed</Th>
+            <Th {handler}>Payment type</Th>
+            <Th {handler}>Customer</Th>
          </tr>
          <tr>
             <ThFilter {handler} filterBy='amount' />
             <ThFilter {handler} filterBy='paymentId' />
             <ThFilter {handler} filterBy='paymentType' />
-            <ThFilter {handler} filterBy='employee' />
+            <ThFilter {handler} filterBy='customer' />
          </tr>
          <tr><th>${$paymentSum} total payments</th></tr>
       </thead>
@@ -59,6 +60,7 @@
          <tr>
             <td>${row.amount}</td>
             <td>{row.invoiceNum}</td>
+            <td>{row.paymentCompleted?.getDate()}/{row.paymentCompleted?.getMonth()}/{row.paymentCompleted?.getFullYear()}</td>
             <td>{row.paymentType}</td>
             <td>{row.familyName}, {row.givenName}</td>
          </tr>

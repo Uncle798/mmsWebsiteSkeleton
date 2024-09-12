@@ -1,17 +1,18 @@
 import prisma from "$lib/server/prisma";
 import { redirect} from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
-import type { PaymentRecord, User } from "@prisma/client";
+import type { Invoice, PaymentRecord } from "@prisma/client";
 import { handleLoginRedirect } from "$lib/utils.js";
 import { superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import z from 'zod'
-export type PaymentTableData = PaymentRecord & User
+import type { PartialUser } from "$lib/server/partialTypes";
+export type PaymentTableData = Invoice & PaymentRecord & PartialUser
 
 export const load:PageServerLoad = async (event) => {
    if(!event.locals.user){
       console.log(event.request.url)
-      return redirect(302, handleLoginRedirect(event, 'You must be an employee to access that page'));
+      return redirect(302, handleLoginRedirect(event));
    }
    const userId = event.params.userId;
    const dbUser = await prisma.user.findUnique({
@@ -30,29 +31,27 @@ export const load:PageServerLoad = async (event) => {
          customerId: dbUser?.id,
       }
    })
+   const invoices = await prisma.invoice.findMany({
+      where:{
+         customerId: userId
+      }
+   })
    const payments = await prisma.paymentRecord.findMany({
       where:{
          customerId:dbUser?.id
       }
    })
-   if(payments){
-      const paymentTableData:PaymentTableData[] = [];
-      for await (const payment of payments){
-         const employee = await prisma.user.findFirst({
-            where: {
-               id: payment.receiverId,
-            }
-         })
-         const paymentTableDatum = {} as PaymentTableData;
-         Object.assign(paymentTableDatum, payment);
-         Object.assign(paymentTableDatum, employee);
-         paymentTableData.push(paymentTableDatum);
+   const tableData:PaymentTableData[]=[];
+   invoices.forEach((invoice) =>{
+      const payment = payments.find((p) => p.invoiceNum === invoice.invoiceId );
+      if(payment){
+         const datum:PaymentTableData = {...invoice, ...dbUser, ...payment};
+         datum.unitNum = invoice.unitNum || '';
+         tableData.push(datum);
       }
-      return { dbUser, contactInfo, leases, paymentTableData }
-   } else{
-
-      return{ dbUser, contactInfo, leases}
-   }
+   })
+   
+   return {dbUser, contactInfo, leases, tableData,}
 }  
 
 
