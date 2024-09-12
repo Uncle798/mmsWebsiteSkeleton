@@ -17,7 +17,7 @@ const adminConfirmSchema = z.object({
 })
 
 export const load:PageServerLoad = async (event) =>{
-   if(!event.locals.user){
+   if(!event.locals.user?.admin){
       throw redirect(302, handleLoginRedirect(event));
    }
    const employeeForm = await superValidate(zod(employeeConfirmSchema), {id: 'employee'});

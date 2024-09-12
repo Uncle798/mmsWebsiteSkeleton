@@ -35,6 +35,9 @@
       },
       resetForm: true,
    })
+   function onClose(){
+      modalStore.close();
+   }
 </script>
 
 
@@ -63,6 +66,6 @@
          </button>
          <input type="hidden" name="userId" id="userId" value={$modalStore[0].meta.userId} {...$constraints.userId}/>
       </form>
-      <button class="btn {parent.buttonNeutral}" on:click={parent.$onClose}>{parent.buttonTextCancel}</button>
+      <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
    </div>
 {/if}

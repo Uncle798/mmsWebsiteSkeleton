@@ -8,7 +8,15 @@
 	import type { PartialUser } from "$lib/server/partialTypes";
 	import { page } from "$app/stores";
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
+	import { createSearchStore, searchHandler } from "$lib/stores/search";
    export let data:PageData;
+
+   const searchUsers = data.users.map((user) =>({
+      ...user,
+      searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
+   }))
+   const searchStore = createSearchStore(searchUsers);
+   const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: EmploymentConfirmModal,
@@ -32,7 +40,11 @@
 <svelte:head>
 	<title>{PUBLIC_COMPANY_NAME} | All Users</title>
 </svelte:head>
-{#each data.users as user}
+<div>
+   <input type="search" name="search" id="search" placeholder="Search..." bind:value={$searchStore.search}/>
+</div>
+
+{#each $searchStore.filtered as user}
 <div class="flex">
    <NameBlock nameBlock = {user} />
    <div class="card"><button on:click={()=>{modalFire(user.employee, user.admin, user.id, user.givenName, user.familyName)}}>Change employment status</button></div>
