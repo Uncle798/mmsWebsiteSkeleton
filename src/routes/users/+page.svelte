@@ -41,7 +41,7 @@
 	<title>{PUBLIC_COMPANY_NAME} | All Users</title>
 </svelte:head>
 <div>
-   <input type="search" name="search" id="search" placeholder="Search..." bind:value={$searchStore.search}/>
+   <input type="search" name="search" id="search" placeholder="Search..." class="input" bind:value={$searchStore.search}/>
 </div>
 
 {#each $searchStore.filtered as user}
