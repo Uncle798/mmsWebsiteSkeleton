@@ -146,6 +146,7 @@ model Invoice {
   invoiceCreated  DateTime       @default(now())
   paymentRecordId String?        @unique
   invoicePaid     DateTime?      @unique
+  invoiceNotes    String?
   customer        User?          @relation(fields: [customerId], references: [id])
   lease           Lease?         @relation(fields: [leaseId, unitNum, price], references: [leaseId, unitNum, price])
   paymentRecord   PaymentRecord? @relation(fields: [paymentRecordId, invoicePaid], references: [paymentId, paymentCompleted])
