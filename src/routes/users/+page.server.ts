@@ -1,11 +1,11 @@
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
-import { superValidate } from 'sveltekit-superforms'
+import { superValidate, message } from 'sveltekit-superforms'
+import { ratelimit } from "$lib/server/redis";
 import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
-
 
 const employeeConfirmSchema = z.object({
    employee: z.boolean().optional(),
@@ -32,19 +32,31 @@ export const load:PageServerLoad = async (event) =>{
 
 export const actions:Actions = {
    changeEmployeeStatus: async (event) =>{
+      if(!event.locals.user?.admin){
+         return redirect(302, handleLoginRedirect(event));
+      }
       const formData = await event.request.formData();
       const form = await superValidate(formData, zod(employeeConfirmSchema));
       if(!form.valid){
          return fail(400, {form});
       }
-      console.log(form);
-      if(form.data.employee){
+      const { success, reset } = await ratelimit.login.limit(event.locals.user?.id || event.getClientAddress())
+		if(!success) {
+         const timeRemaining = Math.floor((reset - Date.now()) /1000);
+			return message(form, `Please wait ${timeRemaining}s before trying again.`)
+		}
+      const user = await prisma.user.findFirst({
+         where: {
+            id: form.data.userId,
+         }
+      })
+      if(user?.employee){
          await prisma.user.update({
             where:{
                id: form.data.userId,
             },
             data:{
-               employee: form.data.employee
+               employee: false,
             }
          })
       } else {
@@ -53,27 +65,39 @@ export const actions:Actions = {
                id: form.data.userId
             },
             data:{
-               employee: false,
+               employee: true,
             }
          })
       }
-      return redirect(302, '/users')
+      return { form, }
    },
    changeAdminStatus: async (event) =>{
+      if(!event.locals.user?.admin){
+         return redirect(302, handleLoginRedirect(event));
+      }
       const formData = await event.request.formData();
       console.log(formData)
       const form = await superValidate(formData, zod(adminConfirmSchema));
       if(!form.valid){
          return fail(400, {form});
       }
-      console.log(form);
-      if(form.data.admin){
+      const { success, reset } = await ratelimit.login.limit(event.locals.user?.id || event.getClientAddress())
+		if(!success) {
+			const timeRemaining = Math.floor((reset - Date.now()) /1000);
+			return message(form, `Please wait ${timeRemaining}s before trying again.`)
+		}
+      const user = await prisma.user.findUnique({
+         where: {
+            id: form.data.userId,
+         }
+      })
+      if(user?.admin){
          await prisma.user.update({
             where:{
                id: form.data.userId,
             },
             data:{
-               admin: form.data.admin
+               admin: false
             }
          })
       } else {
@@ -82,11 +106,14 @@ export const actions:Actions = {
                id: form.data.userId,
             },
             data:{
-               admin: false,
+               admin: true,
             }
          })
       }
-      return redirect(302, '/users')
+      return {
+         form,
+         success: true,
+      }
    },
 
 }

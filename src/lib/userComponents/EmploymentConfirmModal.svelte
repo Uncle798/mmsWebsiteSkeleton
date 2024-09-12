@@ -4,6 +4,7 @@
    import SuperDebug from "sveltekit-superforms";
    import type { SvelteComponent } from "svelte";
    import { page } from "$app/stores";
+	import { invalidateAll } from "$app/navigation";
 
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
@@ -15,9 +16,12 @@
          console.error(event.result);
       },
       onSubmit({formData}){
-         console.log({formData});
          formData.set('userId', $modalStore[0].meta.userId)
          modalStore.close();
+      },
+      onResult(event) {
+         console.log(event)
+         invalidateAll();
       },
       resetForm: true,
    });
@@ -29,9 +33,11 @@
          console.error(event.result);
       },
       onSubmit({formData}){
-         console.log({formData});
          formData.set('userId', $modalStore[0].meta.userId)
          modalStore.close();
+      },
+      onResult(event) {
+         invalidateAll();
       },
       resetForm: true,
    })
