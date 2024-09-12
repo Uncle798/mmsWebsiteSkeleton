@@ -6,6 +6,9 @@ export const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
       givenName: true,
       familyName: true, 
       organizationName: true,
+      id: true,
+      employee: true,
+      admin: true,
    }
 })
 
