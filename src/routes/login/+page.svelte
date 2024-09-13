@@ -8,7 +8,7 @@
    const toastStore = getToastStore();
    export let data;
    const mess = data.mess
-   $: if (mess && data.user?.employee) {
+   $: if (mess === 'notAllowed' && data.user?.employee) {
     onMount(() => {
       // You cannot use async directly in onMount's function, so we need a workaround wrapping () around async 
       (async () => {
@@ -27,6 +27,19 @@
       (async () => {
         const toast: ToastSettings = {
           message: 'You must be logged in to access that page',
+          timeout: 5000,
+          background: 'variant-filled-error'
+        };
+        toastStore.trigger(toast);
+      })();
+    });
+  }
+   $: if (mess && data.user) {
+    onMount(() => {
+      // You cannot use async directly in onMount's function, so we need a workaround wrapping () around async 
+      (async () => {
+        const toast: ToastSettings = {
+          message: 'You must be an admin to access that page',
           timeout: 5000,
           background: 'variant-filled-error'
         };

@@ -14,43 +14,51 @@ export const load:PageServerLoad = async (event) => {
       return redirect(302, handleLoginRedirect(event));
    }
    const userId = event.params.userId;
-   const dbUser = await prisma.user.findUnique({
-      where:{
-         id:userId
+   if(event.locals.user.employee){
+      const dbUser = await prisma.user.findUnique({
+         where:{
+            id:userId
+         }
+      })
+      const contactInfo = await prisma.contactInfo.findMany({
+         where:{
+            userId:dbUser?.id,
+            softDelete: false
+         }
+      })
+      const leases = await prisma.lease.findMany({
+         where: {
+            customerId: dbUser?.id,
+         }
+      })
+      const invoices = await prisma.invoice.findMany({
+         where:{
+            customerId: userId
+         }
+      })
+      const payments = await prisma.paymentRecord.findMany({
+         where:{
+            customerId:dbUser?.id
+         }
+      })
+      const tableData:PaymentTableData[]=[];
+      invoices.forEach((invoice) =>{
+         const payment = payments.find((p) => p.paymentId === invoice.invoiceId );
+         if(payment){
+            const datum:PaymentTableData = {...invoice, ...dbUser, ...payment};
+            datum.unitNum = invoice.unitNum || '';
+            tableData.push(datum);
+         }
+      })
+      
+      return {dbUser, contactInfo, leases, tableData,}
+   }
+   if(event.locals.user && !event.locals.user.employee){
+      if(event.locals.user.id !== userId){
+         redirect(302, handleLoginRedirect(event));
       }
-   })
-   const contactInfo = await prisma.contactInfo.findMany({
-      where:{
-         userId:dbUser?.id,
-         softDelete: false
-      }
-   })
-   const leases = await prisma.lease.findMany({
-      where: {
-         customerId: dbUser?.id,
-      }
-   })
-   const invoices = await prisma.invoice.findMany({
-      where:{
-         customerId: userId
-      }
-   })
-   const payments = await prisma.paymentRecord.findMany({
-      where:{
-         customerId:dbUser?.id
-      }
-   })
-   const tableData:PaymentTableData[]=[];
-   invoices.forEach((invoice) =>{
-      const payment = payments.find((p) => p.invoiceNum === invoice.invoiceId );
-      if(payment){
-         const datum:PaymentTableData = {...invoice, ...dbUser, ...payment};
-         datum.unitNum = invoice.unitNum || '';
-         tableData.push(datum);
-      }
-   })
-   
-   return {dbUser, contactInfo, leases, tableData,}
+      
+   }
 }  
 
 
