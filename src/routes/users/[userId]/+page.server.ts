@@ -11,7 +11,6 @@ export type PaymentTableData = Invoice & PaymentRecord & PartialUser
 
 export const load:PageServerLoad = async (event) => {
    if(!event.locals.user){
-      console.log(event.request.url)
       return redirect(302, handleLoginRedirect(event));
    }
    const userId = event.params.userId;
