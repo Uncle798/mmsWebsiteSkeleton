@@ -8,7 +8,8 @@ import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
 
 const employeeConfirmSchema = z.object({
-   employee: z.boolean().optional(),
+   employee: z.boolean().nullable(),
+   admin: z.boolean().nullable(),
    userId: z.string().min(23).max(30),
 })
 const adminConfirmSchema = z.object({
@@ -45,27 +46,48 @@ export const actions:Actions = {
          const timeRemaining = Math.floor((reset - Date.now()) /1000);
 			return message(form, `Please wait ${timeRemaining}s before trying again.`)
 		}
-      const user = await prisma.user.findFirst({
-         where: {
-            id: form.data.userId,
+      if(form.data.userId === event.locals.user.id){
+         return message(form, 'You can not change your own employment status');
+      }
+      console.log(form.data)
+      const admins = await prisma.user.findMany({
+         where:{
+            admin: true, 
          }
       })
-      if(user?.employee){
+      if(admins.length <= 1 && !form.data.admin){
+         return message(form, 'You must have at least one Admin');
+      }
+      if(form.data.admin){
+         await prisma.user.update({
+            where: {
+               id: form.data.userId,
+            },
+            data: {
+               employee: true,
+               admin: true,
+            }
+         })
+      }
+      if(form.data.employee && !form.data.admin){
          await prisma.user.update({
             where:{
                id: form.data.userId,
             },
             data:{
-               employee: false,
+               employee: true,
+               admin: false,
             }
          })
-      } else {
+      } 
+      if(!form.data.employee){
          await prisma.user.update({
             where:{
                id: form.data.userId
             },
             data:{
-               employee: true,
+               employee: false,
+               admin: false
             }
          })
       }
@@ -76,16 +98,19 @@ export const actions:Actions = {
          return redirect(302, handleLoginRedirect(event));
       }
       const formData = await event.request.formData();
-      console.log(formData)
       const form = await superValidate(formData, zod(adminConfirmSchema));
       if(!form.valid){
          return fail(400, {form});
       }
       const { success, reset } = await ratelimit.login.limit(event.locals.user?.id || event.getClientAddress())
 		if(!success) {
-			const timeRemaining = Math.floor((reset - Date.now()) /1000);
+         const timeRemaining = Math.floor((reset - Date.now()) /1000);
 			return message(form, `Please wait ${timeRemaining}s before trying again.`)
 		}
+      if(form.data.userId === event.locals.user.id){
+         return message(form, 'You can not change your own employment status');
+      }
+      
       const user = await prisma.user.findUnique({
          where: {
             id: form.data.userId,
@@ -107,6 +132,7 @@ export const actions:Actions = {
             },
             data:{
                admin: true,
+               employee: true, 
             }
          })
       }
