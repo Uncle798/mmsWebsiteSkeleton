@@ -11,6 +11,9 @@ importers:
       '@anvilco/anvil':
         specifier: ^3.3.0
         version: 3.3.0
+      '@anvilco/encryption':
+        specifier: ^2.0.4
+        version: 2.0.4
       '@floating-ui/dom':
         specifier: 1.6.8
         version: 1.6.8
@@ -191,6 +194,9 @@ packages:
   '@anvilco/anvil@3.3.0':
     resolution: {integrity: sha512-Usu7YMARS6hPUDB4WoI/OaKYxuXorA2BBizFeKSb1Sou1aFO91r28qbBzjaIIzdHqSm7pXDNAp1UWUa3E63IFQ==}
     engines: {node: '>=14'}
+
+  '@anvilco/encryption@2.0.4':
+    resolution: {integrity: sha512-KLfSGHp4GUY5leFwq82wgjwljE/QHwtTkmOyitglv91EkobCPN60/vXzODv918imQFR63pcNVE3lwo6mH7X34A==}
 
   '@anvilco/node-fetch@3.3.3-beta.0':
     resolution: {integrity: sha512-hiruVZHjUvBxaTBSCRoeGNRknJWSwatrAm+uczyjcDGMpblOQb28sPjFVqGJ3EyOFzbIfXrm03/uIg8pr1NILA==}
@@ -2829,6 +2835,8 @@ snapshots:
       abort-controller: 3.0.0
       extract-files: 13.0.0
       limiter: 2.1.0
+
+  '@anvilco/encryption@2.0.4': {}
 
   '@anvilco/node-fetch@3.3.3-beta.0':
     dependencies:

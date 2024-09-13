@@ -1,7 +1,11 @@
 import prisma from '$lib/server/prisma';
 import { dropbox } from '$lib/server/dropbox'
+import { decryptRSA } from '@anvilco/encryption';
+import { ANVIL_RSA_PRIVATE_KEY_BASE64 } from '$env/static/private';
 import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
 
+const key = Buffer.from(ANVIL_RSA_PRIVATE_KEY_BASE64, 'base64').toString('ascii');
 
 export const POST: RequestHandler = async (event) => {
    const data = event.request.body;
@@ -29,5 +33,5 @@ export const POST: RequestHandler = async (event) => {
          }
       })
    }
-   return new Response();
+   return json( {}, {status:200});
 };
