@@ -25,6 +25,9 @@ export const load:PageServerLoad = (async (event) =>{
    const form = await superValidate(zod(newLeaseSchema));
    if(!event.locals.user.employee){
       const unitNum = event.url.searchParams.get('unitNum');
+      if(!unitNum){
+         redirect(302, '/units/available');
+      }
       let unit:Unit= {} as Unit;
       if(unitNum){
          console.log('newLease +page.server: unitNum:' + unitNum);
