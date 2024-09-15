@@ -8,8 +8,24 @@
 	
    // @ts-ignore: it works
    import type { PageData } from './$types';
+	import { onMount } from 'svelte';
+	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	export let data:PageData
-	const { form, errors, constraints, message, enhance } = superForm(data.form)
+	const { form, errors, constraints, message, enhance } = superForm(data.form);
+   const toastStore = getToastStore();
+   const newLease = data.newLease
+   $: if(newLease === 'true'){
+      onMount(()=>{
+         ( async () => {
+            const toast: ToastSettings = {
+               message: 'Please select a unit before setting up a lease',
+               timeout: 4000,
+               background: 'variant-filled-info'
+            };
+            toastStore.trigger(toast);
+         });
+      });
+   }
 </script>
 
 <svelte:head>
@@ -53,6 +69,6 @@
 {#if data.user && data.address && data.unitPrice}
    <input type="hidden" name="unitPriceId" id="unitPriceId" value={data.unitPrice.unitPricingId} />
    <input type="hidden" name="unitNum" id="unitNum" value={data.unit.num} />
-   <button class="btn">All the above is correct, please email me a lease to sign</button>
+   <button class="btn">All the above is correct pay deposit</button>
 {/if}
 </form>

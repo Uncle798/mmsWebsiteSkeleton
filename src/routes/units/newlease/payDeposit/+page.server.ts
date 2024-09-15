@@ -31,19 +31,14 @@ export const actions:Actions = {
             }
          })
          if(invoice){
-            const paymentIntent = await stripe.paymentIntents.create({
-               amount: invoice.price,
-               currency: 'usd',
-               payment_method_types: ['card'],
-            })
-            return {
-               body: {
-                  clientSecret: paymentIntent.client_secret
+            const lease = await prisma.lease.findFirst({
+               where: {
+                  leaseId: invoice.leaseId,
                }
-            }
+            })
             const customer = await prisma.user.findUnique({
                where:{
-                  id: invoice?.customerId 
+                  id: invoice.customerId,
                }
             })
             const unit = await prisma.unit.findUnique({
@@ -77,5 +72,6 @@ export const actions:Actions = {
             }
          }
       }
+      redirect(302, '/newLease/leaseSent');
    }
 }

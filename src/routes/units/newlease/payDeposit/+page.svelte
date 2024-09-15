@@ -3,7 +3,7 @@
    import { PUBLIC_COMPANY_NAME, PUBLIC_STRIPE_TEST } from '$env/static/public';   
    // @ts-ignore: it works
    import type { PageData } from './$types';
-   import { Elements, PaymentElement, LinkAuthenticationElement, Address } from 'svelte-stripe';
+   import { Elements, PaymentElement, LinkAuthenticationElement, Address, Card } from 'svelte-stripe';
    import { onMount } from 'svelte';
 	import { loadStripe, type StripeElements, type Stripe } from '@stripe/stripe-js';
 	import { enhance } from '$app/forms';
@@ -54,6 +54,7 @@
 {#if !mounted}
    loading...
 {:else}
+   <p>Please pay a deposit of ${data.invoice?.invoiceAmount}</p>
    <Elements {stripe} clientSecret={clientSecret} bind:elements>
       <form on:submit|preventDefault={submit} >
          <LinkAuthenticationElement />

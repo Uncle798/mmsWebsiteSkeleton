@@ -18,7 +18,7 @@
           background: 'variant-filled-error'
         };
         toastStore.trigger(toast);
-      })();
+      });
     });
   }
    $: if (mess && !data.user) {

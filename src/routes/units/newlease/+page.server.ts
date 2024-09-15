@@ -23,10 +23,11 @@ export const load:PageServerLoad = (async (event) =>{
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
+   const newLease = event.url.searchParams.get('newLease');
    if(!event.locals.user.employee){
       const unitNum = event.url.searchParams.get('unitNum');
       if(!unitNum){
-         redirect(302, '/units/available');
+         redirect(302, '/units/available?newLease=true');
       }
       let unit:Unit= {} as Unit;
       if(unitNum){
@@ -56,9 +57,10 @@ export const load:PageServerLoad = (async (event) =>{
       }).catch((err) =>{
          console.error(err);
       });
-      return { form, unit, address, unitPrice };
+      
+      return { form, unit, address, unitPrice, newLease };
    }
-   return { form }
+   return { form, newLease }
 })
 
 
