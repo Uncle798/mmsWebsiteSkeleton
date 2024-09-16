@@ -7,7 +7,7 @@
    import { onMount } from 'svelte';
 	import { loadStripe, type StripeElements, type Stripe } from '@stripe/stripe-js';
 	import { enhance } from '$app/forms';
-	import { redirect } from '@sveltejs/kit';
+   import { goto } from '$app/navigation';
 	export let data:PageData;
    let stripe:Stripe|null;
    let clientSecret:string;
@@ -43,7 +43,7 @@
          error = result.error;
          processing = false;
       } else {
-         redirect(302,'/units/newLease/leaseSent?leaseId=' + data.invoice?.leaseId);
+         goto('/units/newLease/leaseSent?leaseId=' + data.invoice?.leaseId);
       }
    }
 </script>

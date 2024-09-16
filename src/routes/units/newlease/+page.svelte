@@ -14,22 +14,21 @@
 	const { form, errors, constraints, message, enhance } = superForm(data.form);
    const toastStore = getToastStore();
    const newLease = data.newLease
-   $: if(newLease === 'true'){
+   $: if(newLease){
       onMount(()=>{
          ( async () => {
             const toast: ToastSettings = {
                message: 'Please select a unit before setting up a lease',
                timeout: 4000,
-               background: 'variant-filled-info'
             };
             toastStore.trigger(toast);
-         });
+         })();
       });
    }
 </script>
 
 <svelte:head>
-	<title>{PUBLIC_COMPANY_NAME} | Admin New Lease</title>
+	<title>{PUBLIC_COMPANY_NAME} | Customer New Lease</title>
 </svelte:head>
 
 {#if $message}
