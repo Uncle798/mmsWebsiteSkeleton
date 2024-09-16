@@ -38,7 +38,6 @@
          elements,
          redirect: 'if_required',
       });
-      console.log({result});
       if(result.error){
          error = result.error;
          processing = false;
