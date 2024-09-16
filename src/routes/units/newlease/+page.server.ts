@@ -8,7 +8,7 @@ import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/redis";
-import type { Unit } from 'prisma/prisma-client';
+import type { Unit, UnitPricing } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
@@ -31,7 +31,7 @@ export const load:PageServerLoad = (async (event) =>{
       }
       let unit:Unit= {} as Unit;
       if(unitNum){
-         unit = await prisma.unit.findUnique({
+         unit = await prisma.unit.findFirst({
             where:{
                num:unitNum,
             }
@@ -47,16 +47,17 @@ export const load:PageServerLoad = (async (event) =>{
       }).catch((err) =>{
          console.error(err);
       });
-      const unitPrice = await prisma.unitPricing.findFirst({
-         where:{
-            endDate: null,
-            unitNum: unit.num
-         }
-      }).catch((err) =>{
-         console.error(err);
-      });
-      
-      return { form, unit, address, unitPrice, newLease };
+      let unitPrice:UnitPricing | null;
+      if(unit){
+         unitPrice = await prisma.unitPricing.findFirst({
+            where:{
+               endDate: null,
+               unitNum: unit.num
+            }
+         })
+         return { form, unit, address, unitPrice, newLease };
+      }
+      return { form, unit, address, newLease}
    }
    return { form, newLease }
 })
