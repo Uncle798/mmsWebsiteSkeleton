@@ -29,7 +29,7 @@ export const load:PageServerLoad = (async (event) =>{
       if(!unitNum){
          redirect(302, '/units/available?newLease=true');
       }
-      let unit:Unit= {} as Unit;
+      let unit:Unit | null;
       if(unitNum){
          unit = await prisma.unit.findFirst({
             where:{
@@ -38,7 +38,7 @@ export const load:PageServerLoad = (async (event) =>{
          }).catch((err) =>{
             console.error(err);
             return error(404, 'Unit not found')
-         }) || {} as Unit;
+         });
       }
       const address = await prisma.contactInfo.findMany({
          where:{
