@@ -1,7 +1,6 @@
 import { STRIPE_SIGNING_SECRET } from '$env/static/private';
 import { stripe } from '$lib/server/stripe';
-import type { RequestHandler } from './$types';
-import type { Stripe } from '@stripe/stripe-js'; 
+import type { RequestHandler } from './$types'; 
 
 async function handlePaymentIntent(intent) {
 
@@ -14,8 +13,9 @@ export const POST: RequestHandler = async (event) => {
       let stripeEvent;
       if(signature){
          try {
+            const body = await event.request.text();
             stripeEvent = stripe.webhooks.constructEvent(
-               event.request.body, 
+               body, 
                signature, 
                STRIPE_SIGNING_SECRET
             );
@@ -26,10 +26,10 @@ export const POST: RequestHandler = async (event) => {
          switch (stripeEvent?.type) {
             case 'payment_intent.succeeded': {
                const paymentIntent = stripeEvent.data.object;
-               handlePaymentIntent(paymentIntent);
+               console.log('stripe webhooks '+paymentIntent);
                break;
             }
-         
+            case 'payment'
             default:
                break;
          }
