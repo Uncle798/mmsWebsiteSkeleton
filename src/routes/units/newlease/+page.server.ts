@@ -30,19 +30,19 @@ export const load:PageServerLoad = (async (event) =>{
       if(!unitNum){
          redirect(302, '/units/available?newLease=true');
       }
-      // let unit:Unit | null;
-      // if(unitNum){
-      //    unit = await prisma.unit.findFirst({
-      //       where:{
-      //          num:unitNum,
-      //       }
-      //    }).catch((err) =>{
-      //       console.error(err);
-      //       return error(404, 'Unit not found')
-      //    });
-      // } else {
-      //    unit = null;
-      // }
+      let unit:Unit | null;
+      if(unitNum){
+         unit = await prisma.unit.findFirst({
+            where:{
+               num:unitNum,
+            }
+         }).catch((err) =>{
+            console.error(err);
+            return error(404, 'Unit not found')
+         });
+      } else {
+         unit = null;
+      }
       console.log(unit);
       const address = await prisma.contactInfo.findMany({
          where:{
@@ -60,7 +60,7 @@ export const load:PageServerLoad = (async (event) =>{
       //       }
       //    })
       //    return { form, unit, address, unitPrice, newLease };
-      }
+      // }
       return { form, unit, address, newLease}
    }
    return { form, newLease }
