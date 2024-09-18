@@ -1,0 +1,33 @@
+{
+   "version": "0.2.0",
+   "configurations": [
+     {
+       "name": "netlify dev",
+       "type": "node",
+       "request": "launch",
+       "runtimeExecutable": "/Users/ericbranson/.nvm/versions/node/v18.20.4/bin/node",
+       "skipFiles": ["<node_internals>/**"],
+       "outFiles": ["${workspaceFolder}/.netlify/functions-serve/**/*.js"],
+       "program": "/Users/ericbranson/Library/pnpm/netlify",
+       "args": ["dev"],
+       "console": "integratedTerminal",
+       "env": { "BROWSER": "none" },
+       "serverReadyAction": {
+         "pattern": "Server now ready on (https?://[\\w:.-]+)",
+         "uriFormat": "%s",
+         "action": "openExternally"
+       }
+     },
+     {
+       "name": "netlify functions:serve",
+       "type": "node",
+       "request": "launch",
+       "skipFiles": ["<node_internals>/**"],
+       "outFiles": ["${workspaceFolder}/.netlify/functions-serve/**/*.js"],
+       "program": "${workspaceFolder}/node_modules/.bin/netlify",
+       "args": ["functions:serve"],
+       "console": "integratedTerminal"
+     }
+   ]
+ }
+ 
