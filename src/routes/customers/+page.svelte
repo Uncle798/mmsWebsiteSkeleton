@@ -15,18 +15,16 @@
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
    const rows = handler.getRows();
    const modalStore = getModalStore();
-   const modalComponent: ModalComponent = {
-      ref: EmploymentConfirmModal,
-   }
    function modalFire(customerId:string, leaseId: string,  unitNum:string|null, ):void {
       const modal:ModalSettings = {
-         type: 'component',
-         component: modalComponent,
-         title:'Are you sure you\'d like to end this lease?',
-         body:`for Unit ${unitNum}`,
-         meta: {
-            customerId,
-            leaseId,
+         type: 'confirm',
+         title:'Are you sure you\'d like to end this lease',
+         body:`for Unit ${unitNum?.replace(/^0+/gm,'')}?`,
+         response: async (r:boolean) => {
+            await fetch('/customers', {
+               method: 'POST',
+               body: JSON.stringify({leaseId, customerId}),
+            })
          }
       }
       modalStore.trigger(modal);
