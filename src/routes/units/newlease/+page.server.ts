@@ -30,20 +30,20 @@ export const load:PageServerLoad = (async (event) =>{
       if(!unitNum){
          redirect(302, '/units/available?newLease=true');
       }
-      // let unit:Unit | null;
-      // if(unitNum){
-      //    unit = await prisma.unit.findFirst({
-      //       where:{
-      //          num:unitNum,
-      //       }
-      //    }).catch((err) =>{
-      //       console.error(err);
-      //       return error(404, 'Unit not found')
-      //    });
-      // } else {
-      //    unit = null;
-      // }
-      // console.log(unit);
+      let unit:Unit | null;
+      if(unitNum){
+         unit = await prisma.unit.findFirst({
+            where:{
+               num:unitNum,
+            }
+         }).catch((err) =>{
+            console.error(err);
+            return error(404, 'Unit not found')
+         });
+      } else {
+         unit = null;
+      }
+      console.log(unit);
       const address = await prisma.contactInfo.findMany({
          where:{
             userId:event.locals.user.id
@@ -51,17 +51,17 @@ export const load:PageServerLoad = (async (event) =>{
       }).catch((err) =>{
          console.error(err);
       });
-      // let unitPrice:UnitPricing | null;
-      // if(unit){
-      //    unitPrice = await prisma.unitPricing.findFirst({
-      //       where:{
-      //          endDate: null,
-      //          unitNum: unit.num
-      //       }
-      //    })
-      //    return { form, unit, address, unitPrice, newLease };
-      // }
-      return { form, address, newLease}
+      let unitPrice:UnitPricing | null;
+      if(unit){
+         unitPrice = await prisma.unitPricing.findFirst({
+            where:{
+               endDate: null,
+               unitNum: unit.num
+            }
+         })
+         return { form, unit, address, unitPrice, newLease };
+      }
+      return { form, address, unit, newLease}
    }
    return { form, newLease }
 })
