@@ -8,15 +8,16 @@ import { handleLoginRedirect } from "$lib/utils";
 import type { Lease } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
 
-const customerSchema = z.object({
-   customerId: z.string().min(23).max(30)
+const leaseEndSchema = z.object({
+   leaseId: z.string().min(23).max(30),
+   customerId: z.string().min(23).max(30),
 })
 
 export const load:PageServerLoad = async (event) =>{
    if(!event.locals.user){
       throw redirect(302, handleLoginRedirect(event));
    }
-   const form = await(superValidate(zod(customerSchema)))
+   const confirmForm = await superValidate(zod(leaseEndSchema));
    const leases = await prisma.lease.findMany({
       where: {
          leaseEnded: null,
@@ -43,15 +44,42 @@ export const load:PageServerLoad = async (event) =>{
          tableData.push(datum);
       }
    })
-   return { tableData, form }
+   return { tableData, confirmForm }
 }
 
 export const actions:Actions = {
-   default: async (event) =>{
-      const form = await superValidate(event.request, zod(customerSchema));
+   default: async () =>{
+      const form = await superValidate(zod(leaseEndSchema));
       if(!form.valid){
-         return fail(400, {form});
+         return fail(400)
       }
-      console.log(form.data);
+      const { leaseId, customerId } = form.data;
+      console.log(leaseId);
+      let lease:Lease|null;
+      if(leaseId){
+         lease = await prisma.lease.findUnique({
+            where:{
+               leaseId
+            }
+         })
+      } else{
+         lease=null;
+      }
+      if(lease){
+         if(lease.customerId !== customerId){
+            return fail(404);
+         }
+      }
+      if(lease?.customerId === customerId){
+         await prisma.lease.update({
+            where:{
+               leaseId
+            },
+            data:{
+               leaseEnded: new Date,
+            }
+         })
+      }
+
    }
 }
