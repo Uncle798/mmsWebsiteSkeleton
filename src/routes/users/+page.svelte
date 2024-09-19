@@ -1,7 +1,6 @@
 
 <script lang="ts">
    import type { PageData } from "./$types";
-   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
