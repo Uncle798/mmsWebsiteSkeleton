@@ -9,7 +9,6 @@
    const modalStore = getModalStore();
    const { form, errors, constraints, message, enhance } = superForm($page.data.confirmForm,{
       onUpdate(event) {
-         invalidateAll();
          if(!$message){
             modalStore.close();
          }
@@ -18,8 +17,9 @@
          console.error(event.result);
       },
       onSubmit({formData}) {
-         console.log(formData);
+         
       },
+      resetForm: true,
    });
    function onClose(){
       modalStore.close();

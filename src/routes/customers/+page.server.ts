@@ -48,8 +48,9 @@ export const load:PageServerLoad = async (event) =>{
 }
 
 export const actions:Actions = {
-   default: async () =>{
-      const form = await superValidate(zod(leaseEndSchema));
+   default: async (event) =>{
+      const formData = await event.request.formData();
+      const form = await superValidate(formData, zod(leaseEndSchema));
       if(!form.valid){
          return fail(400)
       }
@@ -80,6 +81,6 @@ export const actions:Actions = {
             }
          })
       }
-
+      return { form }
    }
 }
