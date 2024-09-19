@@ -6,7 +6,7 @@
 	
     export let data: PageData;
 
-    const searchPricing = data.pricing.map((price) =>( {
+    const searchPricing = data.priceCount.map((price) =>( {
         ...price,
         searchTerms: `${price.notes} ${price} ${price.size}`
     }));
@@ -23,6 +23,9 @@
 <div>
     <input type="search" name="search" id="search" placeholder="Search..." class="input" bind:value={$searchStore.search}/>
  </div>
+<div>
+    <button class="btn ">Add new price</button>
+</div>
 
  {#each $searchStore.filtered as price}
     <UnitPricing pricing={price} />

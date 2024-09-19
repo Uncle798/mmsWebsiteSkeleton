@@ -6,6 +6,7 @@ import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
+import type { PriceCount } from "$lib/server/partialTypes";
 
 export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user?.admin){
@@ -19,5 +20,20 @@ export const load:PageServerLoad = (async (event) => {
          size: 'asc'
       }
    })
-   return { pricing };
+   const unitPricing = await prisma.unitPricing.findMany({
+      where:{
+         endDate: null,
+      },
+      orderBy:{
+         unitNum: 'asc'
+      }
+   })
+   const priceCount:PriceCount[] = [];
+   pricing.forEach((price) =>{
+      const unitPrice = unitPricing.filter((uP) => uP.price === price.price);
+      const pC:PriceCount = { ...price, count:unitPrice.length};
+      priceCount.push(pC);
+   })
+
+   return { priceCount, unitPricing };
 })

@@ -1,6 +1,7 @@
 <script lang="ts"> 
    import type { Pricing, Unit } from "@prisma/client";
-   export let pricing:Pricing;
+   import type { PriceCount } from "$lib/server/partialTypes";
+   export let pricing:PriceCount;
 </script>
 <div class="card">
    <p>Size: {pricing.size.replace(/^0+/gm, '').replace(/x0/gm,'x')}</p>
@@ -9,4 +10,5 @@
    {#if pricing.notes}
       <p>Notes: {pricing.notes}</p>
    {/if}
+   <p>Number of Units at this price: {pricing.count}</p>
 </div>
