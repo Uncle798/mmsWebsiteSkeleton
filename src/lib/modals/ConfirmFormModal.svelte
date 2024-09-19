@@ -3,7 +3,6 @@
    import { superForm } from "sveltekit-superforms";
    import {SvelteComponent } from 'svelte';
    import { page } from "$app/stores";
-	import { invalidateAll } from "$app/navigation";
 
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
