@@ -29,7 +29,7 @@ export const load:PageServerLoad = async (event) =>{
             unitNum: 'asc'
          }
       });
-      const units = await prisma.unitPricing.findMany({
+      const units = await prisma.unit.findMany({
          where: {
             endDate: null,
          }
@@ -39,9 +39,9 @@ export const load:PageServerLoad = async (event) =>{
       const today = Date.now();
       units.forEach((unit) =>{
          const datum:TableData = {} as TableData;
-         datum.unitNum = unit.unitNum;
+         datum.unitNum = unit.num;
          datum.price = unit.price;
-         const unitLeases = leases.filter((lease) => lease.unitNum === unit.unitNum);
+         const unitLeases = leases.filter((lease) => lease.unitNum === unit.num);
          let shortestMonthsSinceLeaseEnded = 0;
          let monthsSinceLeaseEnded = 0;
          if(unitLeases){

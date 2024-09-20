@@ -54,13 +54,16 @@ model ContactInfo {
 }
 
 model Unit {
-  num         String  @id
-  building    String
-  size        String
-  description String
-  price       Int
-  deposit Int
-  lease       Lease[]
+  num             String  @id
+  building        String
+  size            String
+  description     String
+  leasedPrice     Int?
+  advertisedPrice Int
+  deposit         Int
+  notes           String?
+  unavailable     Boolean @default(false)
+  lease           Lease[]
 
   @@index([num(sort: Desc)])
 }
