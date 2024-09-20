@@ -1,4 +1,4 @@
-import { Lease, PrismaClient, User, Invoice, UnitPricing, PaymentType, PaymentRecord, Unit, } from '@prisma/client';
+import { Lease, PrismaClient, User, Invoice, PaymentType, PaymentRecord, Unit, } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import dayjs  from 'dayjs';
 import { hash } from '@node-rs/argon2';
@@ -77,8 +77,6 @@ async function deleteAll() {
    count += await prisma.invoice.count();
    count += await prisma.lease.count();
    count += await prisma.paymentRecord.count();
-   count += await prisma.unitPricing.count();
-   count += await prisma.pricing.count();
    count += await prisma.unit.count();
    count += await prisma.contactInfo.count();
    count += await prisma.user.count();
@@ -282,6 +280,7 @@ async function  main (){
       newUnit.num = unit.num;
       newUnit.size = unit.size;
       newUnit.price = price?.price || 0;
+      newUnit.deposit = price?.price || 5;
       newUnit.description = sD?.description ? sD.description : '';
       uD.push(newUnit);
    })

@@ -59,6 +59,7 @@ model Unit {
   size        String
   description String
   price       Int
+  deposit Int
   lease       Lease[]
 
   @@index([num(sort: Desc)])
