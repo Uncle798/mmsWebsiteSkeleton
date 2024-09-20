@@ -1,5 +1,4 @@
 import { Prisma } from 'prisma/prisma-client';
-import type { Pricing } from '@prisma/client';
 
 export const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
    select:{
@@ -14,5 +13,3 @@ export const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
 })
 
 export type PartialUser = Prisma.UserGetPayload<typeof partialUser>
-
-export type PriceCount = Pricing & { count:number};
