@@ -50,12 +50,6 @@ async function deleteAll() {
    await prisma.paymentRecord.deleteMany().catch((err) =>{
       console.error(err);
    });
-   await prisma.unitPricing.deleteMany().catch((err) =>{
-      console.error(err);
-   });
-   await prisma.pricing.deleteMany().catch((err) =>{
-      console.error(err);
-   });
    await prisma.unit.deleteMany().catch((err) =>{
       console.error(err);
    });
@@ -178,7 +172,7 @@ async function randomEmployee() {
 }
 
 
-async function createLease(unit: UnitPricing, leaseStart, leaseEnd: Date | null, employeeList: string[], randEmployee: User) {
+async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employeeList: string[], randEmployee: User) {
    const customer = await prisma.user.findFirst({
       where: {
          AND:[
@@ -200,7 +194,7 @@ async function createLease(unit: UnitPricing, leaseStart, leaseEnd: Date | null,
        customerId: customer!.id,
        employeeId: randEmployee.id,
        contactInfoId: contactInfos!.contactId,
-       unitNum: unit.unitNum,
+       unitNum: unit.num,
        price: unit.price,
        leaseEffectiveDate: new Date(leaseStart),
        leaseReturnedAt: new Date(leaseStart),
@@ -279,35 +273,24 @@ async function  main (){
    const totalUsers = await prisma.user.count();
    const userEndTime = dayjs(new Date);
    console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 's')} s`);
-   const pricing = await prisma.pricing.createManyAndReturn({
-      data: pricingData
-   })
    const uD:Unit[]=[];
    unitData.forEach((unit)=>{
       const sD = sizeDescription.find((description) => description.size === unit.size);
+      const price = pricingData.find((price) => price.size === unit.size);
       const newUnit:Unit= {} as Unit;
       newUnit.building=unit.building;
       newUnit.num = unit.num;
-      newUnit.size = unit.size
+      newUnit.size = unit.size;
+      newUnit.price = price?.price || 0;
       newUnit.description = sD?.description ? sD.description : '';
       uD.push(newUnit);
    })
    const units = await prisma.unit.createManyAndReturn({
       data: uD
    })
-   for await (const unit of units) {
-      const price = pricing.find((p) => p.size === unit.size);
-      await prisma.unitPricing.create({
-         data:{
-            unitNum: unit.num,
-            price: price!.price,
-            startDate: new Date
-         }
-      });
-   }
+
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 's')} s`);
-   const pricedUnits = (await prisma.unitPricing.findMany());
    const leases:Lease[]=[];
    let leaseStart = dayjs(earliestStarting);
    const today = dayjs();
@@ -319,7 +302,7 @@ async function  main (){
    })
    const employeeList = employees.map((employee) => employee.id);
    let lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
-   for await (const unit of pricedUnits) {
+   for await (const unit of units) {
       const randEmployee = employees[Math.floor(Math.random()*employees.length)];
       let leaseEnd = leaseStart.add(lengthOfLease, 'months');
       while (numMonthsLeft > 3) {

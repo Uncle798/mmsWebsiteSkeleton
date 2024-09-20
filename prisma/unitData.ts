@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
+
  
- const unitData: Prisma.UnitCreateInput[] = [
+ const unitData = [
    { num: '001', building: '1', size: '08x12' },
    { num: '002', building: '1', size: '08x12' },
    { num: '003', building: '1', size: '08x12' },
