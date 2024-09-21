@@ -24,8 +24,8 @@
       const modal:ModalSettings = {
          type: 'component',
          component: modalComponent,
-         title:'Are you sure you\'d like to change employment status?',
-         body:`of ${givenName} ${familyName}`,
+         title:'Are you sure you\'d like to change employment status',
+         body:`of ${givenName} ${familyName}?`,
          meta: {
             employee,
             admin,
