@@ -1,4 +1,4 @@
-import { Prisma } from 'prisma/prisma-client'
+import { Prisma } from 'prisma/prisma-client';
 
 export const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
    select:{

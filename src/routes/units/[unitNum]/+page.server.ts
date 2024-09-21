@@ -10,14 +10,6 @@ export async function load(event) {
    }
    if(event.locals.user.employee){
       const unitNum = event.params.unitNum;
-      const unitPrice = await prisma.unitPricing.findFirst({
-         where: {
-            AND:[
-               {unitNum},
-               {endDate: null}
-            ]
-         }
-      })
       const unit = await prisma.unit.findUnique({
          where:{
             num:unitNum
@@ -32,7 +24,7 @@ export async function load(event) {
          }
       })
       if(unit && !currentLease){
-         return {unit, unitPrice};
+         return {unit};
       }
       if(unit && currentLease){
          const currentCustomer = await prisma.contactInfo.findUnique({
@@ -45,7 +37,7 @@ export async function load(event) {
                id:currentLease?.employeeId
             }
          })
-         return {unit, unitPrice, currentLease, currentCustomer, leaseEmployee}
+         return {unit, currentLease, currentCustomer, leaseEmployee}
       }
    }
    if(event.locals.user){
@@ -55,12 +47,8 @@ export async function load(event) {
             num:unitNum
          }
       })
-      const unitPrice = await prisma.unitPricing.findFirst({
-         where:{
-            unitNum,
-         }
-      })
-      return{unit, unitPrice}
+
+      return{ unit }
    }
       error(404, 'Unit not found');
 }

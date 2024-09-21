@@ -29,7 +29,7 @@ export const POST: RequestHandler = async (event) => {
                console.log('stripe webhooks '+paymentIntent);
                break;
             }
-            case 'payment'
+
             default:
                break;
          }

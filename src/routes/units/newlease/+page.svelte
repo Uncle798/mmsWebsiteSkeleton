@@ -61,13 +61,12 @@
 {:else}
    <a class="a" href="/register/addressFrom">Please add your address</a>
 {/if}
-{#if data.unit && data.unitPrice}
-   <BasicUnitCustomer unit={data.unit} pricing={data.unitPrice} />
+{#if data.unit }
+   <BasicUnitCustomer unit={data.unit} />
 {/if}
 
-{#if data.user && data.address && data.unitPrice}
-   <input type="hidden" name="unitPriceId" id="unitPriceId" value={data.unitPrice.unitPricingId} />
-   <input type="hidden" name="unitNum" id="unitNum" value={data.unit.num} />
+{#if data.user && data.address }
+   <input type="hidden" name="unitNum" id="unitNum" value={data.unit?.num} />
    <button class="btn">All the above is correct pay deposit</button>
 {/if}
 </form>
