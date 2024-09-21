@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client";
 
-const pricingData: Prisma.PricingCreateInput[] = [
+const pricingData = [
    { size: '04x06', price: 20 },
    { size: '06x08', price: 35 },
    { size: '06x10', price: 45 },
