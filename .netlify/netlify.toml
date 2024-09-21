@@ -1,0 +1,43 @@
+plugins = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/ericbranson/Documents/mmsWebsiteSkeleton/build"
+publishOrigin = "ui"
+commandOrigin = "ui"
+command = "pnpm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/_app/immutable/*"
+
+[headers.values]
+cache-control = "public, immutable, max-age=31536000"
+
+[[redirects]]
+from = "*"
+to = "/.netlify/functions/sveltekit-render"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
