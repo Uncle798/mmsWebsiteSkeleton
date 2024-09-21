@@ -20,7 +20,7 @@
       },
       resetForm: true,
    });
-   function onClose(){
+   function cancel(){
       modalStore.close();
    }
    
@@ -35,13 +35,17 @@
      <article>{$modalStore[0].body ?? 'Body missing'}</article>
       <form method="post" class="modal-form border space-y-4 rounded-container-token" use:enhance>
          <label for="size" class="lable">Select a size
-
+            <select class="select" >
+               {#each $page.data.sizes as size}
+                  <option value={size}>{size.replace(/^0+/gm, '').replace(/x0/gm, 'x')}</option>
+               {/each}
+            </select>
          </label>
          <label for="price" class="lable">Enter a price: (must be whole number)
             $<input type="text" name="price" id="price" class="input" bind:value={$form.price}>
          </label>
          <button class="btn {parent.buttonPositive}">Submit</button>
-         <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
+         <button class="btn {parent.buttonNeutral}" on:click={cancel}>{parent.buttonTextCancel}</button>
       </form>
    </div>
 {/if}

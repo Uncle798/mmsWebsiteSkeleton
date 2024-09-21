@@ -21,7 +21,7 @@ export const load:PageServerLoad = async (event) =>{
       throw redirect(302,handleLoginRedirect(event))
    }
    if(event.locals.user){
-      throw redirect(303, '/units/available')
+      throw redirect(302, '/units/available')
    }
    if(event.locals.user.employee){
       const leases = await prisma.lease.findMany({
@@ -30,17 +30,22 @@ export const load:PageServerLoad = async (event) =>{
          }
       });
       const units = await prisma.unit.findMany({
-         where: {
-            endDate: null,
+         orderBy: {
+            num: 'asc'
          }
       });
       const users = await prisma.user.findMany({})
       const tableData:TableData[] = [];
       const today = Date.now();
+      const sizes:string[]=[];
       units.forEach((unit) =>{
+         const size = sizes.find((s) => s === unit.size);
+         if(!size){
+            sizes.push(unit.size);
+         }
          const datum:TableData = {} as TableData;
          datum.unitNum = unit.num;
-         datum.price = unit.price;
+         datum.price = unit.advertisedPrice;
          const unitLeases = leases.filter((lease) => lease.unitNum === unit.num);
          let shortestMonthsSinceLeaseEnded = 0;
          let monthsSinceLeaseEnded = 0;
@@ -53,6 +58,7 @@ export const load:PageServerLoad = async (event) =>{
                   datum.organizationName = users.find((user) => user.id === unitLeases[i].customerId)?.organizationName;
                   datum.leasedFor = dayjs(today).diff(unitLeases[0].leaseEffectiveDate, 'months');
                   datum.emptyFor = 0;
+                  datum.price = unitLeases[i].price;
                   break;
                } else {
                   monthsSinceLeaseEnded = dayjs(today).diff(leaseEndDate,'months');
@@ -68,7 +74,8 @@ export const load:PageServerLoad = async (event) =>{
          }
       })
       return {
-         tableData
+         tableData,
+         sizes
       }
    }
 }
