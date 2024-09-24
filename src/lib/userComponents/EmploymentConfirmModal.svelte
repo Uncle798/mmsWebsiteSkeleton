@@ -4,13 +4,11 @@
    import type { SvelteComponent } from "svelte";
    import { page } from "$app/stores";
 
-	import { invalidateAll } from "$app/navigation";
 
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
    const { form:employeeForm, errors:employeeErrors, constraints, message:employeeMessage, formId, enhance } = superForm($page.data.employeeForm,{
       onUpdate(event) {
-         invalidateAll();
          if(!$employeeMessage){
             modalStore.close();
          }

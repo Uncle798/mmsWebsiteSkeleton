@@ -24,11 +24,16 @@ export const load:PageServerLoad = async (event) =>{
    const employeeForm = await superValidate(zod(employeeConfirmSchema), {id: 'employee'});
    const adminForm = await superValidate(zod(adminConfirmSchema), {id: 'admin'});
    const users = await prisma.user.findMany({
-      orderBy: {
-         familyName: 'asc'
-      }, 
+      orderBy: [
+         {familyName: 'asc'},
+         {givenName: 'asc'},
+      ], 
    });
-   return { users, employeeForm, adminForm }
+   const searchUsers = users.map((user) =>({
+      ...user,
+      searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
+   }))
+   return { users, employeeForm, adminForm, searchUsers }
 }
 
 export const actions:Actions = {
@@ -49,7 +54,6 @@ export const actions:Actions = {
       if(form.data.userId === event.locals.user.id){
          return message(form, 'You can not change your own employment status');
       }
-      console.log(form.data)
       const admins = await prisma.user.findMany({
          where:{
             admin: true, 

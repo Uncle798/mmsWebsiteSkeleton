@@ -38,26 +38,15 @@
          <ThFilter {handler} filterBy='price' />
       </tr>
    </thead>
-   <tbody>
-      {#if data.user}    
+   <tbody>   
          {#each $rows as row}
          <tr>
-            <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.unitNum.replace(/^0+/gm,'')}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.size.replace(/^0+/gm,'')}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.unitNum}">{row.description}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.unitNum}">${row.price}</a></td>
+            <td><a href="/units/newLease/?unitNum={row.num}">{row.num.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/units/newLease/?unitNum={row.num}">{row.size.replace(/^0+/gm,'').replace(/x0/gm,'x')}</a></td>
+            <td><a href="/units/newLease/?unitNum={row.num}">{row.description}</a></td>
+            <td><a href="/units/newLease/?unitNum={row.num}">${row.advertisedPrice}</a></td>
          </tr>
          {/each}
-      {:else}
-         {#each $rows as row}
-         <tr>
-            <td><a href="/register?unitNum={row.unitNum}">{row.unitNum.replace(/^0+/gm,'')}</a></td>
-            <td><a href="/register?unitNum={row.unitNum}">{row.size.replace(/^0+/gm,'')}</a></td>
-            <td><a href="/register?unitNum={row.unitNum}">{row.description}</a></td>
-            <td><a href="/register?unitNum={row.unitNum}">${row.price}</a></td>
-         </tr>
-         {/each}
-      {/if}
    </tbody>
    
 </table>

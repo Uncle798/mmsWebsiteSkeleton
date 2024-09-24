@@ -9,13 +9,10 @@
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import { createSearchStore, searchHandler } from "$lib/stores/search";
    export let data:PageData;
-
-   const searchUsers = data.users.map((user) =>({
-      ...user,
-      searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
-   }))
-   const searchStore = createSearchStore(searchUsers);
+   $: searchUsers = data.searchUsers;
+   const searchStore = createSearchStore(data.searchUsers);
    const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
+   
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: EmploymentConfirmModal,

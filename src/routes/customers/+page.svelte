@@ -1,6 +1,5 @@
 <script lang="ts">
    import type { PageData } from "./$types";
-   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
    import Th from '$lib/tableComponent/Th.svelte'
@@ -14,6 +13,7 @@
    export let data:PageData;
    
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
+   $: data.tableData, handler.setRows(data.tableData)
    const rows = handler.getRows();
    const modalStore = getModalStore();
    const modalComponent:ModalComponent = {
