@@ -23,7 +23,7 @@ export const load:PageServerLoad = (async (event) =>{
    }
    const form = await superValidate(zod(newLeaseSchema));
    const newLease:string | null = event.url.searchParams.get('newLease');
-   if(!event.locals.user.employee){
+   if(event.locals.user){
       const unitNum = event.url.searchParams.get('unitNum');
       console.log(unitNum);
       if(!unitNum){

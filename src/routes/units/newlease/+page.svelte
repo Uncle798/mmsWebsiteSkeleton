@@ -59,7 +59,7 @@
    {/each}
    
 {:else}
-   <a class="a" href="/register/addressFrom">Please add your address</a>
+   <a class="a" href="/register/addressForm?unitNum={data.unit?.num}">Please add your address</a>
 {/if}
 {#if data.unit }
    <BasicUnitCustomer unit={data.unit} />
