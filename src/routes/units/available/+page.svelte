@@ -41,10 +41,10 @@
    <tbody>   
          {#each $rows as row}
          <tr>
-            <td><a href="/units/newLease/?unitNum={row.num}">{row.num.replace(/^0+/gm,'')}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.num}">{row.size.replace(/^0+/gm,'').replace(/x0/gm,'x')}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.num}">{row.description}</a></td>
-            <td><a href="/units/newLease/?unitNum={row.num}">${row.advertisedPrice}</a></td>
+            <td><a href="/units/newLease?unitNum={row.num}">{row.num.replace(/^0+/gm,'')}</a></td>
+            <td><a href="/units/newLease?unitNum={row.num}">{row.size.replace(/^0+/gm,'').replace(/x0/gm,'x')}</a></td>
+            <td><a href="/units/newLease?unitNum={row.num}">{row.description}</a></td>
+            <td><a href="/units/newLease?unitNum={row.num}">${row.advertisedPrice}</a></td>
          </tr>
          {/each}
    </tbody>
