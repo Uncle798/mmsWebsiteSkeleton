@@ -2,4 +2,5 @@
     import { page } from '$app/stores';
 </script>
 
-<h1 class="h1">{$page.status}: {$page.error?.message}</h1>
+<h1 class="h2">{$page.status}: </h1>
+<p class="h3">{$page.error?.message}</p>

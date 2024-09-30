@@ -37,7 +37,7 @@ export const load:PageServerLoad = (async (event) =>{
             }
          }).catch((err) =>{
             console.error(err);
-            return error(404, 'Unit not found')
+            return error(404, { message:'Unit not found' })
          });
       } else {
          unit = null;
