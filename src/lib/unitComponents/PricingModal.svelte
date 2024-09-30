@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getModalStore } from "@skeletonlabs/skeleton";
+	import { getModalStore, SlideToggle } from "@skeletonlabs/skeleton";
    import { superForm } from "sveltekit-superforms";
    import {SvelteComponent } from 'svelte';
    import { page } from "$app/stores";
@@ -9,9 +9,9 @@
    const { form, errors, constraints, message, enhance } = superForm($page.data.form, {
       onUpdate(event) {
          if(!$message){
-            modalStore.close();
+            // modalStore.close();
          }
-         console.log(event.form.data)
+         
       },
       onError(event){
          console.error(event.result);
@@ -30,7 +30,7 @@
 {#if $modalStore[0]}
    <div class="card p-4 w-modal shadow-xl space-y-4">
       {#if $message}
-      <h1 class="h1">{$message}</h1>
+      <p class="h2">{$message}</p>
      {/if}
      <header class="h3">{$modalStore[0].title ?? 'Title missing'}</header>
      <article>{$modalStore[0].body ?? 'Body missing'}</article>
@@ -45,6 +45,8 @@
          <label for="price" class="lable">Enter a price: (must be whole number)
             $<input type="text" name="price" id="price" class="input" bind:value={$form.price}>
          </label>
+         <SlideToggle name="lowerPrice" bind:checked={$form.lowerPrice} >Lower Price</SlideToggle>
+  
          <button class="btn {parent.buttonPositive}">Submit</button>
          <button class="btn {parent.buttonNeutral}" on:click={cancel}>{parent.buttonTextCancel}</button>
       </form>

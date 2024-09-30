@@ -5,7 +5,7 @@
 
 <div class="card p-4">
    <span>
-      <h3 class="h3">{nameBlock.givenName} {nameBlock.familyName}</h3>
+      <h3 class="h3"><a href="/users/{nameBlock.id}">{nameBlock.givenName} {nameBlock.familyName}</a></h3>
    </span>
    <span>
       <p>{nameBlock.email}</p>

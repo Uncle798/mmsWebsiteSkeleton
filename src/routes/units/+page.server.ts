@@ -1,5 +1,4 @@
  import prisma from "$lib/server/prisma";
-import  dayjs  from 'dayjs'
 import { redirect, fail } from "@sveltejs/kit";
 import { handleLoginRedirect } from "$lib/utils";
 import { superValidate, message } from 'sveltekit-superforms'
@@ -8,28 +7,24 @@ import { zod } from 'sveltekit-superforms/adapters'
 import { z } from 'zod'
 
 import type { PageServerLoad, Actions } from "./$types";
-
-type TableData = {
-   unitNum: string,
-   price: number,
-   givenName?: string | null,
-   familyName?: string | null,
-   organizationName?: string | null,
-   leasedFor: number,
-   emptyFor: number,
-   userId: string | null,
-}
+import type { ContactInfo, Lease, Unit } from "@prisma/client";
+import type { PartialUser } from "$lib/server/partialTypes";
 
 const pricingSchema = z.object({
    size: z.string().min(5).max(7).trim(),
-   price: z.number().int().min(0).max(10000)
+   price: z.number().int().min(0).max(10000),
+   lowerPrice: z.boolean().nullable(),
 });
 const unitComponentSchema =  z.object({
    notes: z.string().optional(),
    unavailable: z.boolean().nullable(),
    unitNum: z.string().min(3).max(6),
+});
+const endLeaseSchema = z.object({
+   leaseId: z.string().min(23).max(30),
 })
 export type UnitComponentSchema = typeof unitComponentSchema;
+export type UnitCustomer = Unit & PartialUser & Lease & ContactInfo;
 
 export const load:PageServerLoad = async (event) =>{ 
    if(!event.locals.user){
@@ -54,16 +49,6 @@ export const load:PageServerLoad = async (event) =>{
             num: 'asc'
          }
       });
-      const users = await prisma.user.findMany({
-         where: {
-            customerLeases:{
-               some:{
-                  leaseEnded:null
-               }
-            }
-         }
-      })
-      const today = Date.now();
       type SizePrice ={
          size: string,
          price: number,
@@ -74,7 +59,7 @@ export const load:PageServerLoad = async (event) =>{
          if(!size){
             const sizePrice = {} as SizePrice;
             sizePrice.size = unit.size;
-            sizePrice.price=unit.advertisedPrice;
+            sizePrice.price = unit.advertisedPrice;
             sizesPrices.push(sizePrice);
          }
       });
@@ -82,8 +67,7 @@ export const load:PageServerLoad = async (event) =>{
       (b.size > a.size) ? -1 : 0);
       return {
          units,
-         leases,
-         users,
+         leases, 
          sizesPrices,
          form,
          unitComponentForm,
@@ -103,7 +87,20 @@ export const actions:Actions = {
          const timeRemaining = Math.floor((reset - Date.now()) /1000);
 			return message(form, `Please wait ${timeRemaining}s before trying again.`)
 		}
-      console.log(form.data.price);
+      const unit = await prisma.unit.findFirst({
+         where: {
+            size: form.data.size,
+         }
+      })
+      console.log(form.data.lowerPrice);
+         if(form.data.price < unit?.advertisedPrice && form.data.lowerPrice === null){
+            return message(form, `Please select Lower Price to lower the price of all\
+                ${form.data.size.replace(/^0+/gm,'').replace(/x0/gm,'x')} units.` )
+         }
+         if(form.data.price === unit?.advertisedPrice && form.data.lowerPrice === null){
+            return message(form, 
+               `No change in price for ${form.data.size.replace(/^0+/gm,'').replace(/x0/gm,'x')} units.` )
+         }
       const units = await prisma.unit.updateMany({
          where: {
             size: form.data.size,
@@ -126,7 +123,6 @@ export const actions:Actions = {
          const timeRemaining = Math.floor((reset - Date.now()) /1000);
          return message(form, `Please wait ${timeRemaining}s before trying again.`)
       }
-      console.log(form.data.notes);
       await prisma.unit.update({
          where: {
             num: form.data.unitNum,
@@ -137,5 +133,19 @@ export const actions:Actions = {
          }
       })
       return { form }
+   },
+   endLease: async (event) =>{
+      const formData = await event.request.formData();
+      const form = await superValidate(formData, zod(endLeaseSchema));
+      await prisma.lease.update({
+         where: {
+            leaseId: form.data.leaseId
+         },
+         data:{
+            leaseEnded: new Date,
+         }
+      })
+      return { form }
    }
+   
 }

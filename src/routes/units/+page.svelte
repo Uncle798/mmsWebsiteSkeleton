@@ -9,7 +9,7 @@
 	import BasicUnitEmployee from '$lib/unitComponents/BasicUnitEmployee.svelte';
 	import NameBlock from '$lib/userComponents/NameBlock.svelte';
    export let data;
-   const { leases, users } = data;
+
    $: units = data.units;
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
@@ -34,10 +34,10 @@
    <button class="btn" on:click={modalFire}>Set new price by size</button>
 </div>
 {#if  units}
-{#each units as unit}
- <div class="card">
-    <BasicUnitEmployee unit={unit} lease={leases.find((lease) => lease.unitNum === unit.num)} data={data.unitComponentForm}/>
+   {#each units as unit}
+   <div class="card">
+      <BasicUnitEmployee unit={unit} lease={data.leases?.find((lease) => lease.unitNum === unit.num)} data={data.unitComponentForm}/>
+   </div>
 
- </div>
-{/each}
+   {/each}
 {/if}

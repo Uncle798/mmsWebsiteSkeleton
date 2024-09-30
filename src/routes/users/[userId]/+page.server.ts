@@ -57,7 +57,30 @@ export const load:PageServerLoad = async (event) => {
       if(event.locals.user.id !== userId){
          redirect(302, handleLoginRedirect(event));
       }
-      
+      const contactInfos = await prisma.contactInfo.findMany({
+         where: {
+            userId: event.locals.user.id
+         }
+      });
+      const leases = await prisma.lease.findMany({
+         where: {
+            customerId: event.locals.user.id
+         },
+         orderBy: {
+            unitNum: 'asc'
+         }
+      })
+      const paymentRecords = await prisma.paymentRecord.findMany({
+         where: {
+            customerId: event.locals.user.id
+         }
+      });
+      const invoices = await prisma.invoice.findMany({
+         where: {
+            customerId: event.locals.user.id
+         }
+      })
+      return { contactInfos, leases, paymentRecords, invoices, }
    }
 }  
 
