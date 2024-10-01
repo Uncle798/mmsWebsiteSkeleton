@@ -31,10 +31,11 @@ export const handle:Handle = async ({ event, resolve }) =>{
 }
 
 export const handleError:HandleServerError = async ({ error, event, status, message }) => {
-   const errorId = crypto.randomUUID();
    console.error(message);
    return {
+      error,
+      event,
+      status,
       message,
-      errorId,
    }
 }

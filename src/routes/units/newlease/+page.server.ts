@@ -25,7 +25,6 @@ export const load:PageServerLoad = (async (event) =>{
    const newLease:string | null = event.url.searchParams.get('newLease');
    if(event.locals.user){
       const unitNum = event.url.searchParams.get('unitNum');
-      console.log(unitNum);
       if(!unitNum){
          redirect(302, '/units/available?newLease=true');
       }
@@ -42,7 +41,9 @@ export const load:PageServerLoad = (async (event) =>{
       } else {
          unit = null;
       }
-      console.log(unit);
+      if(!unit){
+         return error(404, {message: 'Unit not found'})
+      }
       const address = await prisma.contactInfo.findMany({
          where:{
             userId:event.locals.user.id

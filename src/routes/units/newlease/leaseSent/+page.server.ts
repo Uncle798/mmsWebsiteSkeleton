@@ -1,30 +1,38 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+import prisma from '$lib/server/prisma';
 import { redirect } from '@sveltejs/kit';
 
 import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
-//@ts-ignore:
+
 import type { PageServerLoad } from './$types';
 
 export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user){
       redirect(302, '/login')
    }
-   const invoiceId = event.url.searchParams.get('invoiceId');
-   if(invoiceId){
-      const invoice = await prisma.invoice.findUnique({
+   const paymentId = event.url.searchParams.get('paymentId');
+   console.log(paymentId);
+   if(paymentId){
+      const payment = await prisma.paymentRecord.findUnique({
          where:{
-            invoiceId,
+            paymentId,
          }
-      })
-      if(invoice){
+      });
+      console.log(payment);
+      if(payment?.paymentCompleted){
+         const invoice = await prisma.invoice.findUnique({
+            where:{
+               invoiceId: payment.invoiceId
+            }
+         });
+         console.log('leaseSent ' + payment)
          const lease = await prisma.lease.findFirst({
             where: {
-               leaseId: invoice.leaseId,
+               leaseId: invoice?.leaseId,
             }
          })
          const customer = await prisma.user.findUnique({
             where:{
-               id: invoice.customerId,
+               id: invoice?.customerId,
             }
          })
          const unit = await prisma.unit.findUnique({
@@ -56,6 +64,7 @@ export const load:PageServerLoad = (async (event) => {
             console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
             console.log(JSON.stringify(packetDetails, null, 2))
          }
+         return { customer, }
       }
    }
 });

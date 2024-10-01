@@ -11,13 +11,18 @@ export const POST:RequestHandler = async (event) => {
          }
       })
       if(invoice){
-         console.log(invoice);
          const paymentIntent = await stripe.paymentIntents.create({
             amount: invoice.invoiceAmount * 100,
             currency: 'usd',
             automatic_payment_methods: {
                enabled: true,
             },
+            metadata:{
+               invoiceId,
+               customerId: invoice.customerId,
+               unitNum: invoice.unitNum,
+            },
+            setup_future_usage: 'off_session'
          })
          return new Response(JSON.stringify(paymentIntent.client_secret), {status:200});
       }

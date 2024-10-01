@@ -95,18 +95,16 @@ model PaymentRecord {
   paymentId        String      @id @default(cuid())
   customerId       String
   unitNum          String?
-  unitPrice        Int?
   paymentAmount    Int
-  receiverId       String
+  receiverId       String?
   payee            String?
   paymentCreated   DateTime    @default(now())
   paymentCompleted DateTime?
   paymentType      PaymentType
-  recordNum        String
   invoiceId        String?
   invoice          Invoice?
   customer         User        @relation("customer", fields: [customerId], references: [id])
-  receiver         User        @relation("employee", fields: [receiverId], references: [id])
+  receiver         User?       @relation("employee", fields: [receiverId], references: [id])
 
   @@unique([paymentCompleted, paymentId])
   @@index([paymentId, paymentCompleted(sort: Desc)])

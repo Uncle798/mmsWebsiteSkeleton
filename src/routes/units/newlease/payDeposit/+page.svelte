@@ -42,7 +42,7 @@
          error = result.error;
          processing = false;
       } else {
-         goto('/units/newLease/leaseSent?leaseId=' + data.invoice?.leaseId);
+         goto('/units/newLease/leaseSent?paymentId=' + result.paymentIntent.id);
       }
    }
 </script>
