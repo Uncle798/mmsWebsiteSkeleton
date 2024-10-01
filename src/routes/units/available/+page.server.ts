@@ -16,26 +16,23 @@ export const load:PageServerLoad = (async () => {
       orderBy: {
          num:'asc'
       }, 
-      where: {
-         lease:{
-            some: {
-               leaseEnded: {
-                  not: null
-               }
-            }
-         },
-         unavailable: false
+      where: { 
+            unavailable: false
       }
    })
    const leases = await prisma.lease.findMany({
-      where:{
-         leaseEnded: null,
-      },
-      orderBy:{
-         unitNum: 'asc'
+      where: {
+         leaseEnded: null
+      }
+   });
+   const availableUnits:Unit[]=[];
+   units.forEach((unit)=>{
+      const lease = leases.find((l) => l.unitNum === unit.num);
+      if(!lease){
+         availableUnits.push(unit);
       }
    })
-   return { form, units };
+   return { form, availableUnits };
 })
 
 export const actions: Actions ={

@@ -10,7 +10,7 @@
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
 	import type { PageData } from './$types';
    export let data:PageData;
-   const handler = new DataHandler(data.units, { rowsPerPage: 50})
+   const handler = new DataHandler(data.availableUnits, { rowsPerPage: 50})
    const rows = handler.getRows();
 </script>
 
