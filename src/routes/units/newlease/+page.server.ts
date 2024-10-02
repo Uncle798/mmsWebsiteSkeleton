@@ -1,14 +1,12 @@
 import  prisma from "$lib/server/prisma";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore: it works
 import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/redis";
-import type { Unit, UnitPricing } from 'prisma/prisma-client';
+import type { Unit } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
@@ -22,11 +20,11 @@ export const load:PageServerLoad = (async (event) =>{
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
-   const newLease:string | null = event.url.searchParams.get('newLease');
    if(event.locals.user){
       const unitNum = event.url.searchParams.get('unitNum');
+      console.log(unitNum);
       if(!unitNum){
-         redirect(302, '/units/available?newLease=true');
+         redirect(302, '/units/available');
       }
       let unit:Unit | null;
       if(unitNum){
@@ -34,10 +32,7 @@ export const load:PageServerLoad = (async (event) =>{
             where:{
                num:unitNum,
             }
-         }).catch((err) =>{
-            console.error(err);
-            return error(404, { message:'Unit not found' })
-         });
+         })
       } else {
          unit = null;
       }
@@ -48,12 +43,10 @@ export const load:PageServerLoad = (async (event) =>{
          where:{
             userId:event.locals.user.id
          }
-      }).catch((err) =>{
-         console.error(err);
-      });
-      return { form, address, unit, newLease}
+      })
+      return { form, address, unit}
    }
-   return { form, newLease }
+   return { form, }
 })
 
 
@@ -87,6 +80,8 @@ export const actions:Actions = {
             unitNum: unit?.num,
             leaseEnded: null,
          }
+      }).catch((err) => {
+         console.error(err);
       })
       if(currentLease){
          message(form, 'That unit is already leased');
@@ -107,7 +102,7 @@ export const actions:Actions = {
             contactInfoId,
             leaseEffectiveDate: new Date(),
          }
-      });
+      })
       const invoice = await prisma.invoice.create({
          data:{
             price: lease.price,

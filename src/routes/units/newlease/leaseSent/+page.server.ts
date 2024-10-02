@@ -1,5 +1,5 @@
 import prisma from '$lib/server/prisma';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 import { anvilClient, getOrganizationalPacketVariables, getPersonalPacketVariables } from "$lib/server/anvil";
 
@@ -10,26 +10,34 @@ export const load:PageServerLoad = (async (event) => {
       redirect(302, '/login')
    }
    const paymentId = event.url.searchParams.get('paymentId');
-   console.log(paymentId);
    if(paymentId){
       const payment = await prisma.paymentRecord.findUnique({
          where:{
             paymentId,
          }
       });
-      console.log(payment);
       if(payment?.paymentCompleted){
          const invoice = await prisma.invoice.findUnique({
             where:{
-               invoiceId: payment.invoiceId
+               invoiceId: payment.invoiceId || '',
             }
          });
-         console.log('leaseSent ' + payment)
-         const lease = await prisma.lease.findFirst({
+         const lease = await prisma.lease.findUnique({
             where: {
-               leaseId: invoice?.leaseId,
+               leaseId: invoice?.leaseId || '',
             }
          })
+         const priorLease = await prisma.lease.findFirst({
+            where: {
+               AND:{
+                  unitNum: lease?.unitNum,
+                  leaseEnded: null, 
+               }
+            }
+         })
+         if(priorLease){
+            return error(403,{message:'That unit already has a lease'});
+         }
          const customer = await prisma.user.findUnique({
             where:{
                id: invoice?.customerId,
@@ -58,13 +66,23 @@ export const load:PageServerLoad = (async (event) => {
             // Note: because of the nature of GraphQL, statusCode may be a 200 even when
             // there are errors.
             console.log('There were errors!')
-            console.log(JSON.stringify(errors, null, 2))
+            console.log(JSON.stringify(errors, null, 2));
+            console.log(data?.data['createEtchPacket'])
          } else {
             const packetDetails = data?.data['createEtchPacket']
             console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
+            const updatedLease = await prisma.lease.update({
+               where: {
+                  leaseId: lease?.leaseId
+               },
+               data: {
+                  anvilEID: packetDetails.etchPacket.eid,
+               }
+            })
+            console.log(updatedLease);
             console.log(JSON.stringify(packetDetails, null, 2))
          }
-         return { customer, }
+         return {  }
       }
    }
 });
