@@ -90,7 +90,7 @@ export const actions:Actions = {
 			subject: "Please verify your email",
 			html: `testing: verification code: ${verificationCode}`
 		}).catch((err) =>{
-			console.log(err);
+			console.error(err);
 		})
 		const session = await lucia.createSession(user.id, {});
 		const sessionCookie = await lucia.createSessionCookie(session.id);
