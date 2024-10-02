@@ -1,6 +1,6 @@
 <script>
-   // @ts-ignore: it works
+
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { enhance } from '$app/forms'
 </script>
-<form method="post" use:enhance><button>Sign Out</button></form>
+<form method="post" action="/logout" use:enhance><button>Sign Out</button></form>
