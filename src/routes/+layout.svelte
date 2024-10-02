@@ -20,7 +20,7 @@
 		{#if !data.user}
 		<li><a href="/login">Login</a></li>
 		{:else}
-		<li><a href="/logout">Logout</a></li>
+		<li><form method="post" action="/logout" ><button>Sign Out</button></form></li>
 		{/if}
 		<li><a href="/register" class="a">Register</a></li>
 		<li><a href="/register/addressForm" class="a">Address Form</a></li>
