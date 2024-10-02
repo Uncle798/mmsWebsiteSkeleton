@@ -80,7 +80,7 @@ model Lease {
   leaseEffectiveDate DateTime
   leaseEnded         DateTime?
   dropboxURL         String?
-  anvilEID           String?
+  anvilEID           String?     @unique()
   invoices           Invoice[]
   contactInfo        ContactInfo @relation(fields: [contactInfoId], references: [contactId], onDelete: NoAction, onUpdate: NoAction)
   customer           User        @relation("customer", fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
