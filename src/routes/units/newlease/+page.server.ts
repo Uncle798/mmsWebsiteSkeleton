@@ -10,7 +10,7 @@ import type { Unit } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
-   unitNum: z.string().min(23).max(30),
+   unitNum: z.string().min(3).max(6),
    organization: z.boolean(),
 })
 
@@ -21,7 +21,7 @@ export const load:PageServerLoad = (async (event) =>{
    }
    const form = await superValidate(zod(newLeaseSchema));
    const unitNum = event.url.searchParams.get('unitNum');
-   console.log(unitNum);
+   console.log('newLease unit num: '+unitNum);
    if(!unitNum){
       redirect(302, '/units/available');
    }
