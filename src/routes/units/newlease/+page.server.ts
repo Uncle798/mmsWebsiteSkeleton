@@ -20,33 +20,22 @@ export const load:PageServerLoad = (async (event) =>{
       redirect(302, '/login')
    }
    const form = await superValidate(zod(newLeaseSchema));
-   if(event.locals.user){
-      const unitNum = event.url.searchParams.get('unitNum');
-      console.log(unitNum);
-      if(!unitNum){
-         redirect(302, '/units/available');
-      }
-      let unit:Unit | null;
-      if(unitNum){
-         unit = await prisma.unit.findFirst({
-            where:{
-               num:unitNum,
-            }
-         })
-      } else {
-         unit = null;
-      }
-      if(!unit){
-         return error(404, {message: 'Unit not found'})
-      }
-      const address = await prisma.contactInfo.findMany({
-         where:{
-            userId:event.locals.user.id
-         }
-      })
-      return { form, address, unit}
+   const unitNum = event.url.searchParams.get('unitNum');
+   console.log(unitNum);
+   if(!unitNum){
+      redirect(302, '/units/available');
    }
-   return { form, }
+   const unit = await prisma.unit.findUnique({
+      where: {
+         num: unitNum,
+      }
+   })
+   const address = await prisma.contactInfo.findMany({
+      where:{
+         userId:event.locals.user.id
+      }
+   })
+   return { form, address, unit}
 })
 
 
