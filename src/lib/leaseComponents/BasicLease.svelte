@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { PartialUser } from "$lib/server/partialTypes";
+	import Address from "$lib/userComponents/Address.svelte";
+	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import type { Lease } from "@prisma/client";
    export let lease: Lease;
    export let customer: PartialUser;
@@ -12,5 +14,6 @@
    <p>Lease effective Date: {lease.leaseEffectiveDate.getMonth()}/{lease.leaseEffectiveDate.getDate()}/{lease.leaseEffectiveDate.getFullYear()}</p>
    {#if lease.leaseEnded}
       <p>Lease ended: {lease.leaseEnded.getMonth()}/{lease.leaseEnded.getDate()}/{lease.leaseEnded.getFullYear()}</p>
-   {/if}   
+   {/if}
+      <NameBlock nameBlock={customer} />
 </div>

@@ -113,16 +113,14 @@ model PaymentRecord {
 model Invoice {
   invoiceId       String         @id @default(cuid())
   customerId      String?
-  leaseId         String?
-  unitNum         String
-  price           Int
+  leaseId         String
   invoiceAmount   Int
   invoiceCreated  DateTime       @default(now())
   paymentRecordId String?        @unique
   invoicePaid     DateTime?      @unique
   invoiceNotes    String?
   customer        User?          @relation(fields: [customerId], references: [id])
-  lease           Lease?         @relation(fields: [leaseId, unitNum, price], references: [leaseId, unitNum, price])
+  lease           Lease?         @relation(fields: [leaseId], references: [leaseId])
   paymentRecord   PaymentRecord? @relation(fields: [paymentRecordId, invoicePaid], references: [paymentId, paymentCompleted])
 
   @@unique([paymentRecordId, invoicePaid])

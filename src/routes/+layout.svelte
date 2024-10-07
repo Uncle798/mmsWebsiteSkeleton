@@ -29,6 +29,7 @@
 		<li><a href="/units/newLease">New Lease</a></li>
 		<li><a href="/users">Users</a></li>
 		<li><a href="/customers">Customers</a></li>
+		<li><a href="/invoice/newInvoice">New Invoice</a></li>
 	</ul>
 </nav>
 {/if}
