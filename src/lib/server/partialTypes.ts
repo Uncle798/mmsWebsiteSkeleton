@@ -13,3 +13,29 @@ export const partialUser = Prisma.validator<Prisma.UserDefaultArgs>()({
 })
 
 export type PartialUser = Prisma.UserGetPayload<typeof partialUser>
+
+export const partialContactInfo = Prisma.validator<Prisma.ContactInfoDefaultArgs>()({
+   select: {
+      address1: true,
+      city: true,
+      state: true,
+      zip: true,
+      phoneNum1: true, 
+      userId: true
+   }
+})
+export type PartialContactInfo = Prisma.ContactInfoGetPayload<typeof partialContactInfo>
+
+export const partialLease = Prisma.validator<Prisma.LeaseDefaultArgs>()({
+   select: {
+      customerId: true,
+      employeeId: true,
+      contactInfoId: true,
+      unitNum: true,
+      price: true,
+      leaseEffectiveDate: true,
+      leaseReturnedAt: true, 
+      leaseEnded: true
+   }
+})
+export type PartialLease = Prisma.LeaseGetPayload<typeof partialLease>

@@ -1,10 +1,11 @@
-import { Lease, PrismaClient, User, Invoice, PaymentType, PaymentRecord, Unit, } from '@prisma/client';
+import {  PrismaClient, User, Invoice, PaymentType, PaymentRecord, Unit } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import dayjs  from 'dayjs';
 import { hash } from '@node-rs/argon2';
 import  unitData from './unitData'
 import pricingData  from './pricingData'
 import sizeDescription  from './sizeDescription'
+import { PartialContactInfo, PartialLease } from '../src/lib/server/partialTypes'
 const numUsers=unitData.length + 1500;
 const earliestStarting = new Date('2018-01-01');
 const hashedPass = await hash(String(process.env.USER_PASSWORD), {
@@ -45,9 +46,6 @@ async function deleteAll() {
       console.error(err);
    });
    await prisma.lease.deleteMany().catch((err) =>{
-      console.error(err);
-   });
-   await prisma.paymentRecord.deleteMany().catch((err) =>{
       console.error(err);
    });
    await prisma.unit.deleteMany().catch((err) =>{
@@ -229,8 +227,8 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employ
       }
    })
    const leaseEnded:Date | null = leaseEnd;
-   const lease = await prisma.lease.create({
-     data: {
+
+   const lease:PartialLease = {
        customerId: customer!.id,
        employeeId: randEmployee.id,
        contactInfoId: contactInfos!.contactId,
@@ -239,8 +237,7 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employ
        leaseEffectiveDate: new Date(leaseStart),
        leaseReturnedAt: new Date(leaseStart),
        leaseEnded,
-     },
-   });
+   };
    return lease;
  }
 
@@ -252,34 +249,34 @@ async function  main (){
    userMakeEmail();
    const users:User[] = await prisma.user.createManyAndReturn({
       data: userData
-   })
-   for await (const user of users) {
-      await prisma.contactInfo.create({
-         data:{
-            userId: user.id!,
+   });
+   const contactInfos:PartialContactInfo[] =[];
+   users.forEach((user, i) =>{
+      const contactInfo:PartialContactInfo = {
+         userId: user.id,
+         address1: faker.location.streetAddress(), 
+         city: faker.location.city(),
+         state: faker.location.state({abbreviated: true}),
+         zip: faker.location.zipCode(),
+         phoneNum1: faker.phone.number(),
+      }
+      contactInfos.push(contactInfo);
+      if(i%12 === 0 ) {
+         const contactInfo2:PartialContactInfo = {
+            userId: user.id,
             address1: faker.location.streetAddress(), 
             city: faker.location.city(),
             state: faker.location.state({abbreviated: true}),
             zip: faker.location.zipCode(),
             phoneNum1: faker.phone.number(),
          }
-      }) 
-   }
-   for(let i=0; i<users.length; i++){
-      if(i%12 === 0){
-         await prisma.contactInfo.create({
-            data:{
-               userId: users[i].id!,
-               address1: faker.location.streetAddress(), 
-               city: faker.location.city(),
-               state: faker.location.state({abbreviated: true}),
-               zip: faker.location.zipCode(),
-               phoneNum1: faker.phone.number(),
-            }
-         }) 
-         
+         contactInfos.push(contactInfo2);
+
       }
-   }
+   });
+   await prisma.contactInfo.createMany({
+      data: contactInfos
+   })
    await createEmployees();
    const totalUsers = await prisma.user.count();
    const userEndTime = dayjs(new Date);
@@ -305,7 +302,7 @@ async function  main (){
 
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
-   const leases:Lease[]=[];
+   const leases:PartialLease[]=[];
    let leaseStart = dayjs(earliestStarting);
    const today = dayjs();
    let numMonthsLeft = today.diff(leaseStart, 'months');
@@ -338,23 +335,19 @@ async function  main (){
       leaseStart = dayjs(earliestStarting);
       numMonthsLeft = today.diff(leaseStart);
    }
-   for await (const lease of leases){
+   for (const lease of leases){
       const leaseEnd = dayjs(lease.leaseEnded);
       if(today.diff(leaseEnd, 'months') <3){
-         await prisma.lease.update({
-            where:{
-               leaseId: lease.leaseId
-            },
-            data:{
-               leaseEnded: null
-            }
-         })
+         lease.leaseEnded = null;
       }
    }
+   const dbLeases = await prisma.lease.createManyAndReturn({
+      data: leases
+   })
    const leaseEndTime = dayjs(new Date);
    console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'minute')} min`);
    const invoices: Invoice[] = [];
-   for await (const lease of leases){
+   for await (const lease of dbLeases){
       const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
       const months:Date[] = arrayOfMonths(lease.leaseEffectiveDate, leaseEndDate); 
       for await (const month of months) {
