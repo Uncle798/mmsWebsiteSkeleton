@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import prisma from '$lib/server/prisma';
-import { fail, message, superValidate } from 'sveltekit-superforms';
+import { fail,  superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { error, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 const newInvoiceSchema = z.object({
    customerId: z.string().min(23).max(30),
@@ -57,7 +57,6 @@ export const actions: Actions = {
       }
       const form = await superValidate( zod(newInvoiceSchema));
       if(!form.valid){
-         console.log(form)
          return fail(400, {form})
       }
 
