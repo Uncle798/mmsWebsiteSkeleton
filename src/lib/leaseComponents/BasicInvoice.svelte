@@ -2,5 +2,8 @@
    import type {Invoice} from 'prisma/prisma-client';
    export let invoice:Invoice;
 </script>
-{invoice.invoiceAmount}
-{invoice.invoicePaid}
+
+<p>Invoice created: {invoice.invoiceCreated}</p>
+<p>Invoice amount: ${invoice.invoiceAmount}</p>
+<p>Invoice paid: {invoice.invoicePaid}</p>
+<p>Invoice notes: {invoice.invoiceNotes}</p>
