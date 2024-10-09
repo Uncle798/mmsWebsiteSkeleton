@@ -2,12 +2,12 @@
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { error } from '@sveltejs/kit';
    import { superForm } from 'sveltekit-superforms'
-   import type { PageData } from './$types';
    import { Autocomplete } from '@skeletonlabs/skeleton';
-   import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
-	import type { ContactInfo, Lease } from '@prisma/client';
 	import Address from '$lib/userComponents/Address.svelte';
+   import type { AutocompleteOption } from '@skeletonlabs/skeleton';
+	import type { ContactInfo, Lease } from '@prisma/client';
+   import type { PageData } from './$types';
 	import type { PartialUser } from '$lib/server/partialTypes';
    export let data: PageData;
    const customers = data.customers;
