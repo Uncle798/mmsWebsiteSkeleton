@@ -111,6 +111,7 @@ async function deleteAll() {
          const randString:string=String(Math.floor(Math.random()*101));
          const emailFront = user.givenName + '.' + user.familyName + randString;
          user.email = emailFront.toLowerCase() + 'yetanotherfakeemail.com';
+         //cSpell:enable
       }
    })
 }
@@ -190,17 +191,26 @@ async function createEmployees() {
    return employees
 }
 
-async function randomEmployee() {
-   const employees = await prisma.user.findMany({
-      where:{
-         employee: true
-      },
-      select: { id: true }
-   });
-   const employee = employees[Math.floor(Math.random() * employees.length)];
-   return employee;
+// async function randomEmployee() {
+//    const employees = await prisma.user.findMany({
+//       where:{
+//          employee: true
+//       },
+//       select: { id: true }
+//    });
+//    const employee = employees[Math.floor(Math.random() * employees.length)];
+//    return employee;
+// }
+function arrayOfMonths(startDate:Date, endDate:Date){
+   const dateArray:Date[]=[];
+   let currentDate = startDate;
+   const numberOfMonths = dayjs(endDate).diff(startDate, 'months');
+   for(let i=0; i<numberOfMonths; i++){
+      dateArray.push(new Date(currentDate));
+      currentDate = new Date(currentDate.setMonth(currentDate.getMonth()+1));
+   }
+   return dateArray;
 }
-
 
 async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employeeList: string[], randEmployee: User) {
    const customer = await prisma.user.findFirst({
@@ -235,144 +245,134 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employ
  }
 
 async function  main (){
-   // const deleteStartTime = dayjs(new Date);
-   // await deleteAll();
-   // const deleteEndTime = dayjs(new Date);
-   // console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 's')} sec`);
-   // userMakeEmail();
-   // //cSpell:enable
-   // const users:User[] = await prisma.user.createManyAndReturn({
-   //    data: userData
-   // })
-   // for await (const user of users) {
-   //    await prisma.contactInfo.create({
-   //       data:{
-   //          userId: user.id!,
-   //          address1: faker.location.streetAddress(), 
-   //          city: faker.location.city(),
-   //          state: faker.location.state({abbreviated: true}),
-   //          zip: faker.location.zipCode(),
-   //          phoneNum1: faker.phone.number(),
-   //       }
-   //    }) 
-   // }
-   // for(let i=0; i<users.length; i++){
-   //    if(i%12 === 0){
-   //       await prisma.contactInfo.create({
-   //          data:{
-   //             userId: users[i].id!,
-   //             address1: faker.location.streetAddress(), 
-   //             city: faker.location.city(),
-   //             state: faker.location.state({abbreviated: true}),
-   //             zip: faker.location.zipCode(),
-   //             phoneNum1: faker.phone.number(),
-   //          }
-   //       }) 
+   const deleteStartTime = dayjs(new Date);
+   await deleteAll();
+   const deleteEndTime = dayjs(new Date);
+   console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 's')} sec`);
+   userMakeEmail();
+   const users:User[] = await prisma.user.createManyAndReturn({
+      data: userData
+   })
+   for await (const user of users) {
+      await prisma.contactInfo.create({
+         data:{
+            userId: user.id!,
+            address1: faker.location.streetAddress(), 
+            city: faker.location.city(),
+            state: faker.location.state({abbreviated: true}),
+            zip: faker.location.zipCode(),
+            phoneNum1: faker.phone.number(),
+         }
+      }) 
+   }
+   for(let i=0; i<users.length; i++){
+      if(i%12 === 0){
+         await prisma.contactInfo.create({
+            data:{
+               userId: users[i].id!,
+               address1: faker.location.streetAddress(), 
+               city: faker.location.city(),
+               state: faker.location.state({abbreviated: true}),
+               zip: faker.location.zipCode(),
+               phoneNum1: faker.phone.number(),
+            }
+         }) 
          
-   //    }
-   // }
-   // await createEmployees();
-   // const totalUsers = await prisma.user.count();
-   // const userEndTime = dayjs(new Date);
-   // console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 'minute')} min`);
-   // const uD:Unit[]=[];
-   // unitData.forEach((unit)=>{
-   //    const sD = sizeDescription.find((description) => description.size === unit.size);
-   //    const price = pricingData.find((p) => p.size === unit.size);
-   //    const newUnit:Unit= {} as Unit;
-   //    newUnit.building=unit.building;
-   //    newUnit.num = unit.num;
-   //    newUnit.size = unit.size;
-   //    newUnit.leasedPrice = price?.price || 0;
-   //    newUnit.advertisedPrice = price?.price || 0;
-   //    newUnit.deposit = price?.price || 5;
+      }
+   }
+   await createEmployees();
+   const totalUsers = await prisma.user.count();
+   const userEndTime = dayjs(new Date);
+   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 'minute')} min`);
+   const uD:Unit[]=[];
+   unitData.forEach((unit)=>{
+      const sD = sizeDescription.find((description) => description.size === unit.size);
+      const price = pricingData.find((p) => p.size === unit.size);
+      const newUnit:Unit= {} as Unit;
+      newUnit.building=unit.building;
+      newUnit.num = unit.num;
+      newUnit.size = unit.size;
+      newUnit.leasedPrice = price?.price || 0;
+      newUnit.advertisedPrice = price?.price || 0;
+      newUnit.deposit = price?.price || 5;
 
-   //    newUnit.description = sD?.description ? sD.description : '';
-   //    uD.push(newUnit);
-   // })
-   // const units = await prisma.unit.createManyAndReturn({
-   //    data: uD
-   // })
+      newUnit.description = sD?.description ? sD.description : '';
+      uD.push(newUnit);
+   })
+   const units = await prisma.unit.createManyAndReturn({
+      data: uD
+   })
 
-   // const unitEndTime = dayjs(new Date);
-   // console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
-   // const leases:Lease[]=[];
-   // let leaseStart = dayjs(earliestStarting);
-   // const today = dayjs();
-   // let numMonthsLeft = today.diff(leaseStart, 'months');
-   // const employees = await prisma.user.findMany({
-   //    where:{
-   //       employee: true
-   //    }
-   // })
-   // const employeeList = employees.map((employee) => employee.id);
-   // let lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
-   // for await (const unit of units) {
-   //    const randEmployee = employees[Math.floor(Math.random()*employees.length)];
-   //    let leaseEnd = leaseStart.add(lengthOfLease, 'months');
-   //    while (numMonthsLeft > 3) {
-   //       const lease = await createLease(unit, 
-   //          leaseStart.toDate(), 
-   //          leaseEnd.toDate(),
-   //          employeeList, 
-   //          randEmployee
-   //       );
-   //       leases.push(lease);
-   //       leaseStart = leaseEnd.add(1,'months');
-   //       numMonthsLeft = today.diff(leaseStart, 'months');
-   //       lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
-   //       if(lengthOfLease > 78){
-   //          lengthOfLease = 1
-   //       }
-   //       leaseEnd = leaseStart.add(lengthOfLease, 'months');
-   //    };
-   //    leaseStart = dayjs(earliestStarting);
-   //    numMonthsLeft = today.diff(leaseStart);
-   // }
-   // for await (const lease of leases){
-   //    const leaseEnd = dayjs(lease.leaseEnded);
-   //    if(today.diff(leaseEnd, 'months') <3){
-   //       await prisma.lease.update({
-   //          where:{
-   //             leaseId: lease.leaseId
-   //          },
-   //          data:{
-   //             leaseEnded: null
-   //          }
-   //       })
-   //    }
-   // }
-   // const leaseEndTime = dayjs(new Date);
-   // console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'minute')} min`);
-   // const invoices: Invoice[] = [];
-   // for await (const lease of leases){
-   //    const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
-   //    const numMonths = dayjs(leaseEndDate).diff(lease.leaseEffectiveDate, 'months');
-   //    const months:Date[] = Array.from({length:numMonths})
-   //    for await (const month of months) {
-   //       const invoice = await prisma.invoice.create({
-   //          data: {
-   //             customerId: lease.customerId,
-   //             leaseId: lease.leaseId,
-   //             invoiceAmount: lease.price,
-   //             invoiceCreated: month,
-   //             unitNum: lease.unitNum,
-   //             price: lease.price,
-   //          },
-   //       });
-         
-   //       invoices.push(invoice)
-   //    }
-   // }
-   const invoiceEndTime = dayjs(new Date);
-   await prisma.paymentRecord.deleteMany({});
-   // console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'minute')} min`);
-   const invoices = await prisma.invoice.findMany({})
+   const unitEndTime = dayjs(new Date);
+   console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
+   const leases:Lease[]=[];
+   let leaseStart = dayjs(earliestStarting);
+   const today = dayjs();
+   let numMonthsLeft = today.diff(leaseStart, 'months');
    const employees = await prisma.user.findMany({
-      where: {
-         employee: true,
+      where:{
+         employee: true
       }
    })
+   const employeeList = employees.map((employee) => employee.id);
+   let lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
+   for await (const unit of units) {
+      const randEmployee = employees[Math.floor(Math.random()*employees.length)];
+      let leaseEnd = leaseStart.add(lengthOfLease, 'months');
+      while (numMonthsLeft > 3) {
+         const lease = await createLease(unit, 
+            leaseStart.toDate(), 
+            leaseEnd.toDate(),
+            employeeList, 
+            randEmployee
+         );
+         leases.push(lease);
+         leaseStart = leaseEnd.add(1,'months');
+         numMonthsLeft = today.diff(leaseStart, 'months');
+         lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
+         if(lengthOfLease > 78){
+            lengthOfLease = 1
+         }
+         leaseEnd = leaseStart.add(lengthOfLease, 'months');
+      };
+      leaseStart = dayjs(earliestStarting);
+      numMonthsLeft = today.diff(leaseStart);
+   }
+   for await (const lease of leases){
+      const leaseEnd = dayjs(lease.leaseEnded);
+      if(today.diff(leaseEnd, 'months') <3){
+         await prisma.lease.update({
+            where:{
+               leaseId: lease.leaseId
+            },
+            data:{
+               leaseEnded: null
+            }
+         })
+      }
+   }
+   const leaseEndTime = dayjs(new Date);
+   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'minute')} min`);
+   const invoices: Invoice[] = [];
+   for await (const lease of leases){
+      const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
+      const months:Date[] = arrayOfMonths(lease.leaseEffectiveDate, leaseEndDate); 
+      for await (const month of months) {
+         const invoice = await prisma.invoice.create({
+            data: {
+               customerId: lease.customerId,
+               leaseId: lease.leaseId,
+               invoiceAmount: lease.price,
+               invoiceCreated: month,
+               invoiceNotes: `Rent for ${lease.unitNum.replace(/^0+/gm,'')} ${month.getDate()}/${month.getMonth()+1}/${month.getFullYear()}`
+            },
+         });
+         
+         invoices.push(invoice)
+      }
+   }
+   const invoiceEndTime = dayjs(new Date);
+   console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'minute')} min`);
    const paymentRecords:PaymentRecord[]=[];
    for await (const invoice of invoices){
       const paymentDate = dayjs(invoice.invoiceCreated).add(1, 'months');
@@ -383,22 +383,27 @@ async function  main (){
          data:{
             paymentType: paymentType,
             customerId: invoice!.customerId!,
-            unitNum: invoice.unitNum,
-            unitPrice: invoice.invoiceAmount, 
             paymentAmount: invoice.invoiceAmount, 
             receiverId: employee.id,
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
-            recordNum: faker.string.uuid(),
             invoiceId: invoice.invoiceId
          }      
       });
+      await prisma.invoice.update({
+         where: {
+            invoiceId: invoice.invoiceId
+         },
+         data: {
+            invoicePaid: record.paymentCompleted
+         }
+      })
       paymentRecords.push(record);
    }                                                     
    const paymentEndTime = dayjs(new Date);
    const totalRecords = await countAll();
    console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 'minute')} min`);
-   // console.log(`🖥️  ${totalRecords} database entries created in ${paymentEndTime.diff(deleteStartTime, 'minute')} min`);
+   console.log(`🖥️  ${totalRecords} database entries created in ${paymentEndTime.diff(deleteStartTime, 'minute')} min`);
 }
 
 main().catch((error)=>{
