@@ -117,7 +117,7 @@ model Invoice {
   invoiceAmount   Int
   invoiceCreated  DateTime       @default(now())
   paymentRecordId String?        @unique
-  invoicePaid     DateTime?      @unique
+  invoicePaid     DateTime?
   invoiceNotes    String?
   customer        User?          @relation(fields: [customerId], references: [id])
   lease           Lease?         @relation(fields: [leaseId], references: [leaseId])
