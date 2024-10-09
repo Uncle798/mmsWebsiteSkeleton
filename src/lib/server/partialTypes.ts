@@ -39,3 +39,28 @@ export const partialLease = Prisma.validator<Prisma.LeaseDefaultArgs>()({
    }
 })
 export type PartialLease = Prisma.LeaseGetPayload<typeof partialLease>
+
+export const partialInvoice = Prisma.validator<Prisma.InvoiceDefaultArgs>()({
+   select: {
+      customerId: true,
+      leaseId: true,
+      invoiceAmount: true,
+      invoiceCreated: true,
+      invoiceNotes: true,
+      invoicePaid: true, 
+   }
+})
+export type PartialInvoice = Prisma.InvoiceGetPayload<typeof partialInvoice>
+
+export const partialPaymentRecord = Prisma.validator<Prisma.PaymentRecordDefaultArgs>()({
+   select: {
+      paymentType: true,
+      customerId: true,
+      paymentAmount: true,
+      receiverId: true,
+      paymentCreated: true,
+      paymentCompleted: true,
+      invoiceId: true,
+   }
+})
+export type PartialPaymentRecord = Prisma.PaymentRecordGetPayload<typeof partialPaymentRecord>

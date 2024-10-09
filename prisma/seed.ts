@@ -1,11 +1,11 @@
-import {  PrismaClient, User, Invoice, PaymentType, PaymentRecord, Unit } from '@prisma/client';
+import {  PrismaClient, User, PaymentType, Unit, ContactInfo, Lease } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import dayjs  from 'dayjs';
 import { hash } from '@node-rs/argon2';
 import  unitData from './unitData'
 import pricingData  from './pricingData'
 import sizeDescription  from './sizeDescription'
-import { PartialContactInfo, PartialLease } from '../src/lib/server/partialTypes'
+import { PartialContactInfo, PartialLease, PartialInvoice, PartialPaymentRecord } from '../src/lib/server/partialTypes'
 const numUsers=unitData.length + 1500;
 const earliestStarting = new Date('2018-01-01');
 const hashedPass = await hash(String(process.env.USER_PASSWORD), {
@@ -210,28 +210,12 @@ function arrayOfMonths(startDate:Date, endDate:Date){
    return dateArray;
 }
 
-async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employeeList: string[], randEmployee: User) {
-   const customer = await prisma.user.findFirst({
-      where: {
-         AND:[
-            {customerLeases: {
-               none: {}
-            }},
-            { id:{notIn:employeeList} }
-         ]
-      },
-   });
-   const contactInfos = await prisma.contactInfo.findFirst({
-      where: {
-         userId: customer?.id
-      }
-   })
+async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employeeList: string[], randEmployee: User, customer: User, contact:ContactInfo) {
    const leaseEnded:Date | null = leaseEnd;
-
    const lease:PartialLease = {
        customerId: customer!.id,
        employeeId: randEmployee.id,
-       contactInfoId: contactInfos!.contactId,
+       contactInfoId: contact.contactId,
        unitNum: unit.num,
        price: unit.advertisedPrice,
        leaseEffectiveDate: new Date(leaseStart),
@@ -241,16 +225,8 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, employ
    return lease;
  }
 
-async function  main (){
-   const deleteStartTime = dayjs(new Date);
-   await deleteAll();
-   const deleteEndTime = dayjs(new Date);
-   console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 's')} sec`);
-   userMakeEmail();
-   const users:User[] = await prisma.user.createManyAndReturn({
-      data: userData
-   });
-   const contactInfos:PartialContactInfo[] =[];
+ function makeContactInfo(users:User[]){
+   const contactInfos:PartialContactInfo[]=[]
    users.forEach((user, i) =>{
       const contactInfo:PartialContactInfo = {
          userId: user.id,
@@ -274,18 +250,13 @@ async function  main (){
 
       }
    });
-   await prisma.contactInfo.createMany({
-      data: contactInfos
-   })
-   await createEmployees();
-   const totalUsers = await prisma.user.count();
-   const userEndTime = dayjs(new Date);
-   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 'minute')} min`);
-   const uD:Unit[]=[];
-   unitData.forEach((unit)=>{
-      const sD = sizeDescription.find((description) => description.size === unit.size);
-      const price = pricingData.find((p) => p.size === unit.size);
-      const newUnit:Unit= {} as Unit;
+   return contactInfos;
+ }
+
+ function makeUnit(unit){
+    const sD = sizeDescription.find((description) => description.size === unit.size);
+    const price = pricingData.find((p) => p.size === unit.size);
+    const newUnit:Unit= {} as Unit;
       newUnit.building=unit.building;
       newUnit.num = unit.num;
       newUnit.size = unit.size;
@@ -294,12 +265,47 @@ async function  main (){
       newUnit.deposit = price?.price || 5;
 
       newUnit.description = sD?.description ? sD.description : '';
-      uD.push(newUnit);
+   return newUnit
+ }
+
+
+function makeInvoice(lease:Lease, month:Date){
+   const invoice:PartialInvoice = {
+      customerId: lease.customerId,
+      leaseId: lease.leaseId,
+      invoiceAmount: lease.price,
+      invoiceCreated: month,
+      invoiceNotes: `Rent for ${lease.unitNum.replace(/^0+/gm,'')} ${month.getDate()}/${month.getMonth()+1}/${month.getFullYear()}`,
+      invoicePaid: dayjs(month).add(1, 'month').toDate(),
+   };
+   return invoice;
+}
+
+async function  main (){
+   const deleteStartTime = dayjs(new Date);
+   await deleteAll();
+   const deleteEndTime = dayjs(new Date);
+   console.log(`📋 Previous records deleted in ${deleteEndTime.diff(deleteStartTime, 's')} sec`);
+   userMakeEmail();
+   const users:User[] = await prisma.user.createManyAndReturn({
+      data: userData
+   });
+   const contactInfos = makeContactInfo(users);
+   const dbContacts = await prisma.contactInfo.createManyAndReturn({
+      data: contactInfos
+   })
+   await createEmployees();
+   const totalUsers = await prisma.user.count();
+   const userEndTime = dayjs(new Date);
+   console.log(`👥 ${totalUsers} users created in ${userEndTime.diff(deleteEndTime, 's')} sec`);
+   const uD:Unit[]=[];
+   unitData.forEach((unit)=>{
+      const dbUnit = makeUnit(unit);
+      uD.push(dbUnit);
    })
    const units = await prisma.unit.createManyAndReturn({
       data: uD
    })
-
    const unitEndTime = dayjs(new Date);
    console.log(`🚪 ${units.length} units created in ${unitEndTime.diff(userEndTime, 'ms')} ms`);
    const leases:PartialLease[]=[];
@@ -316,24 +322,30 @@ async function  main (){
    for await (const unit of units) {
       const randEmployee = employees[Math.floor(Math.random()*employees.length)];
       let leaseEnd = leaseStart.add(lengthOfLease, 'months');
-      while (numMonthsLeft > 3) {
-         const lease = await createLease(unit, 
-            leaseStart.toDate(), 
-            leaseEnd.toDate(),
-            employeeList, 
-            randEmployee
-         );
-         leases.push(lease);
-         leaseStart = leaseEnd.add(1,'months');
-         numMonthsLeft = today.diff(leaseStart, 'months');
-         lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
-         if(lengthOfLease > 78){
-            lengthOfLease = 1
-         }
-         leaseEnd = leaseStart.add(lengthOfLease, 'months');
-      };
-      leaseStart = dayjs(earliestStarting);
-      numMonthsLeft = today.diff(leaseStart);
+      const customer = users.pop();
+      const contact = dbContacts.find((c) => c.userId === customer!.id);
+      if(customer && contact){
+         while (numMonthsLeft > 3) {
+            const lease = await createLease(unit, 
+               leaseStart.toDate(), 
+               leaseEnd.toDate(),
+               employeeList, 
+               randEmployee, 
+               customer,
+               contact
+            );
+            leases.push(lease);
+            leaseStart = leaseEnd.add(1,'months');
+            numMonthsLeft = today.diff(leaseStart, 'months');
+            lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
+            if(lengthOfLease > 78){
+               lengthOfLease = 1
+            }
+            leaseEnd = leaseStart.add(lengthOfLease, 'months');
+         };
+         leaseStart = dayjs(earliestStarting);
+         numMonthsLeft = today.diff(leaseStart);
+      }
    }
    for (const lease of leases){
       const leaseEnd = dayjs(lease.leaseEnded);
@@ -345,35 +357,28 @@ async function  main (){
       data: leases
    })
    const leaseEndTime = dayjs(new Date);
-   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'minute')} min`);
-   const invoices: Invoice[] = [];
+   console.log(`🎫 ${leases.length} leases created in ${leaseEndTime.diff(unitEndTime, 'ms')} ms`);
+   const invoices: PartialInvoice[] = [];
    for await (const lease of dbLeases){
       const leaseEndDate:Date | null = lease.leaseEnded ?? new Date;
       const months:Date[] = arrayOfMonths(lease.leaseEffectiveDate, leaseEndDate); 
       for await (const month of months) {
-         const invoice = await prisma.invoice.create({
-            data: {
-               customerId: lease.customerId,
-               leaseId: lease.leaseId,
-               invoiceAmount: lease.price,
-               invoiceCreated: month,
-               invoiceNotes: `Rent for ${lease.unitNum.replace(/^0+/gm,'')} ${month.getDate()}/${month.getMonth()+1}/${month.getFullYear()}`
-            },
-         });
-         
+         const invoice = makeInvoice(lease, month)
          invoices.push(invoice)
       }
    }
+   const dbInvoices = await prisma.invoice.createManyAndReturn({
+      data: invoices,
+   })
    const invoiceEndTime = dayjs(new Date);
-   console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'minute')} min`);
-   const paymentRecords:PaymentRecord[]=[];
-   for await (const invoice of invoices){
+   console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'ms')} ms`);
+   const paymentRecords:PartialPaymentRecord[]=[];
+   for await (const invoice of dbInvoices){
       const paymentDate = dayjs(invoice.invoiceCreated).add(1, 'months');
       const employee = employees[Math.floor(Math.random()*employees.length)];
       const randNum = Math.floor(Math.random()*3);
       const paymentType = PaymentType[Object.keys(PaymentType)[randNum]];
-      const record = await prisma.paymentRecord.create({
-         data:{
+      const record = {
             paymentType: paymentType,
             customerId: invoice!.customerId!,
             paymentAmount: invoice.invoiceAmount, 
@@ -382,22 +387,17 @@ async function  main (){
             paymentCompleted: paymentDate.toDate(), 
             invoiceId: invoice.invoiceId
          }      
-      });
-      await prisma.invoice.update({
-         where: {
-            invoiceId: invoice.invoiceId
-         },
-         data: {
-            invoicePaid: record.paymentCompleted
-         }
-      })
       paymentRecords.push(record);
-   }                                                     
+   }                              
+   await prisma.paymentRecord.createMany({
+      data: paymentRecords
+   })                       
    const paymentEndTime = dayjs(new Date);
    const totalRecords = await countAll();
-   console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 'minute')} min`);
-   console.log(`🖥️  ${totalRecords} database entries created in ${paymentEndTime.diff(deleteStartTime, 'minute')} min`);
+   console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 'ms')} ms`);
+   console.log(`🖥️  ${totalRecords} database entries created in ${paymentEndTime.diff(deleteStartTime, 'second')} sec`);
 }
+
 
 main().catch((error)=>{
    console.log(error);
