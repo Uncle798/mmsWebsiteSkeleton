@@ -30,6 +30,7 @@
 		<li><a href="/users">Users</a></li>
 		<li><a href="/customers">Customers</a></li>
 		<li><a href="/invoice/newInvoice">New Invoice</a></li>
+		<li><a href="/paymentRecord/newPaymentRecord">New Payment Record</a></li>
 	</ul>
 </nav>
 {/if}
