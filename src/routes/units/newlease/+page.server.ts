@@ -94,12 +94,10 @@ export const actions:Actions = {
       })
       const invoice = await prisma.invoice.create({
          data:{
-            price: lease.price,
-            unitNum: lease.unitNum,
             invoiceAmount: lease.price,
             customerId: lease.customerId,
             leaseId: lease.leaseId,
-            invoiceNotes:'Deposit for ' + lease.unitNum, 
+            invoiceNotes:'Deposit for ' + lease.unitNum.replace(/^0+/gm,''), 
          }
       })
       redirect(302, '/units/newLease/payDeposit?invoiceId=' + invoice.invoiceId)
