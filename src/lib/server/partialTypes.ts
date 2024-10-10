@@ -61,6 +61,7 @@ export const partialPaymentRecord = Prisma.validator<Prisma.PaymentRecordDefault
       paymentCreated: true,
       paymentCompleted: true,
       invoiceId: true,
+      paymentNotes: true,
    }
 })
 export type PartialPaymentRecord = Prisma.PaymentRecordGetPayload<typeof partialPaymentRecord>
