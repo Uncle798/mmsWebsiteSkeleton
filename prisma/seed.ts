@@ -136,6 +136,7 @@ async function createEmployees() {
                state: faker.location.state({abbreviated: true}),
                zip: faker.location.zipCode(),
                phoneNum1: faker.phone.number(),
+               country: 'US'
             }
          },
          employee: true,
@@ -156,6 +157,7 @@ async function createEmployees() {
                   city: faker.location.city(),
                   state: faker.location.state({abbreviated: true}),
                   zip: faker.location.zipCode(),
+                  country: 'US',
                   phoneNum1: faker.phone.number(),
                }
             },
@@ -178,6 +180,7 @@ async function createEmployees() {
                   city: faker.location.city(),
                   state: faker.location.state({abbreviated: true}),
                   zip: faker.location.zipCode(),
+                  country: 'US',
                   phoneNum1: faker.phone.number(),
                }
             },
@@ -234,6 +237,7 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, randEm
          city: faker.location.city(),
          state: faker.location.state({abbreviated: true}),
          zip: faker.location.zipCode(),
+         country: faker.location.countryCode(),
          phoneNum1: faker.phone.number(),
       }
       contactInfos.push(contactInfo);
@@ -244,10 +248,10 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, randEm
             city: faker.location.city(),
             state: faker.location.state({abbreviated: true}),
             zip: faker.location.zipCode(),
+            country: faker.location.countryCode(),
             phoneNum1: faker.phone.number(),
          }
          contactInfos.push(contactInfo2);
-
       }
    });
    return contactInfos;

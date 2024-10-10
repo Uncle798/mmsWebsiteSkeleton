@@ -20,8 +20,9 @@ export const partialContactInfo = Prisma.validator<Prisma.ContactInfoDefaultArgs
       city: true,
       state: true,
       zip: true,
+      country: true,
       phoneNum1: true, 
-      userId: true
+      userId: true,
    }
 })
 export type PartialContactInfo = Prisma.ContactInfoGetPayload<typeof partialContactInfo>

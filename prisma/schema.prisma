@@ -44,6 +44,7 @@ model ContactInfo {
   city               String
   state              String
   zip                String
+  country            String
   phoneNum1          String
   phoneNum2          String?
   phoneNum1Validated Boolean  @default(false)
