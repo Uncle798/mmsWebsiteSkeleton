@@ -3,17 +3,16 @@
 	import Address from "$lib/userComponents/Address.svelte";
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import type { Lease } from "@prisma/client";
+	import dayjs from "dayjs";
    export let lease: Lease;
-   export let customer: PartialUser;
 </script>
 <div class="card p-4">
    <span>
       <h3>Unit Number: <a href="/units/{lease.unitNum}"> {lease.unitNum.replace(/^0+/gm,'')}</a></h3>
       <h4>Price: ${lease.price}</h4>
    </span>
-   <p>Lease effective Date: {lease.leaseEffectiveDate.getMonth()}/{lease.leaseEffectiveDate.getDate()}/{lease.leaseEffectiveDate.getFullYear()}</p>
+   <p>Lease effective Date: {dayjs(lease.leaseEffectiveDate).format('DD/MM/YYYY')}</p>
    {#if lease.leaseEnded}
-      <p>Lease ended: {lease.leaseEnded.getMonth()}/{lease.leaseEnded.getDate()}/{lease.leaseEnded.getFullYear()}</p>
+      <p>Lease ended: {dayjs(lease.leaseEnded).format('DD/MM/YYYY')}</p>
    {/if}
-      <NameBlock nameBlock={customer} />
 </div>
