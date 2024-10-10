@@ -46,7 +46,6 @@ export const load:PageServerLoad = async (event) => {
          const payment = payments.find((p) => p.paymentId === invoice.invoiceId );
          if(payment){
             const datum:PaymentTableData = {...invoice, ...dbUser, ...payment};
-            datum.unitNum = invoice.unitNum || '';
             tableData.push(datum);
          }
       })

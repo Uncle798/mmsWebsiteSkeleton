@@ -8,7 +8,7 @@ const paymentRecordSchema = z.object({
    customerId: z.string(),
    invoiceId: z.string().nullable(),
    paymentAmount: z.number(),
-   payee: z.string(),
+   payee: z.string().optional(),
    paymentType: z.enum(['STRIPE', 'CASH', 'CHECK']),
 
 })
@@ -48,6 +48,7 @@ export const actions: Actions = {
       redirect(302, '/login');
       }
       const form = await superValidate( zod(paymentRecordSchema));
+      console.log(form);
       if(!form.valid){
          return fail(400, {form})
       }

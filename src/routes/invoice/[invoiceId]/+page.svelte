@@ -3,5 +3,8 @@
     import type { PageData } from './$types';
     
     export let data: PageData;
+    const { invoice }= data
 </script>
-<BasicInvoice invoice={data.invoice} />
+{#if invoice}
+    <BasicInvoice invoice={invoice} />
+{/if}

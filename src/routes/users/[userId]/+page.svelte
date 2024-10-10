@@ -28,12 +28,16 @@
 {#if dbUser}
 <NameBlock nameBlock={dbUser} />
 {/if}
-{#each contactInfo as info}   
-   <Address address={info}/>
-{/each}
-{#each leases as lease}   
-   <BasicLease lease={lease} />
-{/each}
+{#if contactInfo}
+   {#each contactInfo as info}   
+      <Address address={info}/>
+   {/each}
+{/if}
+{#if leases}
+   {#each leases as lease}   
+      <BasicLease lease={lease} />
+   {/each}
+{/if}
 {#if $rowCount.total > 0 }
    <header>
       <Search {handler} /> <RowsPerPage {handler} />
@@ -58,8 +62,6 @@
       <tbody>
          {#each $rows as row}
          <tr>
-            <td>${row.amount}</td>
-            <td>{row.invoiceNum}</td>
             <td>{row.paymentCompleted?.getDate()}/{row.paymentCompleted?.getMonth()}/{row.paymentCompleted?.getFullYear()}</td>
             <td>{row.paymentType}</td>
             <td>{row.familyName}, {row.givenName}</td>

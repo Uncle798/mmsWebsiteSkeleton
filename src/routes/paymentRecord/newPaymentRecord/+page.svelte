@@ -12,8 +12,8 @@
     
    export let data: PageData;
    const {form, errors, constraints, message, enhance} = superForm(data.form, {
-      onUpdate(event) {
-         $form.customerId = customer?.id || '';
+      onSubmit(input) {
+         console.log($form);
       },
    });
    const customers = data.customers;
@@ -22,6 +22,7 @@
    let customerSearch:string | undefined = '';
    let customerAddress:ContactInfo[]=[];
    let customerInvoices: Invoice[] =[];
+   let currentInvoice: Invoice | undefined;
    let customer:PartialUser | undefined;
    let invoiceSearch: string | undefined = '';
    let invoiceOptions: AutocompleteOption<string>[] =[];
@@ -53,7 +54,7 @@
          const option:AutocompleteOption<string> ={
             label: String(i.invoiceNotes),
             value: i.invoiceId,
-            keywords: `${i.invoiceNotes} ${i.invoiceAmount}`
+            keywords: `${i.invoiceNotes} ${i.invoiceAmount} ${i.invoiceId}`
          }
          invoiceOptions = [ ...invoiceOptions, option];
       })
@@ -61,12 +62,14 @@
    };
    function onInvoiceSearch(event: CustomEvent<AutocompleteOption<string>>):void {
       invoiceSearch = event.detail.label;
+      currentInvoice = customerInvoices.find((invoice) => invoice.invoiceId === event.detail.value);
       $form.invoiceId = event.detail.value;
+      $form.paymentAmount = currentInvoice!.invoiceAmount;
    }
 </script>
 
 <div>
-   <form method="post">
+   <form method="post" use:enhance>
       <div class="card float-start">
          <label for="customerSearch">Customers
             <input type="search" class="input" name="customerSearch" id="customerSearch" bind:value={customerSearch} placeholder="Customer search ..." />
@@ -77,7 +80,7 @@
          
       <div class="card float-left">
          <input type="search" name="invoiceSearch" id="invoiceSearch" class="input" bind:value={invoiceSearch} />
-         <Autocomplete bind:input={invoiceSearch} options={invoiceOptions} on:selections = {onInvoiceSearch} />
+         <Autocomplete bind:input={invoiceSearch} options={invoiceOptions} on:selection = {onInvoiceSearch} />
       </div>
       <div class="card float-left">
          <label for="paymentAmount">Payment Amount
@@ -103,12 +106,13 @@
          </div>
       </div>
       {/if}
-      {#if customerInvoices.length >0 }
+      {#if customerInvoices.length > 0 }
       {#each customerInvoices as invoice}
       <div>
          <BasicInvoice invoice={invoice} />
       </div>
          {/each}
+         <button class="btn">Make payment Record</button>
       {/if}
    </form>
 </div>
