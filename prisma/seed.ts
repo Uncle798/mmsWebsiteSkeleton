@@ -213,7 +213,7 @@ function arrayOfMonths(startDate:Date, endDate:Date){
 async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, randEmployee: User, customer: User, contact:ContactInfo) {
    const leaseEnded:Date | null = leaseEnd;
    const lease:PartialLease = {
-       customerId: customer!.id,
+       customerId: customer.id,
        employeeId: randEmployee.id,
        contactInfoId: contact.contactId,
        unitNum: unit.num,
@@ -279,7 +279,7 @@ function makeInvoice(lease:Lease, month:Date){
       leaseId: lease.leaseId,
       invoiceAmount: lease.price,
       invoiceCreated: month,
-      invoiceNotes: `Rent for ${lease.unitNum.replace(/^0+/gm,'')} ${month.getDate()}/${month.getMonth()+1}/${month.getFullYear()}`,
+      invoiceNotes: `Rent for unit ${lease.unitNum} for ${dayjs(month).format('MMMM YYYY')}`,
       invoicePaid
    };
    return invoice;
@@ -326,28 +326,30 @@ async function  main (){
       const randEmployee = employees[Math.floor(Math.random()*employees.length)];
       let leaseEnd = leaseStart.add(lengthOfLease, 'months');
       let customer = users.pop();
+      numMonthsLeft = today.diff(leaseStart);
+      if(!customer){
+         break
+      }
       let contact = dbContacts.find((c) => c.userId === customer!.id);
-         while (numMonthsLeft > 3) {
-            const lease = await createLease(unit, 
-               leaseStart.toDate(), 
-               leaseEnd.toDate(), 
-               randEmployee, 
-               customer!,
-               contact!
-            );
-            leases.push(lease);
-            leaseStart = leaseEnd.add(1,'months');
-            numMonthsLeft = today.diff(leaseStart, 'months');
-            lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
-            if(lengthOfLease > 78){
-               lengthOfLease = 1
-            }
-            leaseEnd = leaseStart.add(lengthOfLease, 'months');
-            customer = users.pop();
-            contact = dbContacts.find((c) => c.userId === customer!.id);
-         };
+      while (numMonthsLeft > 3) {
+         const lease = await createLease(unit, 
+            leaseStart.toDate(), 
+            leaseEnd.toDate(), 
+            randEmployee, 
+            customer,
+            contact,
+         );
+         leases.push(lease);
+         leaseStart = leaseEnd.add(1,'months');
+         numMonthsLeft = today.diff(leaseStart, 'months');
+         lengthOfLease = Math.floor(Math.random()*numMonthsLeft);
+         if(lengthOfLease > 78){
+            lengthOfLease = 1
+         }
+         leaseEnd = leaseStart.add(lengthOfLease, 'months');
+         customer = users.pop();
+         contact = dbContacts.find((c) => c.userId === customer?.id);
          leaseStart = dayjs(earliestStarting);
-         numMonthsLeft = today.diff(leaseStart);
       }
    }
    for (const lease of leases){
@@ -385,14 +387,15 @@ async function  main (){
       const employee = employees[Math.floor(Math.random()*employees.length)];
       const randNum = Math.floor(Math.random()*3);
       const paymentType = PaymentType[Object.keys(PaymentType)[randNum]];
-      const record = {
+      const record:PartialPaymentRecord = {
             paymentType: paymentType,
             customerId: invoice!.customerId!,
             paymentAmount: invoice.invoiceAmount, 
             receiverId: employee.id,
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
-            invoiceId: invoice.invoiceId
+            invoiceId: invoice.invoiceId, 
+            paymentNotes: `Payment for invoice ${invoice.invoiceId}`
          }      
       paymentRecords.push(record);
    }                              

@@ -100,6 +100,7 @@ model PaymentRecord {
   payee            String?
   paymentCreated   DateTime    @default(now())
   paymentCompleted DateTime?
+  paymentNotes     String?
   paymentType      PaymentType
   invoiceId        String?
   invoice          Invoice?
