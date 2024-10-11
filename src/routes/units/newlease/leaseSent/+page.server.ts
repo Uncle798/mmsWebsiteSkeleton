@@ -40,12 +40,12 @@ export const load:PageServerLoad = (async (event) => {
          }
          const customer = await prisma.user.findUnique({
             where:{
-               id: invoice?.customerId,
+               id: invoice?.customerId || undefined,
             }
          })
          const unit = await prisma.unit.findUnique({
             where:{
-               num: invoice?.unitNum,
+               num: lease?.unitNum,
             }
          });
          const employee = await prisma.user.findFirst({
@@ -62,12 +62,13 @@ export const load:PageServerLoad = (async (event) => {
          const { data, errors } = await anvilClient.createEtchPacket({
             variables
          })
+         console.log(data);
          if (errors) {
             // Note: because of the nature of GraphQL, statusCode may be a 200 even when
             // there are errors.
-            console.log('There were errors!')
-            console.log(JSON.stringify(errors, null, 2));
-            console.log(data?.data['createEtchPacket'])
+            console.error('There were errors!')
+            console.error(JSON.stringify(errors, null, 2));
+            console.error(data?.data['createEtchPacket'])
          } else {
             const packetDetails = data?.data['createEtchPacket']
             console.log('Visit the new packet on your dashboard:', packetDetails.detailsURL)
@@ -81,8 +82,8 @@ export const load:PageServerLoad = (async (event) => {
             })
             console.log(updatedLease);
             console.log(JSON.stringify(packetDetails, null, 2))
+            return { packetDetails }
          }
-         return {  }
       }
    }
 });

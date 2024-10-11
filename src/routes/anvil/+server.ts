@@ -20,15 +20,6 @@ export const POST: RequestHandler = async (event) => {
                leaseReturnedAt: decrypted.etchPacket.completedAt,
             }
          })
-         if(!lease?.dropboxURL){
-            const downloadURL = decrypted.documentGroup.files[0].downloadURL;
-
-            const dropboxResult = await dropbox.filesSaveUrl({
-               url:downloadURL,
-               path: ''
-            })
-            console.log('anvil/server ' + dropboxResult.result);
-         }
       }
    }
    return new Response(JSON.stringify('ok'), {status: 200});

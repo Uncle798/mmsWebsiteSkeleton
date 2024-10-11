@@ -6,9 +6,9 @@
    import { Elements, PaymentElement, LinkAuthenticationElement, Address, Card } from 'svelte-stripe';
    import { onMount } from 'svelte';
 	import { loadStripe, type StripeElements, type Stripe } from '@stripe/stripe-js';
-	import { enhance } from '$app/forms';
    import { goto } from '$app/navigation';
 	export let data:PageData;
+   const { address, invoice, user } = data;
    let stripe:Stripe|null;
    let clientSecret:string;
    let elements: StripeElements;
@@ -21,20 +21,22 @@
       mounted=true;
    })
    async function createPaymentIntent() {
-      const response = await fetch('/stripe/paymentIntent?invoiceId='+data.invoice?.invoiceId, {
+      const response = await fetch('/stripe/paymentIntent?invoiceId=' + invoice?.invoiceId, {
          method: 'POST',
          headers: {
             'content-type': 'applications/json'
          },
-         body:JSON.stringify({price:data.invoice?.price}),
+         body:JSON.stringify({price:data.invoice?.invoiceAmount}),
       });
       const clientSecret = await response.json();
+      console.log(clientSecret);
+
       return clientSecret;
    }
    async function submit() {
       if(processing) return;
       processing = true;
-      const result = await stripe.confirmPayment({
+      const result = await stripe!.confirmPayment({
          elements,
          redirect: 'if_required',
       });
@@ -54,11 +56,38 @@
    loading...
 {:else}
    <p>Please pay a deposit of ${data.invoice?.invoiceAmount}</p>
+   {#if stripe}
    <Elements {stripe} clientSecret={clientSecret} bind:elements>
       <form on:submit|preventDefault={submit} >
-         <LinkAuthenticationElement />
+         {#if  user}
+            <LinkAuthenticationElement defaultValues = {
+               {
+                  email: user?.email
+               }
+            }/>
+         {/if}
          <PaymentElement />
-         <Address mode='billing' />
+         <Address mode='billing' 
+            defaultValues= {
+               {
+                  lastName: user?.familyName,
+                  firstName: user?.givenName,
+                  address: {
+                     line1: address?.address1,
+                     line2: address?.address2 || undefined,
+                     city: address?.city,
+                     state: address?.state,
+                     country: address?.country || 'US',
+                     postal_code: address?.zip
+                  }
+               }
+            }
+            display = {
+               {
+                  name: 'organization'
+               }
+            }
+         />
          <button class="btn" disabled={processing}>
             {#if processing}
             Processing...
@@ -68,6 +97,6 @@
          </button>
       </form>
    </Elements>
-   
+   {/if}
 {/if}
 

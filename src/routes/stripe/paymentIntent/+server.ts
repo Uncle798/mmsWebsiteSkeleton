@@ -20,7 +20,6 @@ export const POST:RequestHandler = async (event) => {
             metadata:{
                invoiceId,
                customerId: invoice.customerId,
-               unitNum: invoice.unitNum,
             },
             setup_future_usage: 'off_session'
          })

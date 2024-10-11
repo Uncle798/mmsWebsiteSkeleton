@@ -4,9 +4,8 @@ import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
 import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
-import { error, redirect } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/redis";
-import type { Unit } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
@@ -21,7 +20,6 @@ export const load:PageServerLoad = (async (event) =>{
    }
    const form = await superValidate(zod(newLeaseSchema));
    const unitNum = event.url.searchParams.get('unitNum');
-   console.log('newLease unit num: '+unitNum);
    if(!unitNum){
       redirect(302, '/units/available');
    }
@@ -97,9 +95,9 @@ export const actions:Actions = {
             invoiceAmount: lease.price,
             customerId: lease.customerId,
             leaseId: lease.leaseId,
-            invoiceNotes:'Deposit for ' + lease.unitNum.replace(/^0+/gm,''), 
+            invoiceNotes:'Deposit for unit ' + lease.unitNum.replace(/^0+/gm,''), 
          }
       })
-      redirect(302, '/units/newLease/payDeposit?invoiceId=' + invoice.invoiceId)
+      redirect(302, '/units/newLease/payDeposit?invoiceId=' + invoice.invoiceId + '&contactInfoId=' + contactInfoId)
    }
 }

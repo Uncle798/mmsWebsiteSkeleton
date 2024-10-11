@@ -340,8 +340,8 @@ async function  main (){
             leaseStart.toDate(), 
             leaseEnd.toDate(), 
             randEmployee, 
-            customer,
-            contact,
+            customer!,
+            contact!,
          );
          leases.push(lease);
          leaseStart = leaseEnd.add(1,'months');
