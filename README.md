@@ -9,6 +9,11 @@ npm run dev
 # or start the server and open the app in a new browser tab
 pnpm run dev --open --host
 ```
+For testing webhooks
+```bash
+smee -u https://smee.io/ZHopezz5StHLNzHc --port 5173 --path /anvil 
+```
+
 
 ## Building
 
