@@ -2,7 +2,7 @@
 import { redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 //@ts-ignore:
-import type { PageServerLoad, Actions } from './$types';
+import type { PageServerLoad } from './$types';
 
 export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user){
@@ -26,10 +26,3 @@ export const load:PageServerLoad = (async (event) => {
       }
    }
 });
-
-export const actions:Actions = {
-   default: async (event) => {
-      console.log('payDeposit actions')
-      redirect(302, '/newLease/leaseSent');
-   }
-}

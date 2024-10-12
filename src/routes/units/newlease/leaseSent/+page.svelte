@@ -17,4 +17,4 @@
    you must provide your own. 
 </p>
 
-<pre class="pre">{data.packetDetails}</pre>
+<pre class="pre">{JSON.stringify(data.packetDetails, null, 2)}</pre>

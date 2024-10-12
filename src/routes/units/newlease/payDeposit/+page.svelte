@@ -44,7 +44,7 @@
          error = result.error;
          processing = false;
       } else {
-         goto('/units/newLease/leaseSent?paymentId=' + result.paymentIntent.id);
+         goto('/units/newLease/leaseSent?invoiceId=' + invoice?.invoiceId);
       }
    }
 </script>
@@ -68,25 +68,21 @@
          {/if}
          <PaymentElement />
          <Address mode='billing' 
-            defaultValues= {
-               {
-                  lastName: user?.familyName,
-                  firstName: user?.givenName,
-                  address: {
-                     line1: address?.address1,
-                     line2: address?.address2 || undefined,
-                     city: address?.city,
-                     state: address?.state,
-                     country: address?.country || 'US',
-                     postal_code: address?.zip
-                  }
+            display = {{
+               name: 'split'
+            }}
+            defaultValues = {{
+               firstName: user?.givenName,
+               lastName: user?.familyName,
+               address: {
+                  line1: address?.address1,
+                  line2: address?.address2 || undefined,
+                  city: address?.city,
+                  state: address?.state, 
+                  country: address?.country || 'US',
+                  postal_code: address?.zip,
                }
-            }
-            display = {
-               {
-                  name: 'organization'
-               }
-            }
+            }}
          />
          <button class="btn" disabled={processing}>
             {#if processing}
