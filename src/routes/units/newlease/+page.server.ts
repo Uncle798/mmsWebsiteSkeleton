@@ -16,7 +16,7 @@ const newLeaseSchema = z.object({
 
 export const load:PageServerLoad = (async (event) =>{
    if(!event.locals.user){
-      redirect(302, '/login')
+      redirect(302, '/login?redirectTo=newLease')
    }
    const form = await superValidate(zod(newLeaseSchema));
    const unitNum = event.url.searchParams.get('unitNum');
@@ -33,7 +33,7 @@ export const load:PageServerLoad = (async (event) =>{
          userId:event.locals.user.id
       }
    })
-   return { form, address, unit}
+   return { form, address, unit }
 })
 
 

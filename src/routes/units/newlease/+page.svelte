@@ -12,19 +12,19 @@
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	export let data:PageData
 	const { form, errors, constraints, message, enhance } = superForm(data.form);
-   const toastStore = getToastStore();
-   const newLease = data.newLease
-   $: if(newLease){
-      onMount(()=>{
-         ( async () => {
-            const toast: ToastSettings = {
-               message: 'Please select a unit before setting up a lease',
-               timeout: 4000,
-            };
-            toastStore.trigger(toast);
-         })();
-      });
-   }
+   // const toastStore = getToastStore();
+   // const {newLease} = data
+   // $: if(newLease){
+   //    onMount(()=>{
+   //       ( async () => {
+   //          const toast: ToastSettings = {
+   //             message: 'Please select a unit before setting up a lease',
+   //             timeout: 4000,
+   //          };
+   //          toastStore.trigger(toast);
+   //       })();
+   //    });
+   // }
 </script>
 
 <svelte:head>
