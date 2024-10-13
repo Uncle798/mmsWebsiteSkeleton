@@ -40,6 +40,7 @@ export const load:PageServerLoad = (async (event) =>{
 export const actions:Actions = {
    default: async (event) =>{
       const form = await superValidate(event.request, zod(newLeaseSchema));
+      console.log(form.data);
       if(!form.valid){
          message(form, 'no good')
       }
