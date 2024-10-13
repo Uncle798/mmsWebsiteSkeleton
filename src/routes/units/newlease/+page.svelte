@@ -11,11 +11,8 @@
 	import { onMount } from 'svelte';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	export let data:PageData
-	const { form, errors, constraints, message, enhance } = superForm(data.form,{
-      onSubmit(input) {
-         input.formData.set('unitNum', data.unit?.num || '');
-      },
-   });
+	const { form, errors, constraints, message, enhance } = superForm(data.form);
+   const { unit, addresses } = data
 </script>
 
 <svelte:head>
@@ -29,8 +26,8 @@
    <NameBlock nameBlock={data.user} />
 {/if}
 <form method="post" use:enhance>
-   {#if data.address}
-      {#each data.address as address, index}
+   {#if addresses}
+      {#each addresses as address, index}
          <div class="flex">
             <Address address={address} />
             {#if index === 0}
@@ -51,11 +48,12 @@
    {:else}
       <a class="a" href="/register/addressForm?unitNum={data.unit?.num}">Please add your address</a>
    {/if}
-   {#if data.unit }
-      <BasicUnitCustomer unit={data.unit} />
+   {#if unit }
+      <BasicUnitCustomer unit={unit} />
+      <input type="hidden" name="unitNum" id="unitNum" bind:value={unit.num}>
    {/if}
 
-   {#if data.user && data.address }
+   {#if data.user && data.addresses  }
       <button class="btn">All the above is correct pay deposit</button>
    {/if}
 </form>

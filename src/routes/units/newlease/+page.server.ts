@@ -28,12 +28,12 @@ export const load:PageServerLoad = (async (event) =>{
          num: unitNum,
       }
    })
-   const address = await prisma.contactInfo.findMany({
+   const addresses = await prisma.contactInfo.findMany({
       where:{
          userId:event.locals.user.id
       }
    })
-   return { form, address, unit }
+   return { form, addresses, unit }
 })
 
 
