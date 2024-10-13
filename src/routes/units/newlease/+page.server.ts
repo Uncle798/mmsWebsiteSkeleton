@@ -9,7 +9,7 @@ import { ratelimit } from "$lib/server/redis";
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
-   unitNum: z.string().min(3).max(6),
+   unitNum: z.string().min(3).max(9),
    organization: z.boolean(),
 })
 
@@ -27,11 +27,15 @@ export const load:PageServerLoad = (async (event) =>{
       where: {
          num: unitNum,
       }
+   }).catch((err) =>{
+      console.error(err);
    })
    const addresses = await prisma.contactInfo.findMany({
       where:{
          userId:event.locals.user.id
       }
+   }).catch((err) =>{
+      console.error(err);
    })
    return { form, addresses, unit }
 })

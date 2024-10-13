@@ -67,7 +67,8 @@ export const actions:Actions = {
       }
       if(unitNum){
          redirect(302, `units/newLease?unitNum=${unitNum}`)
+      } else {
+         redirect(302, '/');
       }
-      redirect(302, '/');
    }
 }
