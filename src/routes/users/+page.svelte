@@ -8,11 +8,11 @@
 	import { page } from "$app/stores";
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import { createSearchStore, searchHandler } from "$lib/stores/search";
+	import Address from "$lib/userComponents/Address.svelte";
    export let data:PageData;
-   $: searchUsers = data.searchUsers;
-   const searchStore = createSearchStore(data.searchUsers);
+   const { searchUsers, contactInfos } = data
+   const searchStore = createSearchStore(searchUsers);
    const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
-   
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: EmploymentConfirmModal,
@@ -41,9 +41,13 @@
 </div>
 
 {#each $searchStore.filtered as user}
-<div class="flex">
-   <NameBlock nameBlock = {user} />
-   <div class="card"><button on:click={()=>{modalFire(user.employee, user.admin, user.id, user.givenName, user.familyName)}}>Change employment status</button></div>
-</div>
+   {@const addresses = contactInfos.filter((cI) => cI.userId === user.id)}
+   <div class="flex">
+      <NameBlock nameBlock = {user} />
+      {#each addresses as address}
+         <Address address={address} />
+      {/each}
+      <div class="card"><button on:click={()=>{modalFire(user.employee, user.admin, user.id, user.givenName, user.familyName)}}>Change employment status</button></div>
+   </div>
 
 {/each} 

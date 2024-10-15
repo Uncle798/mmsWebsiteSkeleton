@@ -3,19 +3,10 @@ import { redirect, fail } from "@sveltejs/kit";
 import { superValidate, message } from 'sveltekit-superforms'
 import { ratelimit } from "$lib/server/redis";
 import { zod } from 'sveltekit-superforms/adapters'
-import { z } from 'zod'
+import { employeeConfirmSchema, adminConfirmSchema } from "$lib/formSchemas/schemas";
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
 
-const employeeConfirmSchema = z.object({
-   employee: z.boolean().nullable(),
-   admin: z.boolean().nullable(),
-   userId: z.string().min(23).max(30),
-})
-const adminConfirmSchema = z.object({
-   admin: z.boolean().optional(),
-   userId: z.string().min(23).max(30),
-})
 
 export const load:PageServerLoad = async (event) =>{
    if(!event.locals.user?.admin){
@@ -29,11 +20,16 @@ export const load:PageServerLoad = async (event) =>{
          {givenName: 'asc'},
       ], 
    });
+   const contactInfos = await prisma.contactInfo.findMany({
+      where: {
+         softDelete: false
+      }
+   })
    const searchUsers = users.map((user) =>({
       ...user,
       searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
    }))
-   return { users, employeeForm, adminForm, searchUsers }
+   return { users, employeeForm, adminForm, searchUsers, contactInfos }
 }
 
 export const actions:Actions = {
