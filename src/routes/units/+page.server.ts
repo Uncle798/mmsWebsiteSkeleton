@@ -4,25 +4,13 @@ import { handleLoginRedirect } from "$lib/utils";
 import { superValidate, message } from 'sveltekit-superforms'
 import { ratelimit } from "$lib/server/redis";
 import { zod } from 'sveltekit-superforms/adapters'
-import { z } from 'zod'
+import { unitComponentSchema, pricingSchema, endLeaseSchema } from "$lib/formSchemas/schemas";
 
 import type { PageServerLoad, Actions } from "./$types";
 import type { ContactInfo, Lease, Unit } from "@prisma/client";
 import type { PartialUser } from "$lib/server/partialTypes";
 
-const pricingSchema = z.object({
-   size: z.string().min(5).max(7).trim(),
-   price: z.number().int().min(0).max(10000),
-   lowerPrice: z.boolean().nullable(),
-});
-const unitComponentSchema =  z.object({
-   notes: z.string().optional(),
-   unavailable: z.boolean().nullable(),
-   unitNum: z.string().min(3).max(6),
-});
-const endLeaseSchema = z.object({
-   leaseId: z.string().min(23).max(30),
-})
+
 export type UnitComponentSchema = typeof unitComponentSchema;
 export type UnitCustomer = Unit & PartialUser & Lease & ContactInfo;
 

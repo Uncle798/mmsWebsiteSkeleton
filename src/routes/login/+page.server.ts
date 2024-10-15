@@ -4,15 +4,9 @@ import { fail, redirect } from "@sveltejs/kit";
 import { verify } from '@node-rs/argon2';
 import { superValidate, message } from 'sveltekit-superforms'
 import { zod } from 'sveltekit-superforms/adapters'
-import { z } from 'zod';
+import { loginSchema } from "$lib/formSchemas/schemas";
 import { ratelimit } from "$lib/server/redis";
 import type { Actions, PageServerLoad } from "./$types";
-
-const loginSchema = z.object({
-   email: z.string().email().min(3).max(255).trim(),
-   password: z.string().min(6, 'Password must be at least 6 characters')
-      .max(255,'Password can\'t be longer than 255 characters').trim(),
-})
 
 export const load: PageServerLoad = (async (event) => {
    const mess = event.url.searchParams.get('message');

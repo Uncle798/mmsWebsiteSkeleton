@@ -1,5 +1,5 @@
 import  prisma from "$lib/server/prisma";
-import { z } from 'zod'
+import { forgotPassSchema } from "$lib/formSchemas/schemas";
 import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import { passwordResetToken } from "$lib/server/authUtils";
@@ -7,11 +7,6 @@ import { ratelimit } from "$lib/server/redis";
 
 import type { Actions, PageServerLoad } from "./$types";
 import { mailtrap } from '$lib/server/mailtrap';
-
-
-const forgotPassSchema = z.object({
-   email: z.string().min(3).max(255).email().trim().toLowerCase()
-})
 
 export const load:PageServerLoad = (async () => {
    const form = await superValidate(zod(forgotPassSchema))

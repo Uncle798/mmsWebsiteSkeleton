@@ -3,37 +3,13 @@ import { lucia } from '$lib/server/lucia';
 import  prisma from "$lib/server/prisma";
 import { mailtrap } from "$lib/server/mailtrap";
 import { hash } from "@node-rs/argon2";
-import { z } from 'zod'
+import { registerSchema } from "$lib/formSchemas/schemas";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import type { Actions, PageServerLoad } from "./$types";
 import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import { generateEmailVerificationRequest } from "$lib/server/authUtils";
 import { ratelimit } from "$lib/server/redis";
-
-
-const registerSchema = z.object({
-   email: z.string().email().min(3).max(255).trim().toLowerCase(),
-   password: z.string().min(6, 'Password must be at least 6 characters')
-      .max(255,'Password can\'t be longer than 255 characters'),
-   passwordConfirm: z.string().min(6, 'Password must be at least 6 characters')
-      .max(255,'Password can\'t be longer than 255 characters'),
-})
-.superRefine(({password, passwordConfirm}, context)=>{
-   if(passwordConfirm !== password){
-      context.addIssue({
-         code: 'custom',
-         message: 'Password must match confirm password', 
-         path: ['password']
-      })
-      context.addIssue({
-         code: 'custom',
-         message: 'Password must match confirm password', 
-         path: ['confirmPassword']
-      })
-   }
-})
-
 
 export const load: PageServerLoad = (async (event) => {
    const form = await superValidate(zod(registerSchema))

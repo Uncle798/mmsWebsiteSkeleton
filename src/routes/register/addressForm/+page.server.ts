@@ -1,26 +1,11 @@
 import prisma from '$lib/server/prisma';
-import { z } from 'zod'
+import { addressFormSchema } from '$lib/formSchemas/schemas';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
 import { handleLoginRedirect } from '$lib/utils';
 import { ratelimit } from '$lib/server/redis';
 import type { PageServerLoad, Actions } from './$types';
-
-const addressFormSchema = z.object({
-   familyName: z.string().min(1).max(255).trim(),
-   givenName: z.string().min(1).max(255).trim(),
-   organizationName: z.string().min(1).max(255).trim().optional(),
-   address1: z.string().min(2).max(255).trim(),
-   address2: z.string().min(2).max(255).trim().optional(),
-   city: z.string(),
-   state: z.string().min(2).max(255),
-   zip: z.string(),
-   phoneNum1: z.string().min(10).max(12).trim(),
-   phoneNum1Country: z.string().min(2).max(2).trim(),
-   phoneNum2: z.string().min(10).max(12).trim().optional(),
-   phoneNum2Country: z.string().min(2).max(2).trim().optional(),
-})
 
 export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user){
@@ -78,9 +63,10 @@ export const actions:Actions = {
             city:address.city,
             state:address.state,
             zip:address.zip,
+            country: address.country,
             phoneNum1: phone1ResponseData.number,
             phoneNum2,
-            userId: user?.id,
+            userId: user!.id,
          },
       }).catch((err) =>{
          return message(form, err);
