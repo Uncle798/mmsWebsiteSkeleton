@@ -94,6 +94,7 @@ model Lease {
 
 model PaymentRecord {
   paymentId        String      @id @default(cuid())
+  paymentNumber    Int         @default(autoincrement())
   customerId       String
   unitNum          String?
   paymentAmount    Int
@@ -114,6 +115,7 @@ model PaymentRecord {
 
 model Invoice {
   invoiceId       String         @id @default(cuid())
+  invoiceNum      Int            @default(autoincrement())
   customerId      String?
   leaseId         String
   invoiceAmount   Int

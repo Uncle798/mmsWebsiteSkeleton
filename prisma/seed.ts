@@ -399,7 +399,7 @@ async function  main (){
             paymentCreated: paymentDate.toDate(),         
             paymentCompleted: paymentDate.toDate(), 
             invoiceId: invoice.invoiceId, 
-            paymentNotes: `Payment for invoice ${invoice.invoiceId}`
+            paymentNotes: `Payment for invoice ${invoice.invoiceNum}`
          }      
       paymentRecords.push(record);
    }                              
