@@ -30,7 +30,9 @@
 		<li><a href="/users">Users</a></li>
 		<li><a href="/customers">Customers</a></li>
 		<li><a href="/invoice/newInvoice">New Invoice</a></li>
+		<li><a href="/invoice/open">Open Invoices</a></li>
 		<li><a href="/paymentRecord/newPaymentRecord">New Payment Record</a></li>
+		<li><a href="/paymentRecord/recent">Recent Payment Records</a></li>
 	</ul>
 </nav>
 {/if}
