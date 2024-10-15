@@ -4,7 +4,6 @@
    import type { SvelteComponent } from "svelte";
    import { page } from "$app/stores";
 
-
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
    const { form:employeeForm, errors:employeeErrors, constraints, message:employeeMessage, formId, enhance } = superForm($page.data.employeeForm,{
@@ -18,9 +17,6 @@
       },
       onSubmit({formData}){
          formData.set('userId', $modalStore[0].meta.userId);
-      },
-      onResult(event) {
-         console.log('onResult');         
       },
       resetForm: true,
    });
