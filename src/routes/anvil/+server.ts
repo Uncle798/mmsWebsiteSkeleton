@@ -1,5 +1,6 @@
 import prisma from '$lib/server/prisma';
-import { dropbox } from '$lib/server/dropbox'
+import { dropbox } from '$lib/server/dropbox';
+import type { Error, files } from 'dropbox';
 import { decryptRSA } from '@anvilco/encryption';
 import { ANVIL_RSA_PRIVATE_KEY_BASE64, ANVIL_WEBHOOK_TOKEN } from '$env/static/private';
 import type { RequestHandler } from './$types';
@@ -20,6 +21,14 @@ export const POST: RequestHandler = async (event) => {
                leaseReturnedAt: decrypted.etchPacket.completedAt,
             }
          })
+         const downloadUrl = decrypted['downloadZipURL'];
+         await dropbox.filesSaveUrl(downloadUrl)
+         .then((response: any) => {
+            console.log(response);
+          })
+          .catch((uploadErr: Error<files.UploadError>) => {
+            console.log(uploadErr);
+          });
       }
    }
    return new Response(JSON.stringify('ok'), {status: 200});
