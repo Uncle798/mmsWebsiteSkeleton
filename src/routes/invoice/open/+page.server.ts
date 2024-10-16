@@ -1,7 +1,11 @@
 import prisma from '$lib/server/prisma';
+import { superValidate, message } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { paymentRecordSchema } from '$lib/formSchemas/schemas';
 import type { PageServerLoad } from './$types';
 
 export const load = (async () => {
+    const newPaymentForm = await superValidate(zod(paymentRecordSchema), {id: 'newPayment'})
     const invoices = await prisma.invoice.findMany({
         where: {
             invoicePaid: null
@@ -15,6 +19,7 @@ export const load = (async () => {
                 }
             }
         }
-    })
-    return { invoices, customers };
+    });
+    const leases = await prisma.lease.findMany()
+    return { invoices, customers, newPaymentForm, leases };
 }) satisfies PageServerLoad;

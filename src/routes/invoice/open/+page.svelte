@@ -9,7 +9,7 @@
     import type { PartialUser } from '$lib/server/partialTypes';
 
     export let data: PageData;
-    const {customers, invoices } = data;
+    const {customers, invoices, leases } = data;
     const searchInvoices = invoices.map((invoice)=> {
         const customer = customers.find((c) => c.id === invoice.customerId);
         return {
@@ -30,11 +30,17 @@
         ref: PaymentRecordModal
     }
     function modalFire(invoice:Invoice, customer:PartialUser){
+        const customerLeases = leases.filter((lease) => lease.customerId === customer.id)
         const modal:ModalSettings = {
             type: 'component',
             component: modalComponent,
             title: 'New Payment record',
             body: `Payment for invoice number ${invoice.invoiceNum}`,
+            meta: {
+                invoice,
+                customer,
+                customerLeases,
+            }
         }
         modalStore.trigger(modal);
     }

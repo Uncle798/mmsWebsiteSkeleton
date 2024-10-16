@@ -45,22 +45,20 @@ export const actions: Actions = {
       redirect(302, '/login');
       }
       const formData = await event.request.formData();
-      console.log(formData);
-      const form = await superValidate(formData, zod(paymentRecordSchema));
-      console.log(form);
-      if(!form.valid){
-         return fail(400, {form})
+      const newPaymentForm = await superValidate(formData, zod(paymentRecordSchema));
+      if(!newPaymentForm.valid){
+         return fail(400, {newPaymentForm})
       }
       const record = await prisma.paymentRecord.create({
          data: {
-            customerId: form.data.customerId,
+            customerId: newPaymentForm.data.customerId,
             receiverId: event.locals.user.id,
-            invoiceId: form.data.invoiceId,
-            paymentAmount: form.data.paymentAmount,
-            paymentType: form.data.paymentType,
-            payee: form.data.payee,
+            invoiceId: newPaymentForm.data.invoiceId,
+            paymentAmount: newPaymentForm.data.paymentAmount,
+            paymentType: newPaymentForm.data.paymentType,
+            payee: newPaymentForm.data.payee,
             paymentCompleted: new Date,
-            paymentNotes: form.data.paymentNotes,
+            paymentNotes: newPaymentForm.data.paymentNotes,
          }
       })
       console.log(record)
@@ -74,6 +72,6 @@ export const actions: Actions = {
          }
       })
       console.log(invoice)
-      return { form }
+      return { newPaymentForm }
    }
 };
