@@ -2,17 +2,10 @@ import  prisma from "$lib/server/prisma";
 
 import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
-import z from 'zod';
+import { newLeaseSchema } from "$lib/formSchemas/schemas";
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/redis";
-
-const newLeaseSchema = z.object({
-   contactInfoId: z.string().min(23).max(30),
-   unitNum: z.string().min(3).max(9),
-   organization: z.boolean(),
-})
-
 
 export const load:PageServerLoad = (async (event) =>{
    if(!event.locals.user){

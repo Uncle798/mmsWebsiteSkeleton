@@ -1,9 +1,9 @@
 <script lang="ts">
    import { getModalStore, SlideToggle } from "@skeletonlabs/skeleton";
    import { superForm } from "sveltekit-superforms";
-   import type { SvelteComponent } from "svelte";
    import { page } from "$app/stores";
-
+   import type { SvelteComponent } from "svelte";
+   
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
    const { form:employeeForm, errors:employeeErrors, constraints, message:employeeMessage, formId, enhance } = superForm($page.data.employeeForm,{
