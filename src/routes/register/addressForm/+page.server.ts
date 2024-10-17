@@ -12,30 +12,29 @@ export const load:PageServerLoad = (async (event) => {
       throw redirect(302, handleLoginRedirect(event));
    }
    if(event.locals.user.employee){
-      const form = await superValidate(zod(addressFormSchema));
-
-      return { form, };
+      const addressForm = await superValidate(zod(addressFormSchema));
+      return { addressForm, };
    }
-   const form = await superValidate(zod(addressFormSchema));
-   return { form, };
+   const addressForm = await superValidate(zod(addressFormSchema));
+   return { addressForm, };
 })
 
 export const actions:Actions = {
    default: async (event) =>{
-      const form = await superValidate(event.request, zod(addressFormSchema));
-      if(!form.valid) {
-         return message(form, 'Code must be 8 characters');
+      const addressForm = await superValidate(event.request, zod(addressFormSchema));
+      if(!addressForm.valid) {
+         return message(addressForm, 'Code must be 8 characters');
       }
       const { success, reset } = await ratelimit.login.limit(event.locals.user?.id ?? event.getClientAddress());
       if(!success){
          const timeRemaining = Math.floor((reset - Date.now()) / 1000);
-         return message(form, `Please wait ${timeRemaining}s before trying again`);
+         return message(addressForm, `Please wait ${timeRemaining}s before trying again`);
       };
       const { user } = event.locals;
-      const address = form.data;
+      const address = addressForm.data;
       const phone1ResponseData = await (await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum1}&country_code=${address.phoneNum1Country}&format=1`)).json();
       if(!phone1ResponseData.valid){
-         return message(form, "That is not a valid phone number")
+         return message(addressForm, "That is not a valid phone number")
       }
       let phone2ResponseData: typeof phone1ResponseData;
       let phoneNum2:string = '';
@@ -43,7 +42,7 @@ export const actions:Actions = {
          phoneNum2 = phone2ResponseData.number;
          phone2ResponseData = await (await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum2}&country_code=${address.phoneNum2Country}&format=1`)).json();
          if(!phone2ResponseData.valid){
-            return message(form, "That is not a valid phone number")
+            return message(addressForm, "That is not a valid phone number")
          }
       }
       await prisma.user.update({
@@ -69,7 +68,7 @@ export const actions:Actions = {
             userId: user!.id,
          },
       }).catch((err) =>{
-         return message(form, err);
+         return message(addressForm, err);
       });
       const unitNum = event.url.searchParams.get('unitNum');
       if(dbAddress){

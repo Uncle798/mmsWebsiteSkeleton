@@ -40,7 +40,7 @@
    <input type="search" name="search" id="search" placeholder="Search..." class="input" bind:value={$searchStore.search}/>
 </div>
 
-{#each $searchStore.filtered as user}
+{#each $searchStore.filtered as user (user.id)}
    {@const addresses = contactInfos.filter((cI) => cI.userId === user.id)}
    <div class="flex">
       <NameBlock nameBlock = {user} />
