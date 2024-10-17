@@ -61,8 +61,7 @@ export const actions: Actions = {
             paymentNotes: newPaymentForm.data.paymentNotes,
          }
       })
-      console.log(record)
-      const invoice = await prisma.invoice.update({
+      await prisma.invoice.update({
          where: {
             invoiceId: record.invoiceId!,
          },
@@ -71,7 +70,6 @@ export const actions: Actions = {
             invoicePaid: record.paymentCompleted,
          }
       })
-      console.log(invoice)
       return { newPaymentForm }
    }
 };

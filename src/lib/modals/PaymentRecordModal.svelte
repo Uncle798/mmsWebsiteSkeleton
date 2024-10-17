@@ -5,7 +5,6 @@
    import { onMount, type SvelteComponent } from "svelte";
 	import type { Invoice, Lease } from "@prisma/client";
 	import type { PartialUser } from "$lib/server/partialTypes";
-	import { custom } from "zod";
 
    export let parent:SvelteComponent;
    const modalStore = getModalStore();

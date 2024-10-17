@@ -23,6 +23,7 @@ export const load:PageServerLoad = (async (event) =>{
    }).catch((err) =>{
       console.error(err);
    })
+   console.log(event.locals.user.id);
    const addresses = await prisma.contactInfo.findMany({
       where:{
          userId:event.locals.user.id
@@ -30,6 +31,7 @@ export const load:PageServerLoad = (async (event) =>{
    }).catch((err) =>{
       console.error(err);
    })
+   console.log(addresses);
    return { form, addresses, unit }
 })
 
