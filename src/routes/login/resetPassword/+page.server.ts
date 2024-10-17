@@ -1,5 +1,5 @@
 import  prisma from "$lib/server/prisma";
-import { forgotPassSchema } from "$lib/formSchemas/schemas";
+import { emailFormSchema } from "$lib/formSchemas/schemas";
 import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import { passwordResetToken } from "$lib/server/authUtils";
@@ -9,14 +9,14 @@ import type { Actions, PageServerLoad } from "./$types";
 import { mailtrap } from '$lib/server/mailtrap';
 
 export const load:PageServerLoad = (async () => {
-   const form = await superValidate(zod(forgotPassSchema))
+   const form = await superValidate(zod(emailFormSchema))
 
    return {form};
 })
 
 export const actions:Actions = {
    default: async (event) =>{
-      const form = await superValidate(event.request, zod(forgotPassSchema));
+      const form = await superValidate(event.request, zod(emailFormSchema));
       if(!form.valid){
          return message(form, 'Please use a valid email');
       }
