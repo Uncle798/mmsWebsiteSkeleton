@@ -2,7 +2,8 @@
    // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import type { PageData } from './$types';
-	import AddressFormModal from '$lib/modals/AddressFormModal.svelte';
+	import AddressForm from '$lib/forms/AddressForm.svelte';
+   import NameForm from '$lib/forms/NameForm.svelte';
    export let data:PageData;
 </script>
 
@@ -10,4 +11,5 @@
 	<title>{PUBLIC_COMPANY_NAME} | Enter your Address</title>
 </svelte:head>
 
-<AddressFormModal data={data.addressForm}/>
+<NameForm data={data.nameForm} />
+<AddressForm data={data.addressForm}/>

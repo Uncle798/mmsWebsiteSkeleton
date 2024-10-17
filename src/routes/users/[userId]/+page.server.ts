@@ -5,14 +5,15 @@ import type { Invoice, PaymentRecord } from "@prisma/client";
 import { handleLoginRedirect } from "$lib/utils.js";
 import { superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
-import { userSettingsForm }
 import type { PartialUser } from "$lib/server/partialTypes";
+import { addressFormSchema } from "$lib/formSchemas/schemas";
 export type PaymentTableData = Invoice & PaymentRecord & PartialUser
 
 export const load:PageServerLoad = async (event) => {
    if(!event.locals.user){
       return redirect(302, handleLoginRedirect(event));
    }
+   const addressForm = superValidate(zod(addressFormSchema))
    const userId = event.params.userId;
    if(event.locals.user.employee){
       const dbUser = await prisma.user.findUnique({
@@ -50,7 +51,7 @@ export const load:PageServerLoad = async (event) => {
          }
       })
       
-      return {dbUser, contactInfo, leases, tableData,}
+      return {dbUser, contactInfo, leases, tableData, addressForm}
    }
    if(event.locals.user && !event.locals.user.employee){
       if(event.locals.user.id !== userId){
@@ -82,10 +83,3 @@ export const load:PageServerLoad = async (event) => {
       return { contactInfos, leases, paymentRecords, invoices, }
    }
 }  
-
-
-export const actions:Actions = {
-   default: async (event) => {
-      const form = await superValidate(event.request, zod(employeeFormSchema))
-   }
-}

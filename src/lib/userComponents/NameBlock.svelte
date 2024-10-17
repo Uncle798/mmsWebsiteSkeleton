@@ -8,7 +8,7 @@
       <h3 class="h3"><a href="/users/{nameBlock.id}">{nameBlock.givenName} {nameBlock.familyName}</a></h3>
    </span>
    <span>
-      <p>{nameBlock.email}</p>
+      <p><a href="/users/{nameBlock.id}">{nameBlock.email}</a></p>
       {#if nameBlock.organizationName}
          <p>{nameBlock.organizationName}</p>
       {/if}

@@ -11,14 +11,42 @@
 	import Pagination from "$lib/tableComponent/Pagination.svelte"; 
 	import { DataHandler } from '@vincjo/datatables';
 	import type { PageData } from './$types';
+	import { getModalStore } from '@skeletonlabs/skeleton';
+   import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
+	import AddressFormModal from '$lib/modals/AddressFormModal.svelte';
+   import NameFormModal from '$lib/modals/NameFormModal.svelte';
 
    export let data:PageData;
    export const { contactInfo, dbUser, leases, tableData } = data;
+   console.log(contactInfo)
    const handler = new DataHandler(tableData, {rowsPerPage:  10});
    const rows = handler.getRows();
    const rowCount = handler.getRowCount();
    const paymentSum = handler.createCalculation('amount').sum()
-   
+   const modalStore = getModalStore();
+   function addressModal(title:string){
+       const modalComponent: ModalComponent = {
+            ref: AddressFormModal
+        }
+        const modal:ModalSettings = {
+            type: 'component',
+            component: modalComponent,
+            title, 
+            body: `Please enter a new address`,
+        }
+        modalStore.trigger(modal);
+    }
+    function nameModal(title: string){
+      const modalComponent:ModalComponent = {
+         ref: NameFormModal
+      }
+      const modal:ModalSettings = {
+         type: 'component',
+         component: modalComponent,
+         title, 
+         body: 'Please enter your name'
+      }
+    }
 </script>
 
 <svelte:head>
@@ -26,13 +54,21 @@
 </svelte:head>
 
 {#if dbUser}
-<NameBlock nameBlock={dbUser} />
+   <NameBlock nameBlock={dbUser} />
+   <button class="btn" on:click={()=>{nameModal('Please update your name')}}>Please update your name</button>
 {/if}
 {#if contactInfo}
+{#if contactInfo.length > 0}
+      
    {#each contactInfo as info}   
-      <Address address={info}/>
+   <Address address={info}/>
+   <button class="btn" on:click={()=>{addressModal('Please update your address')}}>Change Address</button>
    {/each}
+   {/if}
+   {:else}
+   <button class="btn" on:click={()=>{addressModal('Please add your address')}} >Add your Address</button>
 {/if}
+
 {#if leases}
    {#each leases as lease}   
       <BasicLease lease={lease} />

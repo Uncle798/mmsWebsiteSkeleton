@@ -1,5 +1,5 @@
 import prisma from '$lib/server/prisma';
-import { addressFormSchema } from '$lib/formSchemas/schemas';
+import { addressFormSchema, nameFormSchema } from '$lib/formSchemas/schemas';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
@@ -11,17 +11,15 @@ export const load:PageServerLoad = (async (event) => {
    if(!event.locals.user){
       throw redirect(302, handleLoginRedirect(event));
    }
-   if(event.locals.user.employee){
-      const addressForm = await superValidate(zod(addressFormSchema));
-      return { addressForm, };
-   }
+   const nameForm = await superValidate(zod(nameFormSchema));
    const addressForm = await superValidate(zod(addressFormSchema));
-   return { addressForm, };
+   return { addressForm, nameForm};
 })
 
 export const actions:Actions = {
    default: async (event) =>{
       const addressForm = await superValidate(event.request, zod(addressFormSchema));
+      const nameForm = await superValidate(event.request, zod(nameFormSchema));
       if(!addressForm.valid) {
          return message(addressForm, 'Code must be 8 characters');
       }
@@ -45,16 +43,29 @@ export const actions:Actions = {
             return message(addressForm, "That is not a valid phone number")
          }
       }
-      await prisma.user.update({
-         where: {
-            id: user?.id
-         },
-         data:{
-            givenName: address.givenName,
-            familyName: address.familyName,
-            organizationName: address.organizationName,
-         }
-      })
+      if(nameForm.valid){
+        const dbUser = await prisma.user.update({
+            where: {
+               id: user?.id
+            },
+            data:{
+               givenName: nameForm.data.givenName,
+               familyName: nameForm.data.familyName,
+               organizationName: address.organizationName,
+            }
+         })
+         console.log(dbUser);
+      }
+      if(address.organizationName){
+         await prisma.user.update({
+            where: {
+               id: user?.id
+            },
+            data: {
+               organizationName: address.organizationName
+            }
+         })
+      }
       const dbAddress = await prisma.contactInfo.create({
          data:{
             address1:address.address1,
@@ -70,6 +81,7 @@ export const actions:Actions = {
       }).catch((err) =>{
          return message(addressForm, err);
       });
+      console.log(dbAddress);
       const unitNum = event.url.searchParams.get('unitNum');
       if(dbAddress){
          const redirectTo = event.url.searchParams.get('redirectTo');

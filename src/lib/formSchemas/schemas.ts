@@ -80,14 +80,12 @@ export const loginSchema = z.object({
 });
 export type LoginSchema = typeof loginSchema;
 
-export const forgotPassSchema = z.object({
-   email: z.string().min(3).max(255).email().trim().toLowerCase()
+export const emailFormSchema = z.object({
+   email: z.string().min(3).max(255).email().trim().toLowerCase(),
 });
-export type ForgotPassSchema = typeof forgotPassSchema;
+export type EmailFormSchema = typeof emailFormSchema;
 
 export const addressFormSchema = z.object({
-   familyName: z.string().min(1).max(255).trim(),
-   givenName: z.string().min(1).max(255).trim(),
    organizationName: z.string().min(1).max(255).trim().optional(),
    address1: z.string().min(2).max(255).trim(),
    address2: z.string().min(2).max(255).trim().optional(),
@@ -101,3 +99,10 @@ export const addressFormSchema = z.object({
    phoneNum2Country: z.string().min(2).max(2).trim().optional(),
 });
 export type AddressFormSchema = typeof addressFormSchema;
+
+export const nameFormSchema = z.object({
+   familyName: z.string().min(1).max(255).trim(),
+   givenName: z.string().min(1).max(255).trim(),
+});
+export type NameFormSchema = typeof nameFormSchema;
+
