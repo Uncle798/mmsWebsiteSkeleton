@@ -4,7 +4,7 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from '@sveltejs/kit';
 import { handleLoginRedirect } from '$lib/utils';
-import { ratelimit } from '$lib/server/redis';
+import { ratelimit } from '$lib/server/rateLimit';
 import type { PageServerLoad, Actions } from './$types';
 
 export const load:PageServerLoad = (async (event) => {

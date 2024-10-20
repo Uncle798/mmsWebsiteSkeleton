@@ -5,7 +5,7 @@ import {superValidate, message } from 'sveltekit-superforms';
 import { newLeaseSchema } from "$lib/formSchemas/schemas";
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from "@sveltejs/kit";
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 
 export const load:PageServerLoad = (async (event) =>{
    if(!event.locals.user){

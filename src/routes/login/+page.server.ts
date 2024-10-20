@@ -5,7 +5,7 @@ import { verify } from '@node-rs/argon2';
 import { superValidate, message } from 'sveltekit-superforms'
 import { zod } from 'sveltekit-superforms/adapters'
 import { loginSchema } from "$lib/formSchemas/schemas";
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = (async (event) => {

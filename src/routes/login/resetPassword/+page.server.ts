@@ -3,7 +3,7 @@ import { emailFormSchema } from "$lib/formSchemas/schemas";
 import { superValidate, message } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import { passwordResetToken } from "$lib/server/authUtils";
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 
 import type { Actions, PageServerLoad } from "./$types";
 import { mailtrap } from '$lib/server/mailtrap';

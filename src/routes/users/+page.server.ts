@@ -1,7 +1,7 @@
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
 import { superValidate, message } from 'sveltekit-superforms'
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 import { zod } from 'sveltekit-superforms/adapters'
 import { employeeConfirmSchema, adminConfirmSchema } from "$lib/formSchemas/schemas";
 import type { PageServerLoad, Actions } from "../$types";

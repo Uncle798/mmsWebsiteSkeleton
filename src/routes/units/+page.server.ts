@@ -2,7 +2,7 @@
 import { redirect, fail } from "@sveltejs/kit";
 import { handleLoginRedirect } from "$lib/utils";
 import { superValidate, message } from 'sveltekit-superforms'
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 import { zod } from 'sveltekit-superforms/adapters'
 import { unitComponentSchema, pricingSchema, endLeaseSchema } from "$lib/formSchemas/schemas";
 

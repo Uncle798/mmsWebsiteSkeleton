@@ -2,7 +2,7 @@ import prisma from '$lib/server/prisma';
 import { superValidate, message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
-import { ratelimit } from '$lib/server/redis';
+import { ratelimit } from '$lib/server/rateLimit';
 import { nameFormSchema } from '$lib/formSchemas/schemas';
 
 export const load = (async () => {

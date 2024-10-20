@@ -22,8 +22,10 @@
 {#if $message}
    <h3 class="h3">{$message}</h3>
 {/if}
-{#if data.user}
+{#if data.user?.givenName}
    <NameBlock nameBlock={data.user} />
+   {:else}
+   <button class="btn">Tell us your name</button>
 {/if}
 <form method="post" use:enhance>
    {#if addresses}
