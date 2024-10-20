@@ -6,10 +6,29 @@
 	import TextInput from '$lib/formComponents/TextInput.svelte';
    import type { SuperValidated, Infer } from 'sveltekit-superforms/client';
    import type { AddressFormSchema } from '$lib/formSchemas/schemas';
+	import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
+   import type { ToastSettings } from '@skeletonlabs/skeleton'
+   import { page } from '$app/stores';
+	import type { PartialContactInfo } from '$lib/server/partialTypes';
 
    export let data: SuperValidated<Infer<AddressFormSchema>>;
+   const modalStore = getModalStore();
+   const toastStore = getToastStore();
    const { form, errors, constraints, message, enhance } = superForm(data, {
       onUpdate(event) {
+         if(event.result.type === 'success'){
+            const toast:ToastSettings = {
+               message: 'Address Successfully Updated',
+					timeout: 3000,
+					background: 'variant-filled-success'
+				}
+				toastStore.trigger(toast);
+            if($modalStore[0]){
+               if(!$message){
+                  modalStore.close();
+               }
+            }
+			}
       },
       onError(event) {
          console.error(event.result);
@@ -20,8 +39,6 @@
    let selectedCountryPhone2:CountryCode = 'US'
    let detailedValue:DetailedValue = {} as DetailedValue;
    let isValid = false;
-
-   let input:HTMLInputElement;
    onMount(() => {
    if (typeof window !== 'undefined') {
       import('@mapbox/search-js-web').then(({ config, autofill }) => {
@@ -39,9 +56,10 @@
    });
 
 </script>
-   
-<form method="post" action="/register/addressForm" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
-
+  {#if $message}
+   {$message}
+  {/if} 
+<form method="post" action="/register/address" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
       <TextInput
          name="organizationName"
          label="Organization Name (optional)"
@@ -96,7 +114,7 @@
          <select name="country" bind:value={$form.country} class="select" >
             {#each normalizedCountries as country (country.id)}
                {#if country.iso2 === 'US'}
-                  <option value={country.iso2} selected={true} aria-selected>{country.name}</option>
+                  <option value={country.iso2} selected aria-selected>{country.name}</option>
                {:else}
                   <option value={country.iso2}>{country.name}</option>
                {/if}
@@ -134,37 +152,6 @@
    />
    {#if $errors.phoneNum1}
       <span class="input-error">{$errors.phoneNum1}</span>
-   {/if}
-   </div>
-   <div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-      <select
-         class="country-select {!isValid && 'invalid'} "
-         aria-label="Select Country for your secondary phone"
-         name="phoneNum2Country"
-         bind:value={selectedCountryPhone2}
-      >
-      <option value={null} hidden={selectedCountryPhone1 !== null}>Please select</option>
-      {#each normalizedCountries as country (country.id)}
-         <option
-            value={country.iso2}
-            selected={country.iso2 === selectedCountryPhone2}
-            aria-selected={country.iso2 === selectedCountryPhone2}
-         >
-         {country.iso2} (+{country.dialCode})
-         </option>
-      {/each}
-   </select>
-   <TelInput {phoneOptions} 
-   name="phoneNum2"
-   placeholder= "208 882 6564"
-   bind:valid={isValid} 
-   bind:country={selectedCountryPhone2} 
-   bind:value={$form.phoneNum2} 
-   bind:detailedValue  
-   class=" {!isValid && 'invalid'} input" 
-   />
-   {#if $errors.phoneNum2}
-   <span class="input-error">{$errors.phoneNum2}</span>
    {/if}
    </div>
    <button class="btn button-positive">Submit new Address</button>

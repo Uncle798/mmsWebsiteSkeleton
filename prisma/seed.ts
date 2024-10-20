@@ -135,7 +135,8 @@ async function createEmployees() {
                city: faker.location.city(),
                state: faker.location.state({abbreviated: true}),
                zip: faker.location.zipCode(),
-               phoneNum1: faker.phone.number(),
+               phoneNum1: faker.phone.number().trim(),
+               phoneNum1Country: '+1',
                country: 'US'
             }
          },
@@ -159,6 +160,7 @@ async function createEmployees() {
                   zip: faker.location.zipCode(),
                   country: 'US',
                   phoneNum1: faker.phone.number(),
+                  phoneNum1Country: '+1',
                }
             },
             employee: true,
@@ -182,6 +184,7 @@ async function createEmployees() {
                   zip: faker.location.zipCode(),
                   country: 'US',
                   phoneNum1: faker.phone.number(),
+                  phoneNum1Country: '+1',
                }
             },
             employee: true,
@@ -239,6 +242,7 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, randEm
          zip: faker.location.zipCode(),
          country: faker.location.countryCode(),
          phoneNum1: faker.phone.number(),
+         phoneNum1Country: '+1'
       }
       contactInfos.push(contactInfo);
       if(i%12 === 0 ) {
@@ -250,6 +254,7 @@ async function createLease(unit: Unit, leaseStart, leaseEnd: Date | null, randEm
             zip: faker.location.zipCode(),
             country: faker.location.countryCode(),
             phoneNum1: faker.phone.number(),
+            phoneNum1Country: '+1'
          }
          contactInfos.push(contactInfo2);
       }
@@ -283,7 +288,7 @@ function makeInvoice(lease:Lease, month:Date){
       leaseId: lease.leaseId,
       invoiceAmount: lease.price,
       invoiceCreated: month,
-      invoiceNotes: `Rent for unit ${lease.unitNum} for ${dayjs(month).format('MMMM YYYY')}`,
+      invoiceNotes: `Rent for unit ${lease.unitNum.replace(/^0+/gm,'')} for ${dayjs(month).format('MMMM YYYY')}`,
       invoicePaid
    };
    return invoice;

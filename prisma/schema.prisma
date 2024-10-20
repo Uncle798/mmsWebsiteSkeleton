@@ -36,7 +36,7 @@ model User {
 }
 
 model ContactInfo {
-  contactId          String   @id @default(cuid())
+  contactId          String  @id @default(cuid())
   userId             String
   address1           String
   address2           String?
@@ -46,11 +46,10 @@ model ContactInfo {
   zip                String
   country            String
   phoneNum1          String
-  phoneNum2          String?
-  phoneNum1Validated Boolean  @default(false)
-  phoneNum2Validated Boolean? @default(false)
-  softDelete         Boolean  @default(false)
-  user               User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+  phoneNum1Country   String
+  phoneNum1Validated Boolean @default(false)
+  softDelete         Boolean @default(false)
+  user               User    @relation(fields: [userId], references: [id], onUpdate: NoAction)
   leases             Lease[]
 }
 
