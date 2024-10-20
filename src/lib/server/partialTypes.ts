@@ -22,6 +22,7 @@ export const partialContactInfo = Prisma.validator<Prisma.ContactInfoDefaultArgs
       zip: true,
       country: true,
       phoneNum1: true, 
+      phoneNum1Country: true,
       userId: true,
    }
 })
