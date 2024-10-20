@@ -11,9 +11,8 @@ pnpm run dev --open --host
 ```
 For testing webhooks
 ```bash
-smee -u https://smee.io/ZHopezz5StHLNzHc --port 5173 --path /anvil 
+ngrok start basic
 ```
-
 
 ## Building
 
