@@ -6,14 +6,17 @@ import { handleLoginRedirect } from "$lib/utils.js";
 import { superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { PartialUser } from "$lib/server/partialTypes";
-import { addressFormSchema } from "$lib/formSchemas/schemas";
+import { addressFormSchema, emailFormSchema, nameFormSchema, passwordFormSchema } from "$lib/formSchemas/schemas";
 export type PaymentTableData = Invoice & PaymentRecord & PartialUser
 
 export const load:PageServerLoad = async (event) => {
    if(!event.locals.user){
       return redirect(302, handleLoginRedirect(event));
    }
-   const addressForm = superValidate(zod(addressFormSchema))
+   const addressForm = await superValidate(zod(addressFormSchema));
+   const nameForm = await superValidate(zod(nameFormSchema));
+   const passwordForm = await superValidate(zod(passwordFormSchema));
+   const emailForm = await superValidate(zod(emailFormSchema));
    const userId = event.params.userId;
    if(event.locals.user.employee){
       const dbUser = await prisma.user.findUnique({
@@ -51,7 +54,7 @@ export const load:PageServerLoad = async (event) => {
          }
       })
       
-      return {dbUser, contactInfo, leases, tableData, addressForm}
+      return { dbUser, contactInfo, leases, tableData, addressForm, nameForm, passwordForm, emailForm }
    }
    if(event.locals.user && !event.locals.user.employee){
       if(event.locals.user.id !== userId){
@@ -80,6 +83,6 @@ export const load:PageServerLoad = async (event) => {
             customerId: event.locals.user.id
          }
       })
-      return { contactInfos, leases, paymentRecords, invoices, }
+      return { contactInfos, leases, paymentRecords, invoices, nameForm, addressForm, passwordForm, emailForm }
    }
 }  

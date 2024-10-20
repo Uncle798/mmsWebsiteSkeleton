@@ -33,6 +33,7 @@
 		<li><a href="/invoice/open">Open Invoices</a></li>
 		<li><a href="/paymentRecord/newPaymentRecord">New Payment Record</a></li>
 		<li><a href="/paymentRecord/recent">Recent Payment Records</a></li>
+		<li><a href="/users/{data.user?.id}">User Settings</a></li>
 	</ul>
 </nav>
 {/if}
