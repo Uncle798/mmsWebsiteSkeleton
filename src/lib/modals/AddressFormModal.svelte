@@ -10,6 +10,9 @@
    function onClose() {
       modalStore.close();
    }
+   onMount(()=>{
+      console.log('Address form mounted ' + $modalStore[0].body)
+   })
 </script>
 {#if $modalStore[0]}
    <div class="card p-4 w-modal shadow-xl space-y-4">
@@ -18,5 +21,4 @@
       <AddressForm data={$page.data.addressForm}/>
       <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
    </div>
-
 {/if}

@@ -39,8 +39,7 @@ export const newLeaseSchema = z.object({
 })
 export type NewLeaseSchema = typeof newLeaseSchema;
 
-export const registerSchema = z.object({
-   email: z.string().email().min(3).max(255).trim().toLowerCase(),
+export const passwordFormSchema = z.object({
    password: z.string().min(6, 'Password must be at least 6 characters')
       .max(255,'Password can\'t be longer than 255 characters'),
    passwordConfirm: z.string().min(6, 'Password must be at least 6 characters')
@@ -60,7 +59,7 @@ export const registerSchema = z.object({
       })
    }
 });
-export type RegisterSchema = typeof registerSchema;
+export type PasswordFormSchema = typeof passwordFormSchema;
 
 export const paymentRecordSchema = z.object({
    customerId: z.string(),
