@@ -18,5 +18,4 @@
       <EmailForm data={$page.data.emailForm}/>
       <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
    </div>
-
 {/if}

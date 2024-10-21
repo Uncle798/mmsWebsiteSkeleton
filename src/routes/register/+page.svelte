@@ -27,7 +27,10 @@
    const { form, errors, constraints, message, enhance } = superForm(data.registerForm, {
       onUpdate(event){
 			
-      }
+      },
+		onError(event) {
+			console.error(event.result)
+		},
    });
 	$: ({
 	score,

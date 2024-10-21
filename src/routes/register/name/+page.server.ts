@@ -26,7 +26,6 @@ export const actions: Actions = {
             familyName: nameForm.data.familyName,
          }
       });
-      console.log(user)
       return { nameForm }
    }
 };
