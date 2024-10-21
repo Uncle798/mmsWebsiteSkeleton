@@ -23,3 +23,6 @@ vite.config.ts.timestamp-*
 
 app.log
 seed.log
+
+# Local Netlify folder
+.netlify

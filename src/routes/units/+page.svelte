@@ -8,19 +8,40 @@
    import Search from "$lib/tableComponent/Search.svelte";
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
+	import { getModalStore } from '@skeletonlabs/skeleton';
+   import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
+	import PricingModal from '$lib/unitComponents/PricingModal.svelte';
    export let data;
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
    const rows = handler.getRows();
+
+   const modalStore = getModalStore();
+   const modalComponent: ModalComponent = {
+      ref: PricingModal
+   }
+   function modalFire():void {
+      const modal:ModalSettings = {
+         type: 'component',
+         component: modalComponent,
+         title: 'Set new price by size'
+
+      }
+   }
 </script>
+
 <svelte:head>
    <title>{PUBLIC_COMPANY_NAME} | All Units</title>
 </svelte:head>
+
+<div>
+   <button class="btn" on:click={modalFire}>Set new price by size</button>
+</div>
+
 <div class="table-container">
    <header>
       <Search {handler} />
       <RowsPerPage {handler} />
    </header>
-   
    <table class="table table-hover">
       <thead>
          <tr>

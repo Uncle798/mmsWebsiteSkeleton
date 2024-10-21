@@ -1,7 +1,6 @@
 
 <script lang="ts">
    import type { PageData } from "./$types";
-   // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
@@ -25,8 +24,8 @@
       const modal:ModalSettings = {
          type: 'component',
          component: modalComponent,
-         title:'Are you sure you\'d like to change employment status?',
-         body:`of ${givenName} ${familyName}`,
+         title:'Are you sure you\'d like to change employment status',
+         body:`of ${givenName} ${familyName}?`,
          meta: {
             employee,
             admin,

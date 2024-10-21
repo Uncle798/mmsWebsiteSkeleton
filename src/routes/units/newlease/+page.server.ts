@@ -8,11 +8,10 @@ import z from 'zod';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/redis";
-import type { Unit } from 'prisma/prisma-client';
+import type { Unit, UnitPricing } from 'prisma/prisma-client';
 
 const newLeaseSchema = z.object({
    contactInfoId: z.string().min(23).max(30),
-   unitPriceId: z.string().min(23).max(30),
    unitNum: z.string().min(23).max(30),
    organization: z.boolean(),
 })
@@ -26,20 +25,24 @@ export const load:PageServerLoad = (async (event) =>{
    const newLease:string | null = event.url.searchParams.get('newLease');
    if(!event.locals.user.employee){
       const unitNum = event.url.searchParams.get('unitNum');
+      console.log(unitNum);
       if(!unitNum){
          redirect(302, '/units/available?newLease=true');
       }
-      let unit:Unit= {} as Unit;
+      let unit:Unit | null;
       if(unitNum){
-         unit = await prisma.unit.findUnique({
+         unit = await prisma.unit.findFirst({
             where:{
                num:unitNum,
             }
          }).catch((err) =>{
             console.error(err);
             return error(404, 'Unit not found')
-         }) || {} as Unit;
+         });
+      } else {
+         unit = null;
       }
+      console.log(unit);
       const address = await prisma.contactInfo.findMany({
          where:{
             userId:event.locals.user.id
@@ -47,16 +50,7 @@ export const load:PageServerLoad = (async (event) =>{
       }).catch((err) =>{
          console.error(err);
       });
-      const unitPrice = await prisma.unitPricing.findFirst({
-         where:{
-            endDate: null,
-            unitNum: unit.num
-         }
-      }).catch((err) =>{
-         console.error(err);
-      });
-      
-      return { form, unit, address, unitPrice, newLease };
+      return { form, address, unit, newLease}
    }
    return { form, newLease }
 })
@@ -96,13 +90,6 @@ export const actions:Actions = {
       if(currentLease){
          message(form, 'That unit is already leased');
       }
-      const unitPrice = await prisma.unitPricing.findUniqueOrThrow({
-         where:{
-            unitPricingId:form.data.unitPriceId
-         }
-      }).catch((err) =>{
-         console.error(err);
-      })
       const contactInfoId = form.data.contactInfoId;
       const employees = await prisma.user.findMany({
          where:{
@@ -115,7 +102,7 @@ export const actions:Actions = {
             customerId: customer!.id,
             employeeId: employee.id,
             unitNum: form.data.unitNum,
-            price: unitPrice!.price,
+            price:unit!.advertisedPrice,
             contactInfoId,
             leaseEffectiveDate: new Date(),
          }

@@ -54,42 +54,18 @@ model ContactInfo {
 }
 
 model Unit {
-  num         String        @id
-  building    String
-  size        String
-  description String
-  unitPricing UnitPricing[]
+  num             String  @id
+  building        String
+  size            String
+  description     String
+  leasedPrice     Int?
+  advertisedPrice Int
+  deposit         Int
+  notes           String?
+  unavailable     Boolean @default(false)
+  lease           Lease[]
 
   @@index([num(sort: Desc)])
-}
-
-model Pricing {
-  pricingId   String        @id @default(cuid())
-  size        String
-  price       Int
-  startDate   DateTime      @default(now())
-  endDate     DateTime?
-  notes       String?
-  unitPricing UnitPricing[]
-
-  @@unique([price, startDate, endDate])
-  @@unique([size, startDate, endDate])
-  @@index([size, endDate])
-}
-
-model UnitPricing {
-  unitPricingId   String    @id @default(cuid())
-  unitNum         String
-  price           Int
-  startDate       DateTime
-  endDate         DateTime?
-  stripeProductId String?
-  leases          Lease[]
-  pricing         Pricing?  @relation(fields: [price, startDate, endDate], references: [price, startDate, endDate])
-  unit            Unit      @relation(fields: [unitNum], references: [num])
-
-  @@unique([unitNum, price])
-  @@unique([unitNum, startDate, endDate])
 }
 
 model Lease {
@@ -109,7 +85,7 @@ model Lease {
   contactInfo        ContactInfo @relation(fields: [contactInfoId], references: [contactId], onDelete: NoAction, onUpdate: NoAction)
   customer           User        @relation("customer", fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   employee           User        @relation("employee", fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  unitPrice          UnitPricing @relation(fields: [price, unitNum], references: [price, unitNum], onUpdate: NoAction)
+  unit               Unit        @relation(fields: [unitNum], references: [num])
 
   @@unique([leaseId, unitNum, price])
   @@index([leaseId, leaseCreatedAt(sort: Desc)])

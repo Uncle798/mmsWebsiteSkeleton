@@ -4,19 +4,14 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters'
 
 import type { PageServerLoad, Actions } from "../$types";
-import type { Unit, UnitPricing } from "@prisma/client";
+import type { Unit } from "@prisma/client";
 
 const availableUnitsSchema = z.object({
-   unitPriceId: z.string() ,
+   unitId: z.string().min(23).max(30) ,
 })
 
 export const load:PageServerLoad = (async () => {
    const form = await superValidate(zod(availableUnitsSchema));
-   const unitPricing = await prisma.unitPricing.findMany({
-      orderBy: {
-         unitNum: 'asc'
-      }
-   });
    const units = await prisma.unit.findMany({
       orderBy: {
          num:'asc'
@@ -30,13 +25,11 @@ export const load:PageServerLoad = (async () => {
          unitNum: 'asc'
       }
    })
-   const availableUnits:UnitPricing[] & Unit[] =[];
-   unitPricing.forEach((unitPrice)=> {
-      const unitLease = leases.find((lease) => lease.unitNum === unitPrice.unitNum);
-      const unitInfo = units.find((u)=> u.num === unitPrice.unitNum);
-      if(!unitLease){
-         const availableUnit = { ... unitInfo, ...unitPrice, };
-         availableUnits.push(availableUnit);
+   const availableUnits: Unit[] =[];
+   units.forEach((unit)=> {
+      const unitLease = leases.find((lease) => lease.unitNum === unit.num);
+      if(!unitLease ){
+         availableUnits.push(unit);
       }
    })
    return { form, availableUnits };

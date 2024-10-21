@@ -8,22 +8,23 @@
    import Search from "$lib/tableComponent/Search.svelte";
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
-   import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
-	import type { PartialUser } from "$lib/server/partialTypes";
+	import ConfirmFormModal from "$lib/modals/ConfirmFormModal.svelte";
+
    export let data:PageData;
+   
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
    const rows = handler.getRows();
    const modalStore = getModalStore();
-   const modalComponent: ModalComponent = {
-      ref: EmploymentConfirmModal,
+   const modalComponent:ModalComponent = {
+      ref: ConfirmFormModal
    }
    function modalFire(customerId:string, leaseId: string,  unitNum:string|null, ):void {
       const modal:ModalSettings = {
          type: 'component',
          component: modalComponent,
-         title:'Are you sure you\'d like to end this lease?',
-         body:`for Unit ${unitNum}`,
+         title:'Are you sure you\'d like to end this lease',
+         body:`for Unit ${unitNum?.replace(/^0+/gm,'')}?`,
          meta: {
             customerId,
             leaseId,
@@ -32,6 +33,11 @@
       modalStore.trigger(modal);
    }
 </script>
+
+<svelte:head>
+	<title>{PUBLIC_COMPANY_NAME} | Current Customers</title>
+</svelte:head>
+
 
 <div class="table-container">
    <table class="table table-hover">
@@ -63,7 +69,7 @@
             <td><a href="/units/{row.unitNum}">${row.price}</a></td>
             <td class="td"><a href="/users/{row.id}"> {row.familyName}</a></td>
             <td><a href="/users/{row.id}"> {row.givenName}</a></td>
-            <td><a href="/users/{row.id}"> {row.email}</a></td>
+            <td><a href="/users/{row.id}" class="btn"> {row.email}</a></td>
             <td><button class="btn" on:click={()=>modalFire(row.id, row.leaseId, row.unitNum)}>End Lease</button></td>
          </tr>
          {/each}

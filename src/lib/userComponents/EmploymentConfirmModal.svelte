@@ -43,7 +43,7 @@
          <SlideToggle name='employee' checked={$modalStore[0].meta.employee} >Employee </SlideToggle>
          <SlideToggle name='admin' checked={$modalStore[0].meta.admin} >Admin </SlideToggle>
          <input type="hidden" name="userId" id="userId" value={$modalStore[0].meta.userId} {...$constraints.userId}/>
-         <button class="btn {parent.buttonSubmit}">Submit</button>
+         <button class="btn {parent.buttonPositive}">Submit</button>
          <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
       </form>
    </div>
