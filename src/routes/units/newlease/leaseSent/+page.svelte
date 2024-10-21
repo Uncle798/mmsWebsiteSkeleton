@@ -16,3 +16,5 @@
    during business hours, and you'll be notified and sent a copy of the finalized contract. {PUBLIC_COMPANY_NAME} does not provide locks,
    you must provide your own. 
 </p>
+
+<pre class="pre">{JSON.stringify(data.packetDetails, null, 2)}</pre>

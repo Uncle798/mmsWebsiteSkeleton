@@ -19,6 +19,7 @@
          
       },
       resetForm: true,
+      invalidateAll: 'force',
    });
    function onClose(){
       modalStore.close();

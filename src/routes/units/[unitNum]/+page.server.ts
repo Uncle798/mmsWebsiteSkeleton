@@ -1,54 +1,46 @@
+import { redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
-import { handleLoginRedirect } from "$lib/utils";
+import type { PageServerLoad } from './$types';
 
-import { error, redirect } from '@sveltejs/kit';
-
-
-export async function load(event) {
-   if(!event.locals.user){
-      throw redirect(302, handleLoginRedirect(event));
+export const load:PageServerLoad = (async (event) => {
+   if(!event.locals.user!.employee){
+      redirect(302, '/login');
    }
-   if(event.locals.user.employee){
-      const unitNum = event.params.unitNum;
-      const unit = await prisma.unit.findUnique({
-         where:{
-            num:unitNum
-         }
-      })
-      const currentLease = await prisma.lease.findFirst({
-         where:{
-            AND:[
-               {unitNum},
-               {leaseEnded: null}
-            ]
-         }
-      })
-      if(unit && !currentLease){
-         return {unit};
+   const unit = await prisma.unit.findUnique({
+      where: {
+         num: event.params.unitNum,
       }
-      if(unit && currentLease){
-         const currentCustomer = await prisma.contactInfo.findUnique({
-            where:{
-               contactId: currentLease?.contactInfoId
-            }
-         })
-         const leaseEmployee = await prisma.user.findUnique({
-            where:{
-               id:currentLease?.employeeId
-            }
-         })
-         return {unit, currentLease, currentCustomer, leaseEmployee}
+   })
+   const leases = await prisma.lease.findMany({
+      where: {
+         unitNum: event.params.unitNum
+      },
+      orderBy: {
+         leaseEnded: 'desc'
       }
-   }
-   if(event.locals.user){
-      const unitNum = event.params.unitNum;
-      const unit = await prisma.unit.findFirst({
-         where: {
-            num:unitNum
+   })
+   const customers = await prisma.user.findMany({
+      where: {
+         customerLeases: {
+            some: {
+               unitNum: event.params.unitNum
+            }
          }
-      })
+      }
+   })
+   const invoices = await prisma.invoice.findMany({
+      where: {
+         unitNum: event.params.unitNum
+      },
+      orderBy: {
+         invoiceCreated: 'desc'
+      }
+   });
+   const paymentRecords = await prisma.paymentRecord.findMany({
+      where: {
+         unitNum: event.params.unitNum
+      }
+   })
 
-      return{ unit }
-   }
-      error(404, 'Unit not found');
-}
+   return { unit, leases, customers, invoices, paymentRecords };
+});

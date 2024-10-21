@@ -1,16 +1,14 @@
 <script lang="ts">
    import { getModalStore, SlideToggle } from "@skeletonlabs/skeleton";
    import { superForm } from "sveltekit-superforms";
-   import type { SvelteComponent } from "svelte";
    import { page } from "$app/stores";
-
+   import type { SvelteComponent } from "svelte";
 	import { invalidateAll } from "$app/navigation";
-
+   
    export let parent: SvelteComponent;
    const modalStore = getModalStore();
    const { form:employeeForm, errors:employeeErrors, constraints, message:employeeMessage, formId, enhance } = superForm($page.data.employeeForm,{
       onUpdate(event) {
-         invalidateAll();
          if(!$employeeMessage){
             modalStore.close();
          }
@@ -20,9 +18,6 @@
       },
       onSubmit({formData}){
          formData.set('userId', $modalStore[0].meta.userId);
-      },
-      onResult(event) {
-         console.log('onResult');         
       },
       resetForm: true,
    });

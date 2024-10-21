@@ -1,14 +1,10 @@
 <script lang="ts">
-   // @ts-ignore: it works
-   import { PUBLIC_COMPANY_NAME } from '$env/static/public'
-   export let data
+    import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
+import type { PageData } from './$types';
+    
+    export let data: PageData;
 </script>
 
-<svelte:head>
-	<title>{PUBLIC_COMPANY_NAME} | Unit: {data.unit?.num.replace(/^0+/gm, '') ?? ''}</title>
-</svelte:head>
-
-<h1>Unit: {data.unit?.num.replace(/^0+/gm, '')}</h1>
-<h2>Size: {data.unit?.size}</h2>
-<h2>Current price: ${data.unit?.price}</h2>
-<h3>Building: {data.unit?.building}</h3>
+{#each data.leases as lease}
+    <BasicLease lease={lease} customer={data.customers.find((customer) => customer.id === lease.customerId)} />
+{/each}

@@ -2,34 +2,32 @@
 <script lang="ts">
    import type { PageData } from "./$types";
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
-   import EmploymentConfirmModal from "$lib/userComponents/EmploymentConfirmModal.svelte";
+   import EmploymentConfirmModal from "$lib/modals/EmploymentConfirmModal.svelte";
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
 	import type { PartialUser } from "$lib/server/partialTypes";
 	import { page } from "$app/stores";
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import { createSearchStore, searchHandler } from "$lib/stores/search";
+	import Address from "$lib/userComponents/Address.svelte";
    export let data:PageData;
-
-   const searchUsers = data.users.map((user) =>({
-      ...user,
-      searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
-   }))
+   const {  contactInfos, searchUsers } = data
+   
    const searchStore = createSearchStore(searchUsers);
    const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: EmploymentConfirmModal,
    }
-   function modalFire(employee:boolean, admin: boolean, userId:string, givenName:string|null, familyName: string|null):void {
+   function modalFire(user:PartialUser):void {
       const modal:ModalSettings = {
          type: 'component',
          component: modalComponent,
          title:'Are you sure you\'d like to change employment status',
-         body:`of ${givenName} ${familyName}?`,
+         body:`of ${user.givenName} ${user.familyName}?`,
          meta: {
-            employee,
-            admin,
-            userId,
+            employee: user.employee,
+            admin: user.admin,
+            userId: user.id,
          }
       }
       modalStore.trigger(modal);
@@ -42,11 +40,16 @@
 <div>
    <input type="search" name="search" id="search" placeholder="Search..." class="input" bind:value={$searchStore.search}/>
 </div>
-
-{#each $searchStore.filtered as user}
-<div class="flex">
-   <NameBlock nameBlock = {user} />
-   <div class="card"><button on:click={()=>{modalFire(user.employee, user.admin, user.id, user.givenName, user.familyName)}}>Change employment status</button></div>
-</div>
-
+   
+{#each $searchStore.filtered as user (user.id)}
+   {@const addresses = contactInfos.filter((cI) => cI.userId === user.id)}
+   <div class="flex">
+      {#key user.employee}
+         <NameBlock nameBlock = {user} />
+      {/key}
+      {#each addresses as address}
+      <Address address={address} />
+      {/each}
+      <div class="card"><button on:click={()=>{modalFire(user)}}>Change employment status</button></div>
+   </div>
 {/each} 

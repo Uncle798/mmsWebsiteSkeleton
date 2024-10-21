@@ -8,7 +8,7 @@ import { zod } from "sveltekit-superforms/adapters";
 import { isWithinExpirationDate } from 'oslo';
 import { sha256 } from 'oslo/crypto';
 import { encodeHex } from 'oslo/encoding';
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 import { redirect } from '@sveltejs/kit';
 
 const passwordResetSchema = z.object({

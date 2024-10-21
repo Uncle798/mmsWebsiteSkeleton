@@ -12,19 +12,7 @@
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	export let data:PageData
 	const { form, errors, constraints, message, enhance } = superForm(data.form);
-   const toastStore = getToastStore();
-   const newLease = data.newLease
-   $: if(newLease){
-      onMount(()=>{
-         ( async () => {
-            const toast: ToastSettings = {
-               message: 'Please select a unit before setting up a lease',
-               timeout: 4000,
-            };
-            toastStore.trigger(toast);
-         })();
-      });
-   }
+   const { unit, addresses } = data
 </script>
 
 <svelte:head>
@@ -32,41 +20,42 @@
 </svelte:head>
 
 {#if $message}
-<h3>{$message}</h3>
+   <h3 class="h3">{$message}</h3>
 {/if}
-{#if data.user}
-<NameBlock nameBlock={data.user} />
+{#if data.user?.givenName}
+   <NameBlock nameBlock={data.user} />
+   {:else}
+   <button class="btn">Tell us your name</button>
 {/if}
 <form method="post" use:enhance>
-{#if data.address}
-   {#each data.address as address, index}
-      <div class="flex">
-         <Address address={address} />
-         {#if index === 0}
-            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked class="radio"/>
-         {:else}
-            <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} class="radio"/>
-         {/if}
+   {#if addresses}
+      {#each addresses as address, index}
+         <div class="flex">
+            <Address address={address} />
+            {#if index === 0}
+               <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked class="radio"/>
+            {:else}
+               <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} class="radio"/>
+            {/if}
 
-      </div>
-      {#if data.user?.organizationName}
-         <div>
-            <label for="orgainzation">This unit is being rented by an organization (Company, Non Profit, ect)
-               <input type="checkbox" name="organization" id="organization" checked />
-            </label>
          </div>
-      {/if}
-   {/each}
-   
-{:else}
-   <a class="a" href="/register/addressFrom">Please add your address</a>
-{/if}
-{#if data.unit }
-   <BasicUnitCustomer unit={data.unit} />
-{/if}
+         {#if data.user?.organizationName}
+            <div>
+               <label for="orgainzation">This unit is being rented by an organization (Company, Non Profit, ect)
+                  <input type="checkbox" name="organization" id="organization" checked />
+               </label>
+            </div>
+         {/if}
+      {/each}
+   {:else}
+      <a class="a" href="/register/addressForm?unitNum={unit?.num}">Please add your address</a>
+   {/if}
+   {#if unit }
+      <BasicUnitCustomer unit={unit} />
+      <input type="hidden" name="unitNum" id="unitNum" bind:value={unit.num}>
+   {/if}
 
-{#if data.user && data.address }
-   <input type="hidden" name="unitNum" id="unitNum" value={data.unit?.num} />
-   <button class="btn">All the above is correct pay deposit</button>
-{/if}
+   {#if data.user && data.addresses  }
+      <button class="btn">All the above is correct pay deposit</button>
+   {/if}
 </form>

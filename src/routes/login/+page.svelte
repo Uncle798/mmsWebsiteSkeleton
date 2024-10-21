@@ -5,6 +5,7 @@
    import { superForm } from 'sveltekit-superforms'
    import { getToastStore, type ToastSettings } from "@skeletonlabs/skeleton";
 	import { onMount } from 'svelte';
+	import LoginForm from '$lib/forms/LoginForm.svelte';
    const toastStore = getToastStore();
    export let data;
    const mess = data.mess
@@ -59,33 +60,6 @@
 {#if $message}
    {$message}
 {/if}
-<form method="POST" use:enhance>
-   <label for="email">email
-      <input type="email"
-      name="email"
-      class="input" 
-      aria-invalid={$errors.email ? 'true' : undefined } 
-      bind:value={$form.email}
-      {...$constraints.email}
-      />
-   </label>
-      {#if $errors.email}
-      <span class="input-error">{$errors.email}</span>
-      {/if}
-   <label for="password">password
-
-      <input type="password" name="password" 
-      id="password"
-      class="input" 
-      aria-invalid={$errors.password ? 'true' : undefined}
-      bind:value={$form.password}
-      {...$constraints.password}
-      />
-   </label>
-      {#if $errors.password}
-      <span class="input-error">{$errors.password}</span>
-      {/if}
-   <button class="btn">Submit</button>
-</form>
+<LoginForm data={data.form} />
 
 <a href="/login/resetPassword">Forgot your password?</a>

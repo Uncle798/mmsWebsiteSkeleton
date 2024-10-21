@@ -5,7 +5,9 @@ import { PrismaClient } from '@prisma/client';
 // for information about these interfaces
 declare global {
 	namespace App {
-		// interface Error {}
+		interface Error {
+			message: string;
+		}
 		interface Locals {
 			user: import('lucia').User | null;
 			session: import('lucia').Session | null;

@@ -36,7 +36,7 @@ model User {
 }
 
 model ContactInfo {
-  contactId          String   @id @default(cuid())
+  contactId          String  @id @default(cuid())
   userId             String
   address1           String
   address2           String?
@@ -44,12 +44,12 @@ model ContactInfo {
   city               String
   state              String
   zip                String
+  country            String
   phoneNum1          String
-  phoneNum2          String?
-  phoneNum1Validated Boolean  @default(false)
-  phoneNum2Validated Boolean? @default(false)
-  softDelete         Boolean  @default(false)
-  user               User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+  phoneNum1Country   String
+  phoneNum1Validated Boolean @default(false)
+  softDelete         Boolean @default(false)
+  user               User    @relation(fields: [userId], references: [id], onUpdate: NoAction)
   leases             Lease[]
 }
 
@@ -80,7 +80,7 @@ model Lease {
   leaseEffectiveDate DateTime
   leaseEnded         DateTime?
   dropboxURL         String?
-  anvilEID           String?
+  anvilEID           String?     @unique()
   invoices           Invoice[]
   contactInfo        ContactInfo @relation(fields: [contactInfoId], references: [contactId], onDelete: NoAction, onUpdate: NoAction)
   customer           User        @relation("customer", fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -93,20 +93,20 @@ model Lease {
 
 model PaymentRecord {
   paymentId        String      @id @default(cuid())
+  paymentNumber    Int         @default(autoincrement())
   customerId       String
   unitNum          String?
-  unitPrice        Int?
   paymentAmount    Int
-  receiverId       String
+  receiverId       String?
   payee            String?
   paymentCreated   DateTime    @default(now())
   paymentCompleted DateTime?
+  paymentNotes     String?
   paymentType      PaymentType
-  recordNum        String
   invoiceId        String?
   invoice          Invoice?
   customer         User        @relation("customer", fields: [customerId], references: [id])
-  receiver         User        @relation("employee", fields: [receiverId], references: [id])
+  receiver         User?       @relation("employee", fields: [receiverId], references: [id])
 
   @@unique([paymentCompleted, paymentId])
   @@index([paymentId, paymentCompleted(sort: Desc)])
@@ -114,17 +114,16 @@ model PaymentRecord {
 
 model Invoice {
   invoiceId       String         @id @default(cuid())
+  invoiceNum      Int            @default(autoincrement())
   customerId      String?
-  leaseId         String?
-  unitNum         String
-  price           Int
+  leaseId         String
   invoiceAmount   Int
   invoiceCreated  DateTime       @default(now())
   paymentRecordId String?        @unique
-  invoicePaid     DateTime?      @unique
+  invoicePaid     DateTime?
   invoiceNotes    String?
   customer        User?          @relation(fields: [customerId], references: [id])
-  lease           Lease?         @relation(fields: [leaseId, unitNum, price], references: [leaseId, unitNum, price])
+  lease           Lease?         @relation(fields: [leaseId], references: [leaseId])
   paymentRecord   PaymentRecord? @relation(fields: [paymentRecordId, invoicePaid], references: [paymentId, paymentCompleted])
 
   @@unique([paymentRecordId, invoicePaid])

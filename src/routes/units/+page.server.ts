@@ -1,32 +1,35 @@
  import prisma from "$lib/server/prisma";
-import  dayjs  from 'dayjs'
-import { redirect } from "@sveltejs/kit";
+import { redirect, fail } from "@sveltejs/kit";
 import { handleLoginRedirect } from "$lib/utils";
+import { superValidate, message } from 'sveltekit-superforms'
+import { ratelimit } from "$lib/server/rateLimit";
+import { zod } from 'sveltekit-superforms/adapters'
+import { unitComponentSchema, pricingSchema, endLeaseSchema } from "$lib/formSchemas/schemas";
 
-import type { PageServerLoad } from "./$types";
+import type { PageServerLoad, Actions } from "./$types";
+import type { ContactInfo, Lease, Unit } from "@prisma/client";
+import type { PartialUser } from "$lib/server/partialTypes";
 
-type TableData = {
-   unitNum: string,
-   price: number,
-   givenName?: string | null,
-   familyName?: string | null,
-   organizationName?: string | null,
-   leasedFor: number,
-   emptyFor: number,
-   userId: string | null,
-}
+
+export type UnitComponentSchema = typeof unitComponentSchema;
+export type UnitCustomer = Unit & PartialUser & Lease & ContactInfo;
 
 export const load:PageServerLoad = async (event) =>{ 
    if(!event.locals.user){
       throw redirect(302,handleLoginRedirect(event))
    }
-   if(event.locals.user){
+   if(!event.locals.user.employee){
       throw redirect(302, '/units/available')
    }
    if(event.locals.user.employee){
+      const form = superValidate(zod(pricingSchema), {id: 'pricingFrom'});
+      const unitComponentForm = superValidate(zod(unitComponentSchema), {id: 'unitComponentForm'});
       const leases = await prisma.lease.findMany({
          orderBy: {
             unitNum: 'asc'
+         },
+         where: {
+            leaseEnded: null
          }
       });
       const units = await prisma.unit.findMany({
@@ -34,48 +37,103 @@ export const load:PageServerLoad = async (event) =>{
             num: 'asc'
          }
       });
-      const users = await prisma.user.findMany({})
-      const tableData:TableData[] = [];
-      const today = Date.now();
-      const sizes:string[]=[];
+      type SizePrice ={
+         size: string,
+         price: number,
+      }
+      const sizesPrices:SizePrice[]=[];
       units.forEach((unit) =>{
-         const size = sizes.find((s) => s === unit.size);
+         const size = sizesPrices.find((s) => s.size === unit.size);
          if(!size){
-            sizes.push(unit.size);
+            const sizePrice = {} as SizePrice;
+            sizePrice.size = unit.size;
+            sizePrice.price = unit.advertisedPrice;
+            sizesPrices.push(sizePrice);
          }
-         const datum:TableData = {} as TableData;
-         datum.unitNum = unit.num;
-         datum.price = unit.advertisedPrice;
-         const unitLeases = leases.filter((lease) => lease.unitNum === unit.num);
-         let shortestMonthsSinceLeaseEnded = 0;
-         let monthsSinceLeaseEnded = 0;
-         if(unitLeases){
-            for(let i=0; i<unitLeases.length; i++){
-               const leaseEndDate = unitLeases[i].leaseEnded;
-               if(!leaseEndDate) {
-                  datum.familyName = users.find((user) => user.id === unitLeases[i].customerId)?.familyName;
-                  datum.givenName = users.find((user) => user.id === unitLeases[i].customerId)?.givenName;
-                  datum.organizationName = users.find((user) => user.id === unitLeases[i].customerId)?.organizationName;
-                  datum.leasedFor = dayjs(today).diff(unitLeases[0].leaseEffectiveDate, 'months');
-                  datum.emptyFor = 0;
-                  datum.price = unitLeases[i].price;
-                  break;
-               } else {
-                  monthsSinceLeaseEnded = dayjs(today).diff(leaseEndDate,'months');
-               }
-               if(shortestMonthsSinceLeaseEnded === 0){
-                  shortestMonthsSinceLeaseEnded = monthsSinceLeaseEnded;
-               } else if(monthsSinceLeaseEnded < shortestMonthsSinceLeaseEnded) {
-                  shortestMonthsSinceLeaseEnded = monthsSinceLeaseEnded;
-               }
-               datum.emptyFor = shortestMonthsSinceLeaseEnded;
-            }
-            tableData.push(datum);
-         }
-      })
+      });
+      sizesPrices.sort((a,b) => a.size > b.size ? 1 : 
+      (b.size > a.size) ? -1 : 0);
       return {
-         tableData,
-         sizes
+         units,
+         leases, 
+         sizesPrices,
+         form,
+         unitComponentForm,
       }
    }
+}
+
+export const actions:Actions = {
+   changePrice: async (event) => {
+      const formData = await event.request.formData();
+      const form = await superValidate(formData, zod(pricingSchema));
+      if(!form.valid){
+         return fail(400, {form});
+      }
+      const { success, reset } = await ratelimit.login.limit(event.locals.user?.id || event.getClientAddress())
+		if(!success) {
+         const timeRemaining = Math.floor((reset - Date.now()) /1000);
+			return message(form, `Please wait ${timeRemaining}s before trying again.`)
+		}
+      const unit = await prisma.unit.findFirst({
+         where: {
+            size: form.data.size,
+         }
+      })
+      console.log(form.data.lowerPrice);
+         if(form.data.price < unit?.advertisedPrice && form.data.lowerPrice === null){
+            return message(form, `Please select Lower Price to lower the price of all\
+                ${form.data.size.replace(/^0+/gm,'').replace(/x0/gm,'x')} units.` )
+         }
+         if(form.data.price === unit?.advertisedPrice && form.data.lowerPrice === null){
+            return message(form, 
+               `No change in price for ${form.data.size.replace(/^0+/gm,'').replace(/x0/gm,'x')} units.` )
+         }
+      const units = await prisma.unit.updateMany({
+         where: {
+            size: form.data.size,
+         },
+         data: {
+            advertisedPrice: form.data.price
+         }
+      })
+      console.log(units)
+      return { form }
+   },
+   unitComponentForm: async (event) => {
+      const formData = await event.request.formData();
+      const form = await superValidate(formData, zod(unitComponentSchema));
+      if(!form.valid){
+         return fail(400, {form});
+      }
+      const { success, reset } = await ratelimit.login.limit(event.locals.user?.id || event.getClientAddress())
+      if(!success) {
+         const timeRemaining = Math.floor((reset - Date.now()) /1000);
+         return message(form, `Please wait ${timeRemaining}s before trying again.`)
+      }
+      await prisma.unit.update({
+         where: {
+            num: form.data.unitNum,
+         },
+         data:{
+            unavailable: form.data.unavailable || false,
+            notes: form.data.notes,
+         }
+      })
+      return { form }
+   },
+   endLease: async (event) =>{
+      const formData = await event.request.formData();
+      const form = await superValidate(formData, zod(endLeaseSchema));
+      await prisma.lease.update({
+         where: {
+            leaseId: form.data.leaseId
+         },
+         data:{
+            leaseEnded: new Date,
+         }
+      })
+      return { form }
+   }
+   
 }

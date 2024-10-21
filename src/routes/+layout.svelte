@@ -20,7 +20,7 @@
 		{#if !data.user}
 		<li><a href="/login">Login</a></li>
 		{:else}
-		<li><a href="/logout">Logout</a></li>
+		<li><form method="post" action="/logout" ><button>Sign Out</button></form></li>
 		{/if}
 		<li><a href="/register" class="a">Register</a></li>
 		<li><a href="/register/addressForm" class="a">Address Form</a></li>
@@ -29,7 +29,11 @@
 		<li><a href="/units/newLease">New Lease</a></li>
 		<li><a href="/users">Users</a></li>
 		<li><a href="/customers">Customers</a></li>
-		<li><a href="/units/pricing">Pricing</a></li>
+		<li><a href="/invoice/newInvoice">New Invoice</a></li>
+		<li><a href="/invoice/open">Open Invoices</a></li>
+		<li><a href="/paymentRecord/newPaymentRecord">New Payment Record</a></li>
+		<li><a href="/paymentRecord/recent">Recent Payment Records</a></li>
+		<li><a href="/users/{data.user?.id}">User Settings</a></li>
 	</ul>
 </nav>
 {/if}

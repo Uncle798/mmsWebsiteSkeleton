@@ -1,21 +1,12 @@
 import prisma from "$lib/server/prisma";
 import { redirect, fail } from "@sveltejs/kit";
 import { superValidate, message } from 'sveltekit-superforms'
-import { ratelimit } from "$lib/server/redis";
+import { ratelimit } from "$lib/server/rateLimit";
 import { zod } from 'sveltekit-superforms/adapters'
-import { z } from 'zod'
+import { employeeConfirmSchema, adminConfirmSchema } from "$lib/formSchemas/schemas";
 import type { PageServerLoad, Actions } from "../$types";
 import { handleLoginRedirect } from "$lib/utils";
 
-const employeeConfirmSchema = z.object({
-   employee: z.boolean().nullable(),
-   admin: z.boolean().nullable(),
-   userId: z.string().min(23).max(30),
-})
-const adminConfirmSchema = z.object({
-   admin: z.boolean().optional(),
-   userId: z.string().min(23).max(30),
-})
 
 export const load:PageServerLoad = async (event) =>{
    if(!event.locals.user?.admin){
@@ -24,11 +15,21 @@ export const load:PageServerLoad = async (event) =>{
    const employeeForm = await superValidate(zod(employeeConfirmSchema), {id: 'employee'});
    const adminForm = await superValidate(zod(adminConfirmSchema), {id: 'admin'});
    const users = await prisma.user.findMany({
-      orderBy: {
-         familyName: 'asc'
-      }, 
+      orderBy: [
+         {familyName: 'asc'},
+         {givenName: 'asc'},
+      ], 
    });
-   return { users, employeeForm, adminForm }
+   const contactInfos = await prisma.contactInfo.findMany({
+      where: {
+         softDelete: false
+      }
+   })
+   const searchUsers = users.map((user) =>({
+      ...user,
+      searchTerms: `${user.givenName} ${user.familyName} ${user.email}`
+   }))
+   return { users, employeeForm, adminForm, searchUsers, contactInfos }
 }
 
 export const actions:Actions = {
@@ -49,7 +50,6 @@ export const actions:Actions = {
       if(form.data.userId === event.locals.user.id){
          return message(form, 'You can not change your own employment status');
       }
-      console.log(form.data)
       const admins = await prisma.user.findMany({
          where:{
             admin: true, 
