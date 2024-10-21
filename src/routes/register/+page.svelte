@@ -19,7 +19,7 @@
 		dictionary: { ...commonDictionary, ...englishDictionary },
 	};
 	zxcvbnOptions.setOptions(options);
-	const { form, errors, constraints, message, enhance } = superForm(data.form)
+	const { form, errors, constraints, message, enhance } = superForm(data.registerForm)
 	$: ({
 	score,
 	feedback: { warning, suggestions },

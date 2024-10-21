@@ -13,10 +13,7 @@
 	import type { PageData } from './$types';
 
    export let data:PageData;
-   export const { contactInfo, dbUser, leases, tableData } = data;
-   const handler = new DataHandler(tableData, {rowsPerPage:  10});
-   const rows = handler.getRows();
-   const rowCount = handler.getRowCount();
+   export const { contactInfo, dbUser, leases} = data;
    const paymentSum = handler.createCalculation('amount').sum()
    
 </script>
