@@ -24,7 +24,7 @@ export const load:PageServerLoad = async (event) => {
             id:userId
          }
       })
-      const contactInfo = await prisma.contactInfo.findMany({
+      const contactInfo = await prisma.contactInfo.findFirst({
          where:{
             userId:dbUser?.id,
             softDelete: false
@@ -45,24 +45,16 @@ export const load:PageServerLoad = async (event) => {
             customerId:dbUser?.id
          }
       })
-      const tableData:PaymentTableData[]=[];
-      invoices.forEach((invoice) =>{
-         const payment = payments.find((p) => p.paymentId === invoice.invoiceId );
-         if(payment){
-            const datum:PaymentTableData = {...invoice, ...dbUser, ...payment};
-            tableData.push(datum);
-         }
-      })
-      
-      return { dbUser, contactInfo, leases, tableData, addressForm, nameForm, passwordForm, emailForm }
+      return { dbUser, contactInfo, leases, invoices, payments, addressForm, nameForm, passwordForm, emailForm }
    }
    if(event.locals.user && !event.locals.user.employee){
       if(event.locals.user.id !== userId){
          redirect(302, handleLoginRedirect(event));
       }
-      const contactInfos = await prisma.contactInfo.findMany({
+      const contactInfo = await prisma.contactInfo.findFirst({
          where: {
-            userId: event.locals.user.id
+            userId: event.locals.user.id,
+            softDelete: false,
          }
       });
       const leases = await prisma.lease.findMany({
@@ -83,6 +75,6 @@ export const load:PageServerLoad = async (event) => {
             customerId: event.locals.user.id
          }
       })
-      return { contactInfos, leases, paymentRecords, invoices, nameForm, addressForm, passwordForm, emailForm }
+      return { contactInfo, leases, paymentRecords, invoices, nameForm, addressForm, passwordForm, emailForm }
    }
 }  

@@ -17,14 +17,10 @@
    import NameFormModal from '$lib/modals/NameFormModal.svelte';
 	import PasswordFormModal from '$lib/modals/PasswordFormModal.svelte';
 	import EmailFormModal from '$lib/modals/EmailFormModal.svelte';
+	import BasicInvoice from '$lib/leaseComponents/BasicInvoice.svelte';
 
    export let data:PageData;
-   export const { contactInfo,  leases, tableData } = data;
-   $: dbUser = data.dbUser;
-   const handler = new DataHandler(tableData, {rowsPerPage:  10});
-   const rows = handler.getRows();
-   const rowCount = handler.getRowCount();
-   const paymentSum = handler.createCalculation('invoiceAmount').sum()
+   export const { contactInfo,  leases, dbUser, invoices, payments } = data;
    const modalStore = getModalStore();
    function addressModal(title:string){
        const modalComponent: ModalComponent = {
@@ -79,58 +75,38 @@
 <svelte:head>
 	<title>{PUBLIC_COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
 </svelte:head>
-
-{#if dbUser}
-   <NameBlock nameBlock={dbUser} />
-   <button class="btn" on:click={()=>{nameModal('Please update your name')}}>Update your name</button>
-   <button class="btn" on:click={()=>{emailModal('Please update your email')}}>Update your email</button>
-{/if}
-{#if contactInfo}
-{#if contactInfo.length > 0}
-      
-   {#each contactInfo as info}   
-   <Address address={info}/>
-   <button class="btn" on:click={()=>{addressModal('Please update your address')}}>Change Address</button>
+{#if dbUser?.id === data.user?.id}
+   {#if dbUser}
+      <NameBlock nameBlock={dbUser} />
+      <button class="btn" on:click={()=>{nameModal('Please update your name')}}>Update your name</button>
+      <button class="btn" on:click={()=>{emailModal('Please update your email')}}>Update your email</button>
+   {/if}
+   {#if contactInfo} 
+      <Address address={contactInfo}/>
+      <button class="btn" on:click={()=>{addressModal('Please update your address')}}>Change Address</button>
+   {:else}
+      <button class="btn" on:click={()=>{addressModal('Please add your address')}} >Add your Address</button>
+   {/if}
+      <button class="btn " on:click={()=>{passwordModal('Please enter a new password')}}>Change your password</button>
+   {#if leases}
+   {#each leases as lease}   
+   <BasicLease lease={lease} />
    {/each}
    {/if}
-   {:else}
-   <button class="btn" on:click={()=>{addressModal('Please add your address')}} >Add your Address</button>
 {/if}
-   <button class="btn " on:click={()=>{passwordModal('Please enter a new password')}}>Change your password</button>
-{#if leases}
-   {#each leases as lease}   
-      <BasicLease lease={lease} />
-   {/each}
-{/if}
-{#if $rowCount.total > 0 }
-   <header>
-      <Search {handler} /> <RowsPerPage {handler} />
-   </header>   
-   <table class="table-container table-hover">
-      <thead>
-         <tr>
-            <Th {handler}>Invoice Amount</Th>
-            <Th {handler}>Invoice num</Th>
-            <Th {handler}>Payment Completed</Th>
-            <Th {handler}>Payment type</Th>
-            <Th {handler}>Customer</Th>
-         </tr>
-         <tr>
-            <ThFilter {handler} filterBy='invoiceAmount' />
-            <ThFilter {handler} filterBy='paymentId' />
-            <ThFilter {handler} filterBy='paymentType' />
-            <ThFilter {handler} filterBy='customer' />
-         </tr>
-         <tr><th>${$paymentSum} total payments</th></tr>
-      </thead>
-      <tbody>
-         {#each $rows as row}
-         <tr>
-            <td>{row.paymentCompleted?.getDate()}/{row.paymentCompleted?.getMonth()}/{row.paymentCompleted?.getFullYear()}</td>
-            <td>{row.paymentType}</td>
-            <td>{row.familyName}, {row.givenName}</td>
-         </tr>
-         {/each}
-      </tbody>
-   </table>
+{#if data.user?.employee}
+   {#if dbUser}
+      <NameBlock nameBlock={dbUser} />
+   {/if}
+   {#if leases}      
+      {#each leases as lease}
+         <BasicLease lease={lease} />
+      {/each}
+   {/if}
+   {#if invoices}
+      {#each invoices as invoice}
+         <BasicInvoice invoice={invoice} />
+      {/each}
+   {/if}
+
 {/if}
