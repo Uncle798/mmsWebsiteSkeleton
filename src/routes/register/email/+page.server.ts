@@ -16,7 +16,10 @@ export const actions: Actions = {
        }
        const email = emailForm.data
        const dbUser = await prisma.user.create({
-         data: email
+         data: {
+            email: email.email,
+            emailVerified: false
+         }
        })
        console.log(dbUser);
        return { emailForm };

@@ -5,6 +5,7 @@
    import type { SuperValidated, Infer } from 'sveltekit-superforms/client';
    import type { EmailFormSchema } from '$lib/formSchemas/schemas';
 	import TextInput from '$lib/formComponents/TextInput.svelte';
+	import EmailInput from '$lib/formComponents/EmailInput.svelte';
 
    export let data: SuperValidated<Infer<EmailFormSchema>>;
    const modalStore = getModalStore();
@@ -13,7 +14,7 @@
       onUpdate(event) {
          if(event.result.type === 'success'){
             const toast:ToastSettings = {
-               message: 'Password Successfully Updated',
+               message: 'Email Successfully Updated',
 					timeout: 3000,
 					background: 'variant-filled-success'
 				}
@@ -32,12 +33,18 @@
 </script>
 <form method="post" action="/register/email" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
    <div class="flex">
-      <TextInput
-         name="email"
+      <EmailInput
+         value={$form.email}
          label="Email"
-         bind:value={$form.email}
          errors={$errors.email}
-         placeholder="email@email.com"
-         />
+         constraints={$constraints.email}
+      />
+      <EmailInput
+         value={$form.emailConfirm}
+         label="Confirm email"
+         errors={$errors.emailConfirm}
+         constraints={$constraints.emailConfirm}
+      />
    </div>
+   <button class="btn">Submit</button>
 </form>

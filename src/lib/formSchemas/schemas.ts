@@ -82,6 +82,20 @@ export type LoginSchema = typeof loginSchema;
 
 export const emailFormSchema = z.object({
    email: z.string().min(3).max(255).email().trim().toLowerCase(),
+   emailConfirm: z.string().min(3).max(255).email().trim().toLowerCase(),
+}).superRefine(({ email, emailConfirm}, context) =>{
+   if(email !== emailConfirm) {
+      context.addIssue({
+         code: 'custom',
+         message: 'Emails must match', 
+         path: ['email']
+      })
+      context.addIssue({
+         code: 'custom',
+         message: 'Emails must match', 
+         path: ['emailConfirm']
+      })
+   }
 });
 export type EmailFormSchema = typeof emailFormSchema;
 
@@ -107,7 +121,8 @@ export const nameFormSchema = z.object({
 export type NameFormSchema = typeof nameFormSchema;
 
 
-export const registerFormSchema = emailFormSchema.extend({
+export const registerFormSchema = z.object({
+   email: z.string().min(5).max(255), 
    password: z.string().min(6, 'Password must be at least 6 characters')
       .max(255,'Password can\'t be longer than 255 characters'),
    passwordConfirm: z.string().min(6, 'Password must be at least 6 characters')
