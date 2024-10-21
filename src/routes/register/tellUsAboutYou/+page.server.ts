@@ -21,7 +21,7 @@ export const actions:Actions = {
       const addressForm = await superValidate(event.request, zod(addressFormSchema));
       const nameForm = await superValidate(event.request, zod(nameFormSchema));
       if(!addressForm.valid) {
-         return message(addressForm, 'Code must be 8 characters');
+         return message(addressForm, 'Please enter a valid address');
       }
       const { success, reset } = await ratelimit.login.limit(event.locals.user?.id ?? event.getClientAddress());
       if(!success){
@@ -33,15 +33,6 @@ export const actions:Actions = {
       const phone1ResponseData = await (await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum1}&country_code=${address.phoneNum1Country}&format=1`)).json();
       if(!phone1ResponseData.valid){
          return message(addressForm, "That is not a valid phone number")
-      }
-      let phone2ResponseData: typeof phone1ResponseData;
-      let phoneNum2:string = '';
-      if(address.phoneNum2){
-         phoneNum2 = phone2ResponseData.number;
-         phone2ResponseData = await (await fetch(`http://apilayer.net/api/validate?access_key=${process.env.NUMVERIFY_API_KEY}&number=${address.phoneNum2}&country_code=${address.phoneNum2Country}&format=1`)).json();
-         if(!phone2ResponseData.valid){
-            return message(addressForm, "That is not a valid phone number")
-         }
       }
       if(nameForm.valid){
         const dbUser = await prisma.user.update({
@@ -75,7 +66,7 @@ export const actions:Actions = {
             zip:address.zip,
             country: address.country,
             phoneNum1: phone1ResponseData.number,
-            phoneNum2,
+            phoneNum1Country: phone1ResponseData.country,
             userId: user!.id,
          },
       }).catch((err) =>{

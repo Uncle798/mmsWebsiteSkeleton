@@ -8,6 +8,7 @@
 	import { getModalStore } from '@skeletonlabs/skeleton';
 
    export let data: SuperValidated<Infer<NameFormSchema>>;
+   export let finished=false;
    const modalStore = getModalStore();
    const toastStore = getToastStore();
    const { form, errors, constraints, message, enhance } = superForm(data, {
@@ -16,6 +17,7 @@
             modalStore.close();
          }
          if(event.result.type === 'success'){
+            finished = true
 				const toast:ToastSettings = {
 					message: 'Name Successfully Updated',
 					timeout: 3000,
@@ -33,7 +35,7 @@
 {#if $message}
    {$message}
 {/if}
-<form method="post" action="/register/name" class="modal-form border border-surface-500 p-4 space-y-4 rounded-container-token" use:enhance>
+<form method="post" action="/register/name" class=" p-4 space-y-4 rounded-container-token" use:enhance>
    <div class="flex">
       <TextInput
          name="givenName"

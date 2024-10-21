@@ -3,7 +3,7 @@ import { lucia } from '$lib/server/lucia';
 import  prisma from "$lib/server/prisma";
 import { mailtrap } from "$lib/server/mailtrap";
 import { hash } from "@node-rs/argon2";
-import { emailFormSchema, passwordFormSchema } from "$lib/formSchemas/schemas";
+import {  registerFormSchema } from "$lib/formSchemas/schemas";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import type { Actions, PageServerLoad } from "./$types";
 import { superValidate, message } from "sveltekit-superforms";
@@ -12,48 +12,43 @@ import { generateEmailVerificationRequest } from "$lib/server/authUtils";
 import { ratelimit } from "$lib/server/rateLimit";
 
 export const load: PageServerLoad = (async (event) => {
-   const passwordForm = await superValidate(zod(passwordFormSchema));
-	const emailForm = await superValidate(zod(emailFormSchema));
+   const registerForm = await superValidate(zod(registerFormSchema));
 	const unitNum = event.url.searchParams.get('unitNum');
 
-   return {passwordForm, emailForm, unitNum};
+   return { registerForm, unitNum };
 })
 
 export const actions:Actions = {
 	default: async (event) =>{
-		const passwordForm = await superValidate(event.request, zod(passwordFormSchema));
-		const emailForm = await superValidate(event.request, zod(emailFormSchema));
-		if(!emailForm.valid){
-			return fail(400, emailForm)
-		}
-		if(!passwordForm.valid){
-			return fail(400, passwordForm);
+		const registerForm = await superValidate(event.request, zod(registerFormSchema));
+		if(!registerForm.valid){
+			return fail(400, registerForm)
 		}
 		const { success, reset } = await ratelimit.register.limit(event.getClientAddress())
 		if(!success) {
 			const timeRemaining = Math.floor((reset - Date.now()) /1000);
-			return message(emailForm, `Please wait ${timeRemaining}s before trying again.`)
+			return message(registerForm, `Please wait ${timeRemaining}s before trying again.`)
 		}
-		const validPass = passwordForm.data.password;
+		const validPass = registerForm.data.password;
 		const passStrength = zxcvbn(validPass);
 		if(passStrength.score < 3) {
-			return message(passwordForm, 'Please use a stronger password')
+			return message(registerForm, 'Please use a stronger password')
 		}
-		const validEmail = emailForm.data.email;
-		const hashedPass = await hash(validPass, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
+		const validEmail = registerForm.data.email;
 		const userAlreadyExists = await prisma.user.findUnique({
 			where:{
 				email: validEmail
 			}
 		})
 		if(userAlreadyExists){
-			return message(emailForm, 'Email already in use, please login')
+			return message(registerForm, 'Email already in use, please login')
 		}
+		const hashedPass = await hash(validPass, {
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1
+		});
 		const user = await prisma.user.create({
 			data:{ 
 				email: validEmail, 

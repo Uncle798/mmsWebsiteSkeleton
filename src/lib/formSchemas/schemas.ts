@@ -61,6 +61,7 @@ export const passwordFormSchema = z.object({
 });
 export type PasswordFormSchema = typeof passwordFormSchema;
 
+
 export const paymentRecordSchema = z.object({
    customerId: z.string(),
    invoiceId: z.string().nullable(),
@@ -105,3 +106,24 @@ export const nameFormSchema = z.object({
 });
 export type NameFormSchema = typeof nameFormSchema;
 
+
+export const registerFormSchema = emailFormSchema.extend({
+   password: z.string().min(6, 'Password must be at least 6 characters')
+      .max(255,'Password can\'t be longer than 255 characters'),
+   passwordConfirm: z.string().min(6, 'Password must be at least 6 characters')
+      .max(255,'Password can\'t be longer than 255 characters'),
+}).superRefine(({password, passwordConfirm}, context)=>{
+   if(passwordConfirm !== password){
+      context.addIssue({
+         code: 'custom',
+         message: 'Password must match confirm password', 
+         path: ['password']
+      })
+      context.addIssue({
+         code: 'custom',
+         message: 'Password must match confirm password', 
+         path: ['confirmPassword']
+      })
+   }
+});
+export type RegisterFormSchema = typeof registerFormSchema;

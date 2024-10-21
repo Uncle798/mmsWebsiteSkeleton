@@ -48,6 +48,7 @@ export const actions:Actions = {
                   emailVerified: true,
                }
             });
+            console.log('emailVerification' + dbUser)
             const session = await lucia.createSession(dbUser.id, {});
             const sessionCookie = await lucia.createSessionCookie(session.id);
             event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -55,15 +56,16 @@ export const actions:Actions = {
                ...sessionCookie.attributes
             });
          }
+         const redirectTo = event.url.searchParams.get('redirectTo');
+         const unitNum = event.url.searchParams.get('unitNum');
+         if(redirectTo){
+            redirect(302,`${redirectTo.slice(1)}`)
+         }
+         if(unitNum){
+            redirect(302, '/register/tellUssAboutYou?unitNum=' + unitNum);
+         }
+         redirect(302, '/register/tellUsAboutYou');
       }
-      const redirectTo = event.url.searchParams.get('redirectTo');
-      const unitNum = event.url.searchParams.get('unitNum');
-      if(redirectTo){
-         redirect(302,`${redirectTo.slice(1)}`)
-      }
-      if(unitNum){
-         redirect(302, '/register/addressForm?unitNum=' + unitNum);
-      }
-      redirect(302, '/register/addressForm');
+      return { form }
    }
 }
