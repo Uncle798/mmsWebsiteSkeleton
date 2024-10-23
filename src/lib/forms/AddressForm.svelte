@@ -11,7 +11,11 @@
    import { page } from '$app/stores';
 	import type { PartialContactInfo } from '$lib/server/partialTypes';
 
-   export let data: SuperValidated<Infer<AddressFormSchema>>;
+  interface Props {
+    data: SuperValidated<Infer<AddressFormSchema>>;
+  }
+
+  let { data }: Props = $props();
    const modalStore = getModalStore();
    const toastStore = getToastStore();
    const { form, errors, constraints, message, enhance } = superForm(data, {
@@ -35,10 +39,10 @@
       },
    })
    const phoneOptions = { invalidateOnCountryChange: true }
-   let selectedCountryPhone1:CountryCode = 'US'
+   let selectedCountryPhone1:CountryCode = $state('US')
    let selectedCountryPhone2:CountryCode = 'US'
-   let detailedValue:DetailedValue = {} as DetailedValue;
-   let isValid = false;
+   let detailedValue:DetailedValue = $state({} as DetailedValue);
+   let isValid = $state(false);
    onMount(() => {
    if (typeof window !== 'undefined') {
       import('@mapbox/search-js-web').then(({ config, autofill }) => {

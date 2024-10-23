@@ -9,18 +9,22 @@
 	import type { ContactInfo, Lease } from '@prisma/client';
    import type { PageData } from './$types';
 	import type { PartialUser } from '$lib/server/partialTypes';
-   export let data: PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const customers = data.customers;
    const leases = data.leases;
    const addresses = data.addresses
    const {form, errors, constraints, message, enhance} = superForm(data.form);
 
-   let customerSearch = '';
-   let unitSearch = '';
+   let customerSearch = $state('');
+   let unitSearch = $state('');
    let customerAddress:ContactInfo[]=[];
-   let customerLease:Lease;
-   let customer:PartialUser;
-   let selected = false;
+   let customerLease:Lease = $state();
+   let customer:PartialUser = $state();
+   let selected = $state(false);
    let customerOptions: AutocompleteOption<string>[] = [];
    customers.forEach((customer)=> {
       const lease = leases.find((lease) => lease.customerId === customer.id);

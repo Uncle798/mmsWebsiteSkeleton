@@ -4,7 +4,11 @@
    import {SvelteComponent } from 'svelte';
    import { page } from "$app/stores";
 
-   export let parent: SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    const { form, errors, constraints, message, enhance } = superForm($page.data.confirmForm,{
       onUpdate(event) {
@@ -39,7 +43,7 @@
          <input type="hidden" name="leaseId" id="leaseId" value={$modalStore[0].meta.leaseId} {...$constraints.leaseId}>
          <input type="hidden" name="customerId" id="customerId" value={$modalStore[0].meta.customerId} {...$constraints.customerId}>
          <button class="btn {parent.buttonPositive}">End Lease</button>
-         <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
+         <button class="btn {parent.buttonNeutral}" onclick={onClose}>{parent.buttonTextCancel}</button>
       </form>
    </div>
 {/if}

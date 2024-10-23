@@ -6,9 +6,13 @@
    import { page } from "$app/stores";
 	import type { UnitComponentSchema } from "../../routes/units/proxy+page.server";
    import dayjs from "dayjs";
-   export let unit:Unit;
-   export let lease:Lease|undefined;
-   export let data: SuperValidated<Infer<UnitComponentSchema>>;
+   interface Props {
+      unit: Unit;
+      lease: Lease|undefined;
+      data: SuperValidated<Infer<UnitComponentSchema>>;
+   }
+
+   let { unit, lease, data }: Props = $props();
    const today = new Date();
    const { form, enhance,  } = superForm(data, {
       onUpdate(event) {
@@ -37,7 +41,7 @@
 
 <div>
    <form action="?/unitComponentForm" method="post" use:enhance>
-      <p>Notes: <textarea class="textarea" name="notes" rows="4" placeholder={unit.notes} bind:value={$form.notes}/></p>
+      <p>Notes: <textarea class="textarea" name="notes" rows="4" placeholder={unit.notes} bind:value={$form.notes}></textarea></p>
       <SlideToggle name="unavailable" checked={unit.unavailable}>Unit unavailable</SlideToggle>
       <input type="hidden" name="unitNum" id="unitNum" value={unit.num}>
       <button>Update</button>

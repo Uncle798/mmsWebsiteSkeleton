@@ -13,9 +13,13 @@
 	import { onMount } from 'svelte';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
 	import NameFormModal from '$lib/modals/NameFormModal.svelte';
-	export let data:PageData
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
 	const { form, errors, constraints, message, enhance } = superForm(data.leaseForm);
-   let { unit, address } = data
+   let { unit, address } = $state(data)
    const modalStore = getModalStore();
    function fireAddressModal(title:string){
        const modalComponent: ModalComponent = {
@@ -53,7 +57,7 @@
 {#if data.user?.givenName}
    <NameBlock nameBlock={data.user} />
 {:else}
-   <button class="btn" on:click={()=>{fireNameModal('Tell us your name')}}>Tell us your name</button>
+   <button class="btn" onclick={()=>{fireNameModal('Tell us your name')}}>Tell us your name</button>
 {/if}
       
 <form method="post" use:enhance>
@@ -66,9 +70,9 @@
             </label>
          </div>
       {/if}
-         <button class="btn" on:click={()=>{fireAddressModal('Please update your address')}}>Update address</button>
+         <button class="btn" onclick={()=>{fireAddressModal('Please update your address')}}>Update address</button>
    {:else}
-      <button class="btn" on:click={()=>{fireAddressModal('Please add your address')}}>Please add your address</button>
+      <button class="btn" onclick={()=>{fireAddressModal('Please add your address')}}>Please add your address</button>
    {/if}
    {#if unit }
       <BasicUnitCustomer unit={unit} />

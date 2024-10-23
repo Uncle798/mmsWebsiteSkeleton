@@ -7,8 +7,12 @@
 	import TextInput from '$lib/formComponents/TextInput.svelte';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 
-   export let data: SuperValidated<Infer<NameFormSchema>>;
-   export let finished=false;
+   interface Props {
+      data: SuperValidated<Infer<NameFormSchema>>;
+      finished?: boolean;
+   }
+
+   let { data, finished = $bindable(false) }: Props = $props();
    const modalStore = getModalStore();
    const toastStore = getToastStore();
    const { form, errors, constraints, message, delayed, timeout, enhance } = superForm(data, {
@@ -62,7 +66,7 @@
    <div class="flex">
       <button class="btn">Submit</button>
       {#if $modalStore[0]}
-      <button class="btn" on:click={close}>Cancel</button>
+      <button class="btn" onclick={close}>Cancel</button>
       {/if}
       {#if $delayed}
          <ProgressRadial value={undefined} font={12} width='w-10' stroke={100} meter="stroke-primary-500" track="stroke-primary-500/20" strokeLinecap="butt"  />

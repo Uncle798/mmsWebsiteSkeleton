@@ -1,4 +1,6 @@
 <script lang="ts">
+   import { preventDefault } from 'svelte/legacy';
+
    // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME, PUBLIC_STRIPE_TEST } from '$env/static/public';   
    // @ts-ignore: it works
@@ -7,14 +9,18 @@
    import { onMount } from 'svelte';
 	import { loadStripe, type StripeElements, type Stripe } from '@stripe/stripe-js';
    import { goto } from '$app/navigation';
-	export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const { address, invoice, user } = data;
-   let stripe:Stripe|null;
-   let clientSecret:string;
-   let elements: StripeElements;
+   let stripe:Stripe|null = $state();
+   let clientSecret:string = $state();
+   let elements: StripeElements = $state();
    let error = null;
-   let processing = false;
-   let mounted = false;
+   let processing = $state(false);
+   let mounted = $state(false);
    onMount(async () =>{
       stripe  = await loadStripe(PUBLIC_STRIPE_TEST);
       clientSecret = await createPaymentIntent();
@@ -58,7 +64,7 @@
    <p>Please pay a deposit of ${data.invoice?.invoiceAmount}</p>
    {#if stripe}
    <Elements {stripe} clientSecret={clientSecret} bind:elements>
-      <form on:submit|preventDefault={submit} >
+      <form onsubmit={preventDefault(submit)} >
          {#if  user}
             <LinkAuthenticationElement defaultValues = {
                {

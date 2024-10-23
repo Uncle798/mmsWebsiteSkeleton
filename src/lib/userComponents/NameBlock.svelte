@@ -1,6 +1,10 @@
 <script lang="ts">
    import type { PartialUser } from "$lib/server/partialTypes";
-   export let nameBlock: PartialUser;
+   interface Props {
+      nameBlock: PartialUser;
+   }
+
+   let { nameBlock }: Props = $props();
 </script>
 
 <div class="card p-4">

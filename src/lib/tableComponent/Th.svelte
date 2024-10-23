@@ -1,18 +1,23 @@
 <script lang="ts">
    import type { DataHandler  } from "@vincjo/datatables";
-   export let handler:DataHandler;
-   export let orderBy='null';
+   interface Props {
+      handler: DataHandler;
+      orderBy?: string;
+      children?: import('svelte').Snippet;
+   }
+
+   let { handler, orderBy = 'null', children }: Props = $props();
 
    const identifier = orderBy.toString();
    const sorted = handler.getSort();
 </script>
 
-<th on:click={()=> handler.sort(orderBy)} class:active={$sorted.identifier === identifier} >
+<th onclick={()=> handler.sort(orderBy)} class:active={$sorted.identifier === identifier} >
    <div class="flex">
       <strong>
-         <slot />
+         {@render children?.()}
       </strong>
-      <span class:asc={$sorted.direction === 'asc'} class:desc={$sorted.direction === 'desc'} />
+      <span class:asc={$sorted.direction === 'asc'} class:desc={$sorted.direction === 'desc'}></span>
    </div>
 
 </th>

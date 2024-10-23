@@ -8,7 +8,11 @@
    import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
 	import Pagination from "$lib/tableComponent/Pagination.svelte";
 	import type { PageData } from './$types';
-   export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const handler = new DataHandler(data.availableUnits, { rowsPerPage: 50})
    const rows = handler.getRows();
 </script>

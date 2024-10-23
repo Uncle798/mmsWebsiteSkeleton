@@ -3,7 +3,11 @@
    import { PUBLIC_COMPANY_NAME, PUBLIC_ANVIL_EMAIL } from '$env/static/public';   
    // @ts-ignore: it works
    import type { PageData } from './$types';
-	export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
 </script>
 
 <svelte:head>

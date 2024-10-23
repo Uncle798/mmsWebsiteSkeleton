@@ -5,7 +5,11 @@
    import type { SvelteComponent } from "svelte";
 	import { invalidateAll } from "$app/navigation";
    
-   export let parent: SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    const { form:employeeForm, errors:employeeErrors, constraints, message:employeeMessage, formId, enhance } = superForm($page.data.employeeForm,{
       onUpdate(event) {
@@ -39,7 +43,7 @@
          <SlideToggle name='admin' checked={$modalStore[0].meta.admin} >Admin </SlideToggle>
          <input type="hidden" name="userId" id="userId" value={$modalStore[0].meta.userId} {...$constraints.userId}/>
          <button class="btn {parent.buttonPositive}">Submit</button>
-         <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
+         <button class="btn {parent.buttonNeutral}" onclick={onClose}>{parent.buttonTextCancel}</button>
       </form>
    </div>
 {/if}

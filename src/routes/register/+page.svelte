@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	// @ts-ignore: it works
 	import { zxcvbn, zxcvbnOptions, type Score } from "@zxcvbn-ts/core";
 	import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
@@ -14,8 +16,12 @@
 	import TextInput from "$lib/formComponents/TextInput.svelte";
 	import PasswordInput from "$lib/formComponents/PasswordInput.svelte";
 	
-	export let data:PageData;
-	let passwordTouched = false;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+	let passwordTouched = $state(false);
 	const { translations } = zxcvbnEnPackage;
 	const { adjacencyGraphs: graphs, dictionary: commonDictionary } = zxcvbnCommonPackage;
 	const { dictionary: englishDictionary } = zxcvbnEnPackage;
@@ -26,24 +32,26 @@
 	};
 	zxcvbnOptions.setOptions(options);
 	const { form, errors, constraints, message, enhance } = superForm(data.registerForm)
-	$: ({
+	let {
 	score,
 	feedback: { warning, suggestions },
-	} = zxcvbn($form.password));
-	let strengthDescription = "Low";
-	$: switch (score) {
-	case 3:
-		strengthDescription = "OK";
-		break;
-	case 4:
-		strengthDescription = "Good";
-		break;
-	case 0:
-	case 1:
-	case 2:
-	default:
-		strengthDescription = "Low";
-	}
+	} = $derived(zxcvbn($form.password));
+	let strengthDescription = $state("Low");
+	run(() => {
+		switch (score) {
+		case 3:
+			strengthDescription = "OK";
+			break;
+		case 4:
+			strengthDescription = "Good";
+			break;
+		case 0:
+		case 1:
+		case 2:
+		default:
+			strengthDescription = "Low";
+		}
+	});
 </script>
 
 {#if $message}
@@ -99,7 +107,7 @@
 
 	{#if passwordTouched}
 		<label for="password-strength">Password strength: {strengthDescription}</label>
-		<meter id="password-strength" value={score} low="1.9" high="2.9" optimum="4" max="4" />
+		<meter id="password-strength" value={score} low="1.9" high="2.9" optimum="4" max="4"></meter>
 		{#if warning}
 			<span class="warning"> {warning}</span>
 			<ul>

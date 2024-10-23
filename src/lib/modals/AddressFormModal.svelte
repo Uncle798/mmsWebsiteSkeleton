@@ -5,7 +5,11 @@
 	import AddressForm from "../forms/AddressForm.svelte";
 
 
-   export let parent:SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    function onClose() {
       modalStore.close();

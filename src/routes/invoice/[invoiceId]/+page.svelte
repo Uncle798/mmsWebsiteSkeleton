@@ -2,7 +2,11 @@
     import BasicInvoice from '$lib/leaseComponents/BasicInvoice.svelte';
     import type { PageData } from './$types';
     
-    export let data: PageData;
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
     const { invoice }= data
 </script>
 {#if invoice}

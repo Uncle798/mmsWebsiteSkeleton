@@ -10,7 +10,11 @@
 	import Address from '$lib/userComponents/Address.svelte';
 	import BasicInvoice from '$lib/leaseComponents/BasicInvoice.svelte';
     
-   export let data: PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const {form, errors, constraints, message, enhance} = superForm(data.form, {
       onError(event) {
          console.error(event.result);
@@ -18,14 +22,14 @@
       dataType: 'json'
    });
    const { customers, invoices, addresses, leases } = data;
-   let customerSearch:string | undefined = '';
+   let customerSearch:string | undefined = $state('');
    let customerAddress:ContactInfo[] = [];
-   let customerInvoices: Invoice[] = [];
-   let customerLeases: Lease[] = [];
+   let customerInvoices: Invoice[] = $state([]);
+   let customerLeases: Lease[] = $state([]);
    let currentInvoice: Invoice | undefined;
    let customer:PartialUser | undefined;
-   let invoiceSearch: string | undefined = '';
-   let invoiceOptions: AutocompleteOption<string>[] =[];
+   let invoiceSearch: string | undefined = $state('');
+   let invoiceOptions: AutocompleteOption<string>[] =$state([]);
    let customerOptions: AutocompleteOption<string>[] = [];
    customers.forEach((customer)=> {
       const customerInvoices = invoices.filter((i) => i.customerId === customer.id);

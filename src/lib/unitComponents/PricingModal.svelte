@@ -4,7 +4,11 @@
    import {SvelteComponent } from 'svelte';
    import { page } from "$app/stores";
 
-   export let parent: SvelteComponent;
+  interface Props {
+    parent: SvelteComponent;
+  }
+
+  let { parent }: Props = $props();
    const modalStore = getModalStore();
    const { form, errors, constraints, message, enhance } = superForm($page.data.form, {
       onUpdate(event) {
@@ -48,7 +52,7 @@
          <SlideToggle name="lowerPrice" bind:checked={$form.lowerPrice} >Lower Price</SlideToggle>
   
          <button class="btn {parent.buttonPositive}">Submit</button>
-         <button class="btn {parent.buttonNeutral}" on:click={cancel}>{parent.buttonTextCancel}</button>
+         <button class="btn {parent.buttonNeutral}" onclick={cancel}>{parent.buttonTextCancel}</button>
       </form>
    </div>
 {/if}

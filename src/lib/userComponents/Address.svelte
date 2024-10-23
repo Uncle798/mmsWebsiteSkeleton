@@ -1,6 +1,10 @@
 <script lang="ts">
    import type {ContactInfo} from 'prisma/prisma-client'
-   export let address:ContactInfo;
+   interface Props {
+      address: ContactInfo;
+   }
+
+   let { address }: Props = $props();
 </script>
 
 <div class="card p-4">

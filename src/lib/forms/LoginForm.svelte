@@ -8,7 +8,11 @@
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import PasswordInput from '$lib/formComponents/PasswordInput.svelte';
 
-   export let data: SuperValidated<Infer<LoginSchema>>;
+  interface Props {
+    data: SuperValidated<Infer<LoginSchema>>;
+  }
+
+  let { data }: Props = $props();
    const modalStore = getModalStore();
    const { form, errors, constraints, message, enhance } = superForm(data, {
       onUpdate(event) {

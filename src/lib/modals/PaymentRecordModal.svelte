@@ -6,14 +6,18 @@
 	import type { Invoice, Lease } from "@prisma/client";
 	import type { PartialUser } from "$lib/server/partialTypes";
 
-   export let parent:SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    const customer:PartialUser = $modalStore[0].meta.customer
    const invoice:Invoice = $modalStore[0].meta.invoice;
    const customerLeases:Lease[] = $modalStore[0].meta.customerLeases
-   let customerId:string;
-   let invoiceId:string;
-   let unitNum:string;
+   let customerId:string = $state();
+   let invoiceId:string = $state();
+   let unitNum:string = $state();
    const {form, errors, constraints, message, enhance} = superForm($page.data.newPaymentForm, {
       onUpdate(event) {
          if(!$message){
@@ -77,7 +81,7 @@
          <input type="hidden" name="invoiceId" id="invoiceId" bind:value={invoiceId}>
          <input type="hidden" name="unitNum" id="unitNum" bind:value={unitNum}>
          <button class="btn {parent.buttonPositive}">Make payment Record</button>
-         <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
+         <button class="btn {parent.buttonNeutral}" onclick={onClose}>{parent.buttonTextCancel}</button>
       </form>
    </div>
 {/if}

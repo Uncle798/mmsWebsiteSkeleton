@@ -7,7 +7,11 @@
 	import TextInput from '$lib/formComponents/TextInput.svelte';
 	import EmailInput from '$lib/formComponents/EmailInput.svelte';
 
-   export let data: SuperValidated<Infer<EmailFormSchema>>;
+   interface Props {
+      data: SuperValidated<Infer<EmailFormSchema>>;
+   }
+
+   let { data }: Props = $props();
    const modalStore = getModalStore();
    const toastStore = getToastStore();
    const { form, errors, constraints, message, enhance } = superForm(data, {

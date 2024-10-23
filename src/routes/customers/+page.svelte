@@ -1,4 +1,6 @@
 <script lang="ts">
+   import { run } from 'svelte/legacy';
+
    import type { PageData } from "./$types";
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { DataHandler } from '@vincjo/datatables';
@@ -10,10 +12,16 @@
 	import { getModalStore, type ModalComponent, type ModalSettings } from "@skeletonlabs/skeleton";
 	import ConfirmFormModal from "$lib/modals/ConfirmFormModal.svelte";
 
-   export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    
    const handler = new DataHandler(data.tableData, { rowsPerPage: 50})
-   $: data.tableData, handler.setRows(data.tableData)
+   run(() => {
+      data.tableData, handler.setRows(data.tableData)
+   });
    const rows = handler.getRows();
    const modalStore = getModalStore();
    const modalComponent:ModalComponent = {
@@ -70,7 +78,7 @@
             <td class="td"><a href="/users/{row.id}"> {row.familyName}</a></td>
             <td><a href="/users/{row.id}"> {row.givenName}</a></td>
             <td><a href="/users/{row.id}" class="btn"> {row.email}</a></td>
-            <td><button class="btn" on:click={()=>modalFire(row.id, row.leaseId, row.unitNum)}>End Lease</button></td>
+            <td><button class="btn" onclick={()=>modalFire(row.id, row.leaseId, row.unitNum)}>End Lease</button></td>
          </tr>
          {/each}
       </tbody>

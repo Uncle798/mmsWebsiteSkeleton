@@ -7,9 +7,14 @@
 	// }
 	import "../app.css";
 	import { Hamburger } from 'svelte-hamburgers'
-	let open:boolean | undefined;
+	let open:boolean | undefined = $state();
 	initializeStores();
-	export let data:PageData;
+	interface Props {
+		data: PageData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 </script>
 
 <Hamburger bind:open />
@@ -41,4 +46,4 @@
 <Drawer />
 <Modal />
 <Toast />
-<slot></slot>
+{@render children?.()}

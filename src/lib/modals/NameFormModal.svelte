@@ -4,7 +4,11 @@
    import { onMount, type SvelteComponent } from "svelte";
 	import NameForm from "../forms/NameForm.svelte";
 
-   export let parent:SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    function onClose() {
       modalStore.close();

@@ -8,7 +8,11 @@
 	import type { Invoice  } from '@prisma/client';
     import type { PartialUser } from '$lib/server/partialTypes';
 
-    export let data: PageData;
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
     const {customers, invoices, leases } = data;
     const searchInvoices = invoices.map((invoice)=> {
         const customer = customers.find((c) => c.id === invoice.customerId);
@@ -53,7 +57,7 @@
     {#if customer}
         <NameBlock nameBlock= {customer} />
         <div>
-            <button class="btn" on:click={()=>modalFire(invoice, customer)}>Make a payment</button>
+            <button class="btn" onclick={()=>modalFire(invoice, customer)}>Make a payment</button>
         </div>
     {/if}
 </div>

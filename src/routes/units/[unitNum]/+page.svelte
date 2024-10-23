@@ -2,7 +2,11 @@
     import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
 import type { PageData } from './$types';
     
-    export let data: PageData;
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
 </script>
 
 {#each data.leases as lease}

@@ -4,7 +4,11 @@
    import { onMount, type SvelteComponent } from "svelte";
 	import PasswordForm from "$lib/forms/PasswordForm.svelte";
 
-   export let parent:SvelteComponent;
+   interface Props {
+      parent: SvelteComponent;
+   }
+
+   let { parent }: Props = $props();
    const modalStore = getModalStore();
    function onClose() {
       modalStore.close();
@@ -19,6 +23,6 @@
      <header class="text-2xl font-bold">{$modalStore[0].title ?? 'Title missing'}</header>
      <article>{$modalStore[0].body ?? 'Body missing'}</article>
       <PasswordForm data={$page.data.passwordForm} />
-      <button class="btn {parent.buttonNeutral}" on:click={onClose}>{parent.buttonTextCancel}</button>
+      <button class="btn {parent.buttonNeutral}" onclick={onClose}>{parent.buttonTextCancel}</button>
    </div>
 {/if}

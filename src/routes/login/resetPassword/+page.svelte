@@ -3,7 +3,11 @@
     import type { PageData } from './$types';
 	import EmailForm from '$lib/forms/EmailForm.svelte';
     
-    export let data: PageData;
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
     const { form, message, errors, constraints, enhance } = superForm(data.form);
 </script>
 <EmailForm data={data.form} />

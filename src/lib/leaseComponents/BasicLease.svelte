@@ -4,7 +4,11 @@
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import type { Lease } from "@prisma/client";
 	import dayjs from "dayjs";
-   export let lease: Lease;
+   interface Props {
+      lease: Lease;
+   }
+
+   let { lease }: Props = $props();
 </script>
 <div class="card p-4">
    <span>

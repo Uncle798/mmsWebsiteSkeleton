@@ -1,13 +1,17 @@
 <script lang="ts">
    import { DataHandler } from "@vincjo/datatables";
-   export let handler: DataHandler;
+   interface Props {
+      handler: DataHandler;
+   }
+
+   let { handler }: Props = $props();
    const currentPage = handler.getPageNumber();
    const pageCount = handler.getPageCount();
    const pages = handler.getPages({ ellipsis: true });
 </script>
 
 <section>
-   <button type="button" class:disabled={$currentPage === 1} on:click={()=> handler.setPage('previous')}>
+   <button type="button" class:disabled={$currentPage === 1} onclick={()=> handler.setPage('previous')}>
       Previous
    </button>
    {#each $pages as page}
@@ -15,7 +19,7 @@
          type='button' 
          class:active={$currentPage === page} 
          class:ellipse={page === null}
-         on:click={()=> handler.setPage(page)}
+         onclick={()=> handler.setPage(page)}
       >
          {page ?? '...'}
       </button>
@@ -23,7 +27,7 @@
    <button
       type="button"
       class:disabled={$currentPage === $pageCount}
-      on:click={()=> handler.setPage('next')}
+      onclick={()=> handler.setPage('next')}
       >
       Next
    </button>

@@ -13,7 +13,11 @@
 	import EmailFormModal from '$lib/modals/EmailFormModal.svelte';
 	import BasicInvoice from '$lib/leaseComponents/BasicInvoice.svelte';
 
-   export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    export const { contactInfo,  leases, dbUser, invoices, payments } = data;
    const modalStore = getModalStore();
    function addressModal(title:string){
@@ -72,16 +76,16 @@
 {#if dbUser?.id === data.user?.id}
    {#if dbUser}
       <NameBlock nameBlock={dbUser} />
-      <button class="btn" on:click={()=>{nameModal('Please update your name')}}>Update your name</button>
-      <button class="btn" on:click={()=>{emailModal('Please update your email')}}>Update your email</button>
+      <button class="btn" onclick={()=>{nameModal('Please update your name')}}>Update your name</button>
+      <button class="btn" onclick={()=>{emailModal('Please update your email')}}>Update your email</button>
    {/if}
    {#if contactInfo} 
       <Address address={contactInfo}/>
-      <button class="btn" on:click={()=>{addressModal('Please update your address')}}>Change Address</button>
+      <button class="btn" onclick={()=>{addressModal('Please update your address')}}>Change Address</button>
    {:else}
-      <button class="btn" on:click={()=>{addressModal('Please add your address')}} >Add your Address</button>
+      <button class="btn" onclick={()=>{addressModal('Please add your address')}} >Add your Address</button>
    {/if}
-      <button class="btn " on:click={()=>{passwordModal('Please enter a new password')}}>Change your password</button>
+      <button class="btn " onclick={()=>{passwordModal('Please enter a new password')}}>Change your password</button>
    {#if leases}
       {#each leases as lease}   
          <BasicLease lease={lease} />

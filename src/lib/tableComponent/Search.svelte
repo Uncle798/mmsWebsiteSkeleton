@@ -1,8 +1,12 @@
 <script lang='ts'>
    import type { DataHandler } from "@vincjo/datatables";
-   export let handler: DataHandler;
-   let value = ''
+   interface Props {
+      handler: DataHandler;
+   }
+
+   let { handler }: Props = $props();
+   let value = $state('')
 </script>
 
-<input class="input" placeholder="Search" bind:value on:input={() => handler.search(value)} />
+<input class="input" placeholder="Search" bind:value oninput={() => handler.search(value)} />
 

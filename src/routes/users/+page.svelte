@@ -9,7 +9,11 @@
 	import NameBlock from "$lib/userComponents/NameBlock.svelte";
 	import { createSearchStore, searchHandler } from "$lib/stores/search";
 	import Address from "$lib/userComponents/Address.svelte";
-   export let data:PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const {  contactInfos, searchUsers } = data
    
    const searchStore = createSearchStore(searchUsers);
@@ -50,6 +54,6 @@
       {#each addresses as address}
       <Address address={address} />
       {/each}
-      <div class="card"><button on:click={()=>{modalFire(user)}}>Change employment status</button></div>
+      <div class="card"><button onclick={()=>{modalFire(user)}}>Change employment status</button></div>
    </div>
 {/each} 

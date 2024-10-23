@@ -1,6 +1,10 @@
 <script lang="ts">
    import type { Unit } from 'prisma/prisma-client'
-   export let unit:Unit;
+   interface Props {
+      unit: Unit;
+   }
+
+   let { unit }: Props = $props();
 </script>
 
 <div class="card p-4">

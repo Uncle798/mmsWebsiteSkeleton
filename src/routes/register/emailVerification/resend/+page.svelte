@@ -5,7 +5,11 @@
    import type { PageData } from './$types';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
    
-   export let data: PageData;
+   interface Props {
+      data: PageData;
+   }
+
+   let { data }: Props = $props();
    const { form, errors, constraints, message, submitting, delayed, timeout, enhance } = superForm(data.form, {
       delayMs: 300,
       timeoutMs: 8000, 

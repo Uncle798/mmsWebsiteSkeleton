@@ -1,7 +1,11 @@
 <script lang="ts">
    // @ts-ignore: it works
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
-   export let pageTitle:string;
+   interface Props {
+      pageTitle: string;
+   }
+
+   let { pageTitle }: Props = $props();
 </script>
 
 <svelte:head>

@@ -3,7 +3,11 @@
 	import BasicPaymentRecord from '$lib/leaseComponents/BasicPaymentRecord.svelte';
 import type { PageData } from './$types';
     
-    export let data: PageData;
+    interface Props {
+        data: PageData;
+    }
+
+    let { data }: Props = $props();
     const {paymentRecord} = data; 
 </script>
 {#if paymentRecord}

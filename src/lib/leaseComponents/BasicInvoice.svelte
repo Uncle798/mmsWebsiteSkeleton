@@ -1,7 +1,11 @@
 <script lang="ts">
    import dayjs from 'dayjs';
    import type {Invoice} from 'prisma/prisma-client';
-   export let invoice:Invoice;
+   interface Props {
+      invoice: Invoice;
+   }
+
+   let { invoice }: Props = $props();
 </script>
 <div class="card">
    <p>Invoice created: {dayjs(invoice.invoiceCreated).format('M/D/YYYY')}</p>

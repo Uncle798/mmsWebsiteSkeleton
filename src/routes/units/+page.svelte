@@ -8,9 +8,9 @@
 	import PricingModal from '$lib/unitComponents/PricingModal.svelte';
 	import BasicUnitEmployee from '$lib/unitComponents/BasicUnitEmployee.svelte';
 	import NameBlock from '$lib/userComponents/NameBlock.svelte';
-   export let data;
+   let { data } = $props();
 
-   $: units = data.units;
+   let units = $derived(data.units);
    const modalStore = getModalStore();
    const modalComponent: ModalComponent = {
       ref: PricingModal
@@ -31,7 +31,7 @@
 </svelte:head>
 
 <div>
-   <button class="btn" on:click={modalFire}>Set new price by size</button>
+   <button class="btn" onclick={modalFire}>Set new price by size</button>
 </div>
 {#if  units}
    {#each units as unit}

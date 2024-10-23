@@ -1,12 +1,25 @@
 <script lang="ts">
    import type { InputConstraint } from 'sveltekit-superforms';
  
-   export let value: string | undefined = undefined;
-   export let name: string | undefined = undefined;
-   export let label: string | undefined = undefined;
-   export let placeholder: string | undefined = undefined;
-   export let errors: string[] | undefined = undefined;
-   export let constraints: InputConstraint | undefined = undefined;
+   interface Props {
+      value?: string | undefined;
+      name?: string | undefined;
+      label?: string | undefined;
+      placeholder?: string | undefined;
+      errors?: string[] | undefined;
+      constraints?: InputConstraint | undefined;
+      [key: string]: any
+   }
+
+   let {
+      value = $bindable(undefined),
+      name = undefined,
+      label = undefined,
+      placeholder = undefined,
+      errors = undefined,
+      constraints = undefined,
+      ...rest
+   }: Props = $props();
  </script>
  
  <label>
@@ -20,7 +33,7 @@
       aria-invalid={errors ? 'true' : undefined}
       autocomplete="email"
       {...constraints}
-      {...$$restProps} 
+      {...rest} 
       />
  </label>
  {#if errors}<span class="invalid">{errors}</span>{/if}

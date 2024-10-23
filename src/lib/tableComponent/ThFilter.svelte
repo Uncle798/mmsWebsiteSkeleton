@@ -1,11 +1,15 @@
 <script lang="ts">
    import type { DataHandler } from "@vincjo/datatables";
-   export let handler: DataHandler
-   export let filterBy = '';
-   export let placeholder = "Filter"
-   let value = ''
+   interface Props {
+      handler: DataHandler;
+      filterBy?: string;
+      placeholder?: string;
+   }
+
+   let { handler, filterBy = '', placeholder = "Filter" }: Props = $props();
+   let value = $state('')
 </script>
 
 <th class="table-cell">
-   <input class="input" type="text" placeholder={placeholder} bind:value on:input={()=> handler.filter(value, filterBy)} />
+   <input class="input" type="text" placeholder={placeholder} bind:value oninput={()=> handler.filter(value, filterBy)} />
 </th>
