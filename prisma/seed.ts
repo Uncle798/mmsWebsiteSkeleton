@@ -388,7 +388,6 @@ async function  main (){
    console.log(`💰 ${invoices.length} invoices created in ${invoiceEndTime.diff(leaseEndTime, 'ms')} ms`);
    const paymentRecords:PartialPaymentRecord[]=[];
    for await (const invoice of dbInvoices){
-
       const paymentDate = dayjs(invoice.invoiceCreated).add(1, 'months');
       if(dayjs(today).diff(paymentDate, 'days') < 30) {
          continue;
@@ -408,9 +407,20 @@ async function  main (){
          }      
       paymentRecords.push(record);
    }                              
-   await prisma.paymentRecord.createMany({
+   const dbPayments = await prisma.paymentRecord.createManyAndReturn({
       data: paymentRecords
-   })                       
+   });
+   dbPayments.forEach(async (record) =>{
+      await prisma.invoice.update({
+         where: {
+            invoiceId: record.invoiceId!,
+         },
+         data: {
+            paymentRecordId: record.paymentId,
+            invoicePaid: record.paymentCompleted,
+         }
+      });
+   })                      
    const paymentEndTime = dayjs(new Date);
    const totalRecords = await countAll();
    console.log(`🧾 ${paymentRecords.length} payment records created in ${paymentEndTime.diff(invoiceEndTime, 'ms')} ms`);
