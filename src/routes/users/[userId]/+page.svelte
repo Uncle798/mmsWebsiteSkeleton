@@ -4,12 +4,6 @@
    import BasicLease from '$lib/leaseComponents/BasicLease.svelte';
    import Address from '$lib/userComponents/Address.svelte';
    import NameBlock from '$lib/userComponents/NameBlock.svelte';
-   import Th from '$lib/tableComponent/Th.svelte'
-   import ThFilter from "$lib/tableComponent/ThFilter.svelte";
-   import Search from "$lib/tableComponent/Search.svelte";
-   import RowsPerPage from "$lib/tableComponent/RowsPerPage.svelte";
-	import Pagination from "$lib/tableComponent/Pagination.svelte"; 
-	import { DataHandler } from '@vincjo/datatables';
 	import type { PageData } from './$types';
 	import { getModalStore } from '@skeletonlabs/skeleton';
    import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
@@ -73,7 +67,7 @@
 </script>
 
 <svelte:head>
-	<title>{PUBLIC_COMPANY_NAME} | User: {dbUser?.givenName} {dbUser?.familyName}</title>
+	<title>User: {dbUser?.givenName} {dbUser?.familyName}</title>
 </svelte:head>
 {#if dbUser?.id === data.user?.id}
    {#if dbUser}
@@ -89,9 +83,9 @@
    {/if}
       <button class="btn " on:click={()=>{passwordModal('Please enter a new password')}}>Change your password</button>
    {#if leases}
-   {#each leases as lease}   
-   <BasicLease lease={lease} />
-   {/each}
+      {#each leases as lease}   
+         <BasicLease lease={lease} />
+      {/each}
    {/if}
 {/if}
 {#if data.user?.employee}
@@ -108,5 +102,4 @@
          <BasicInvoice invoice={invoice} />
       {/each}
    {/if}
-
 {/if}

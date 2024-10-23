@@ -5,15 +5,43 @@
 	import NameBlock from '$lib/userComponents/NameBlock.svelte';
 	import Address from '$lib/userComponents/Address.svelte';
 	import BasicUnitCustomer from '$lib/unitComponents/BasicUnitCustomer.svelte';
-	
+   import AddressFormModal from '$lib/modals/AddressFormModal.svelte';
+   import { getModalStore } from '@skeletonlabs/skeleton'
+	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton'
    // @ts-ignore: it works
    import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+	import NameFormModal from '$lib/modals/NameFormModal.svelte';
 	export let data:PageData
-	const { form, errors, constraints, message, enhance } = superForm(data.form);
-   const { unit, addresses } = data
-</script>
+	const { form, errors, constraints, message, enhance } = superForm(data.leaseForm);
+   let { unit, address } = data
+   const modalStore = getModalStore();
+   function fireAddressModal(title:string){
+       const modalComponent: ModalComponent = {
+            ref: AddressFormModal
+        }
+        const modal:ModalSettings = {
+            type: 'component',
+            component: modalComponent,
+            title, 
+            body: `Please enter a new address`,
+        }
+        modalStore.trigger(modal);
+    }
+   function fireNameModal(title:string){
+       const modalComponent: ModalComponent = {
+            ref: NameFormModal
+        }
+        const modal:ModalSettings = {
+            type: 'component',
+            component: modalComponent,
+            title, 
+            body: `Please enter a new address`,
+        }
+        modalStore.trigger(modal);
+    }
+   </script>
 
 <svelte:head>
 	<title>{PUBLIC_COMPANY_NAME} | Customer New Lease</title>
@@ -24,38 +52,30 @@
 {/if}
 {#if data.user?.givenName}
    <NameBlock nameBlock={data.user} />
-   {:else}
-   <button class="btn">Tell us your name</button>
+{:else}
+   <button class="btn" on:click={()=>{fireNameModal('Tell us your name')}}>Tell us your name</button>
 {/if}
+      
 <form method="post" use:enhance>
-   {#if addresses}
-      {#each addresses as address, index}
-         <div class="flex">
-            <Address address={address} />
-            {#if index === 0}
-               <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} checked class="radio"/>
-            {:else}
-               <input type="radio" name="contactInfoId" id={address.contactId} value={address.contactId} class="radio"/>
-            {/if}
-
+   {#if address}
+      <Address address={address} />
+      {#if data.user?.organizationName}
+         <div>
+            <label for="orgainzation">This unit is being rented by an organization (Company, Non Profit, ect)
+               <input type="checkbox" name="organization" id="organization" checked />
+            </label>
          </div>
-         {#if data.user?.organizationName}
-            <div>
-               <label for="orgainzation">This unit is being rented by an organization (Company, Non Profit, ect)
-                  <input type="checkbox" name="organization" id="organization" checked />
-               </label>
-            </div>
-         {/if}
-      {/each}
+      {/if}
+         <button class="btn" on:click={()=>{fireAddressModal('Please update your address')}}>Update address</button>
    {:else}
-      <a class="a" href="/register/addressForm?unitNum={unit?.num}">Please add your address</a>
+      <button class="btn" on:click={()=>{fireAddressModal('Please add your address')}}>Please add your address</button>
    {/if}
    {#if unit }
       <BasicUnitCustomer unit={unit} />
       <input type="hidden" name="unitNum" id="unitNum" bind:value={unit.num}>
    {/if}
 
-   {#if data.user && data.addresses  }
+   {#if data.user && data.address  }
       <button class="btn">All the above is correct pay deposit</button>
    {/if}
 </form>

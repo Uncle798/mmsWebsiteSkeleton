@@ -2,6 +2,7 @@
    import type { InputConstraint } from 'sveltekit-superforms';
  
    export let value: string | undefined = undefined;
+   export let name: string | undefined = undefined;
    export let label: string | undefined = undefined;
    export let placeholder: string | undefined = undefined;
    export let errors: string[] | undefined = undefined;
@@ -12,6 +13,7 @@
    {#if label}<span>{label}</span><br />{/if}
    <input
       type="text"
+      name={name}
       class="input"
       placeholder={placeholder ? placeholder : undefined}
       bind:value

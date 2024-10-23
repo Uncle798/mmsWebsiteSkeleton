@@ -155,4 +155,7 @@
    {/if}
    </div>
    <button class="btn button-positive">Submit new Address</button>
+   {#if $modalStore[0]}
+      <button class="btn button-negaitive">Cancel</button>   
+   {/if}
 </form>

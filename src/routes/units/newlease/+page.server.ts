@@ -2,7 +2,7 @@ import  prisma from "$lib/server/prisma";
 
 import type { Actions, PageServerLoad } from './$types';
 import {superValidate, message } from 'sveltekit-superforms';
-import { newLeaseSchema } from "$lib/formSchemas/schemas";
+import { addressFormSchema, nameFormSchema, newLeaseSchema } from "$lib/formSchemas/schemas";
 import { zod } from 'sveltekit-superforms/adapters';
 import { redirect } from "@sveltejs/kit";
 import { ratelimit } from "$lib/server/rateLimit";
@@ -11,7 +11,9 @@ export const load:PageServerLoad = (async (event) =>{
    if(!event.locals.user){
       redirect(302, '/login?redirectTo=newLease')
    }
-   const form = await superValidate(zod(newLeaseSchema));
+   const leaseForm = await superValidate(zod(newLeaseSchema));
+   const nameForm = await superValidate(zod(nameFormSchema));
+   const addressForm = await superValidate(zod(addressFormSchema));
    const unitNum = event.url.searchParams.get('unitNum');
    if(!unitNum){
       redirect(302, '/units/available');
@@ -24,23 +26,23 @@ export const load:PageServerLoad = (async (event) =>{
       console.error(err);
    })
    console.log(event.locals.user.id);
-   const addresses = await prisma.contactInfo.findMany({
+   const address = await prisma.contactInfo.findFirst({
       where:{
          userId:event.locals.user.id
       }
    }).catch((err) =>{
       console.error(err);
    })
-   console.log(addresses);
-   return { form, addresses, unit }
+   return { leaseForm, address, addressForm, nameForm, unit }
 })
 
 
 export const actions:Actions = {
    default: async (event) =>{
-      const form = await superValidate(event.request, zod(newLeaseSchema));
-      console.log(form.data);
-      if(!form.valid){
+      const leaseForm = await superValidate(event.request, zod(newLeaseSchema));
+      const nameForm = await superValidate(event.request, zod(nameFormSchema));
+      const addressForm = await superValidate(event.request, zod(addressFormSchema));
+      if(!leaseForm.valid){
          message(form, 'no good')
       }
       const { success, reset } = await ratelimit.register.limit(event.getClientAddress())

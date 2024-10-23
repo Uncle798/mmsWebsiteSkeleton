@@ -6,6 +6,7 @@
    import type { LoginSchema} from '$lib/formSchemas/schemas';
 	import TextInput from '$lib/formComponents/TextInput.svelte';
 	import { getModalStore } from '@skeletonlabs/skeleton';
+	import PasswordInput from '$lib/formComponents/PasswordInput.svelte';
 
    export let data: SuperValidated<Infer<LoginSchema>>;
    const modalStore = getModalStore();
@@ -22,7 +23,7 @@
 </script>
 
 {#if $message}
-   {$message}
+  <h3 class="h3">{$message}</h3> 
 {/if}
 <form method="post" action="/login" class="form" use:enhance>
    <div class="flex">
@@ -33,21 +34,15 @@
          errors={$errors.email}
          constraints={$constraints.email}
          placeholder="email@email.com"
-         />
-         <label for="password">password
-         <input type="password" name="password" 
-            id="password"
-            class="input" 
-            aria-invalid={$errors.password ? 'true' : undefined}
-            bind:value={$form.password}
-            {...$constraints.password}
-            autocomplete="current-password"
-            placeholder="Password"
-         />
-      </label>
-         {#if $errors.password}
-         <span class="input-error">{$errors.password}</span>
-         {/if}
+      />
+      <PasswordInput
+         name="password"
+         label="Password"
+         value={$form.password}
+         errors={$errors.password}
+         constraints={$constraints.password}
+         autocomplete="current-password"
+      />
    </div>
    <button class="btn">Submit</button>
 </form>

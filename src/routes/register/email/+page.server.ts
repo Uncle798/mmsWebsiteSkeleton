@@ -1,6 +1,6 @@
 import prisma from '$lib/server/prisma';
 import { redirect, fail } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { emailFormSchema } from '$lib/formSchemas/schemas';
 import type { Actions } from './$types';
@@ -15,13 +15,23 @@ export const actions: Actions = {
            fail(400, {emailForm})
        }
        const email = emailForm.data
-       const dbUser = await prisma.user.create({
-         data: {
-            email: email.email,
-            emailVerified: false
-         }
+       const emailInUse = await prisma.user.findUnique({
+            where: {
+                email:email.email,
+            }
        })
-       console.log(dbUser);
+       if(emailInUse){
+            return message(emailForm, 'Email in use please use another');
+       }
+       if(email.email === email.emailConfirm){
+           const dbUser = await prisma.user.create({
+             data: {
+                email: email.email,
+                emailVerified: false
+             }
+           })
+           console.log(dbUser);
+       }
        return { emailForm };
    }
 };

@@ -22,6 +22,21 @@ export const actions: Actions = {
             fail(400, {addressForm})
         }
         const address = addressForm.data
+        const previousAddress = await prisma.contactInfo.findFirst({
+            where: {
+                userId: event.locals.user.id
+            }
+        })
+        if(previousAddress){
+            await prisma.contactInfo.update({
+                where: {
+                    contactId: previousAddress.contactId
+                },
+                data: {
+                    softDelete: true
+                }
+            })
+        }
         const dbAddress = await prisma.contactInfo.create({
             data: { ...address, userId: event.locals.user.id}
         });

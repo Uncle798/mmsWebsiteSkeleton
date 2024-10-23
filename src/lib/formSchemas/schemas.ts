@@ -109,8 +109,6 @@ export const addressFormSchema = z.object({
    country: z.string().min(2).max(2),
    phoneNum1: z.string().min(10).max(12).trim(),
    phoneNum1Country: z.string().min(2).max(2).trim(),
-   phoneNum2: z.string().min(10).max(12).trim().optional(),
-   phoneNum2Country: z.string().min(2).max(2).trim().optional(),
 });
 export type AddressFormSchema = typeof addressFormSchema;
 
@@ -122,6 +120,8 @@ export type NameFormSchema = typeof nameFormSchema;
 
 
 export const registerFormSchema = z.object({
+   familyName: z.string().min(1).max(255).trim(),
+   givenName: z.string().min(1).max(255).trim(),
    email: z.string().min(5).max(255), 
    password: z.string().min(6, 'Password must be at least 6 characters')
       .max(255,'Password can\'t be longer than 255 characters'),

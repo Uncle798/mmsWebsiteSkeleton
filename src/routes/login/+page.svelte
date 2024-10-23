@@ -48,18 +48,13 @@
       })();
     });
   }
-
-
-   const {form, errors, constraints, message, enhance} = superForm(data.form);
 </script>
 
 <svelte:head>
 	<title>{PUBLIC_COMPANY_NAME} | Login</title>
 </svelte:head>
 
-{#if $message}
-   {$message}
-{/if}
+
 <LoginForm data={data.form} />
 
 <a href="/login/resetPassword">Forgot your password?</a>

@@ -11,6 +11,4 @@
 	<title>{PUBLIC_COMPANY_NAME} | Enter your Address</title>
 </svelte:head>
 
-<NameForm data={data.nameForm} />
-
 <AddressForm data={data.addressForm}/>

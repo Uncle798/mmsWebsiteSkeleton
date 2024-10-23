@@ -7,6 +7,8 @@ import { verifyEmailVerificationRequest } from '$lib/server/authUtils';
 import { redirect } from '@sveltejs/kit';
 import { handleLoginRedirect } from '$lib/utils';
 import { ratelimit } from '$lib/server/rateLimit';
+import { generateEmailVerificationRequest } from '$lib/server/authUtils';
+import { mailtrap } from '$lib/server/mailtrap';
 
 import type { PageServerLoad, Actions } from './$types';
 
@@ -20,22 +22,35 @@ export const load:PageServerLoad = (async (event) => {
       throw redirect(302, handleLoginRedirect(event));
    }
    const form = await superValidate(zod(emailVerifySchema));
-   
+   const { success, reset } = await ratelimit.emailVerification.limit(event.locals.user.id)
+   if(!success) {
+      const timeRemaining = Math.floor((reset - Date.now()) /1000);
+      return message(form, `Please wait ${timeRemaining}s before trying again.`)
+   }
+   const { user } = event.locals
+   const verificationCode = await generateEmailVerificationRequest(user.id, user.email!);
+		const sender = {
+			name: 'computer@bransonschlegel.com',
+			email: 'computer@bransonschlegel.com',
+		}
+		mailtrap.send({
+			from:sender,
+			to: [{email: user.email!}],
+			subject: "Please verify your email",
+			html: `Sending a new verification code: ${verificationCode}`
+		}).catch((err) =>{
+			console.error(err);
+		})
    return { form, };
 })
 
 export const actions:Actions = {
    default: async (event) =>{
-      if(!event.locals.user){
-         redirect(302, '/login');
-      }
-
       const form = await superValidate(event.request, zod(emailVerifySchema));
-      
       if(!form.valid) {
          return message(form, 'Code must be 8 characters');
       }
-      const { success, reset } = await ratelimit.emailVerification.limit(event.locals.user.id);
+      const { success, reset } = await ratelimit.login.limit(event.locals.user?.id ?? event.getClientAddress());
       if(!success){
          const timeRemaining = Math.floor((reset - Date.now()) / 1000);
          return message(form, `Please wait ${timeRemaining}s before trying again`);

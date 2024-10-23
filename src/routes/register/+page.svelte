@@ -10,6 +10,9 @@
    import type { registerFormSchema } from "$lib/formSchemas/schemas";
 	import { getModalStore } from "@skeletonlabs/skeleton";
 	import type { PageData } from "./$types";
+	import EmailInput from "$lib/formComponents/EmailInput.svelte";
+	import TextInput from "$lib/formComponents/TextInput.svelte";
+	import PasswordInput from "$lib/formComponents/PasswordInput.svelte";
 	
 	export let data:PageData;
 	let passwordTouched = false;
@@ -47,49 +50,53 @@
 	<h3>{$message}</h3>
 {/if}
 <form method="POST" class="p-4 space-y-4 rounded-container-token" use:enhance>
-	<label for="email">Email
-		<input 
-			type="email" 
-			name="email" 
-			id="email" 
-			class="input" 
-			placeholder="email@email.email" 
-			autocomplete="email" 
-			aria-invalid={$errors.email ? 'true' : undefined} 
-			bind:value={$form.email}
-			{...$constraints.email}
-			/>
-	</label>
-	<label for="password">password
-			<input type="password" name="password" 
-			id="password"
-			class="input"
-			autocomplete="new-password"
-			placeholder="Password"
-			on:change={()=>{
-				passwordTouched=true;
-			}}
-			aria-invalid={$errors.password ? 'true' : undefined}
-			bind:value={$form.password}
-			{...$constraints.password}
+	<div class="flex">
+
+		<TextInput 
+			label="Given Name"
+			name="givenName"
+			value={$form.givenName}
+			errors={$errors.givenName}
+			constraints={$constraints.givenName}
+			placeholder="Smokey"
 		/>
-	</label>
-	{#if $errors.password}
-		<span class="input-error">{$errors.password}</span>
-	{/if}
-	<label for="passwordConfirm">Confirm your password
-		<input type="password" name="passwordConfirm" 
-			id="password" 
-			class="input"
-			placeholder="Password again"
-			aria-invalid={$errors.passwordConfirm ? 'true' : undefined}
-			bind:value={$form.passwordConfirm}
-			{...$constraints.passwordConfirm}
+		<TextInput
+			label="Family Name"
+			name="familyName"
+			value={$form.familyName}
+			errors={$errors.familyName}
+			constraints={$constraints.familyName}
+			placeholder="Bear"
 		/>
-	</label>
-	{#if $errors.passwordConfirm}
-		<span class="input-error">{$errors.passwordConfirm}</span>
-	{/if}
+	</div>
+	<EmailInput 
+		label="Email",
+		name="email"
+		errors={$errors.email}
+		constraints={$constraints.email}
+		value={$form.email}
+	/>
+	<PasswordInput
+		label="Password"
+		name="password"
+		autocomplete="new-password"
+		placeholder="Password"
+		value={$form.password}
+		constraints={$constraints.password}
+		errors={$errors.password}
+		on:change={()=>{
+			passwordTouched=true;
+		}}
+	/>
+	<PasswordInput
+		label="Confirm Password"
+		name="passwordConfirm"
+		placeholder="Password again"
+		value={$form.passwordConfirm}
+		errors={$errors.passwordConfirm}
+		constraints={$constraints.passwordConfirm}
+	/>
+
 	{#if passwordTouched}
 		<label for="password-strength">Password strength: {strengthDescription}</label>
 		<meter id="password-strength" value={score} low="1.9" high="2.9" optimum="4" max="4" />

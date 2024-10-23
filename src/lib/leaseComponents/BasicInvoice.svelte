@@ -7,7 +7,7 @@
    <p>Invoice created: {dayjs(invoice.invoiceCreated).format('M/D/YYYY')}</p>
    <p>Invoice amount: ${invoice.invoiceAmount}</p>
    {#if invoice.invoicePaid}
-      <p>Invoice paid: {dayjs(invoice.invoicePaid).format('M/D/YYYY')}</p>
+      <p><a href="/paymentRecord/{invoice.paymentRecordId}" >Invoice paid: {dayjs(invoice.invoicePaid).format('M/D/YYYY')}</a></p>
    {/if}
    <p>Invoice notes: {invoice.invoiceNotes}</p>
 </div>

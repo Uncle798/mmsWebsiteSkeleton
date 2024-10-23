@@ -35,12 +35,14 @@
    <div class="flex">
       <EmailInput
          value={$form.email}
+         name="email"
          label="Email"
          errors={$errors.email}
          constraints={$constraints.email}
       />
       <EmailInput
          value={$form.emailConfirm}
+         name="confirmEmail"
          label="Confirm email"
          errors={$errors.emailConfirm}
          constraints={$constraints.emailConfirm}

@@ -3,9 +3,13 @@
    import { PUBLIC_COMPANY_NAME } from '$env/static/public'
    import { superForm } from 'sveltekit-superforms';
    import type { PageData } from './$types';
+	import { ProgressRadial } from '@skeletonlabs/skeleton';
    
    export let data: PageData;
-   const { form, errors, constraints, message, enhance } = superForm(data.form);
+   const { form, errors, constraints, message, submitting, delayed, timeout, enhance } = superForm(data.form, {
+      delayMs: 300,
+      timeoutMs: 8000, 
+   });
 </script>
 
 <svelte:head>
@@ -32,5 +36,7 @@
       <span class="invalid">{$errors.code}</span>
    {/if}
    <button type="submit" class="btn">Submit</button>
+   {#if delayed}
+      <ProgressRadial value={undefined} />
+   {/if}
 </form>
-   <a href="/register/emailVerification/resend" class="btn">Send a new code</a>

@@ -73,6 +73,7 @@
     "mailtrap": "^3.4.0",
     "oslo": "^1.2.1",
     "stripe": "^16.6.0",
+    "sv": "^0.5.7",
     "svelte-stripe": "^1.2.0",
     "svelte-tel-input": "^3.5.1",
     "zod": "^3.23.8",

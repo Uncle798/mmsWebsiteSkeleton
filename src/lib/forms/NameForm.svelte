@@ -1,6 +1,6 @@
 <script lang="ts">
    import { superForm } from 'sveltekit-superforms';
-   import { getToastStore } from '@skeletonlabs/skeleton'
+   import { getToastStore, ProgressRadial } from '@skeletonlabs/skeleton'
    import type { ToastSettings } from '@skeletonlabs/skeleton'
    import type { SuperValidated, Infer } from 'sveltekit-superforms/client';
    import type { NameFormSchema } from '$lib/formSchemas/schemas';
@@ -11,7 +11,7 @@
    export let finished=false;
    const modalStore = getModalStore();
    const toastStore = getToastStore();
-   const { form, errors, constraints, message, enhance } = superForm(data, {
+   const { form, errors, constraints, message, delayed, timeout, enhance } = superForm(data, {
       onUpdate(event) {
          if($modalStore[0]){
             modalStore.close();
@@ -29,7 +29,12 @@
       onError(event) {
          console.error(event.result);
       },
+      delayMs: 300,
+      timeoutMs: 8000,
    })
+   function close(){
+      modalStore.close();
+   }
 </script>
 
 {#if $message}
@@ -54,5 +59,13 @@
          placeholder="Bear"
          />
    </div>
-   <button class="btn">Submit</button>
+   <div class="flex">
+      <button class="btn">Submit</button>
+      {#if $modalStore[0]}
+      <button class="btn" on:click={close}>Cancel</button>
+      {/if}
+      {#if $delayed}
+         <ProgressRadial value={undefined} font={12} width='w-10' stroke={100} meter="stroke-primary-500" track="stroke-primary-500/20" strokeLinecap="butt"  />
+      {/if}
+   </div>
 </form>
