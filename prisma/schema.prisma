@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid()) @map("id")
+  id               String          @id @default(cuid()) @map("id") @unique()
   createdAt        DateTime        @default(now()) @map("created_at")
   updatedAt        DateTime?       @updatedAt @map("updated_at")
   email            String?         @unique
@@ -36,11 +36,10 @@ model User {
 }
 
 model ContactInfo {
-  contactId          String  @id @default(cuid())
+  contactId          String  @id @default(cuid()) @unique()
   userId             String
   address1           String
   address2           String?
-  address3           String?
   city               String
   state              String
   zip                String
@@ -54,7 +53,7 @@ model ContactInfo {
 }
 
 model Unit {
-  num             String  @id
+  num             String  @id @unique()
   building        String
   size            String
   description     String
@@ -69,7 +68,7 @@ model Unit {
 }
 
 model Lease {
-  leaseId            String      @id @default(cuid())
+  leaseId            String      @id @default(cuid()) @unique()
   customerId         String
   employeeId         String
   contactInfoId      String
@@ -92,7 +91,7 @@ model Lease {
 }
 
 model PaymentRecord {
-  paymentId        String      @id @default(cuid())
+  paymentId        String      @id @default(cuid()) @unique()
   paymentNumber    Int         @default(autoincrement())
   customerId       String
   unitNum          String?
@@ -113,13 +112,13 @@ model PaymentRecord {
 }
 
 model Invoice {
-  invoiceId       String         @id @default(cuid())
+  invoiceId       String         @id @default(cuid()) @unique()
   invoiceNum      Int            @default(autoincrement())
   customerId      String?
   leaseId         String
   invoiceAmount   Int
   invoiceCreated  DateTime       @default(now())
-  paymentRecordId String?        @unique
+  paymentRecordId String?
   invoicePaid     DateTime?
   invoiceNotes    String?
   customer        User?          @relation(fields: [customerId], references: [id])
